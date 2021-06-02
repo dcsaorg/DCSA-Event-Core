@@ -15,6 +15,7 @@ import org.dcsa.core.events.service.EventService;
 import org.dcsa.core.events.util.ExtendedGenericEventRequest;
 import org.dcsa.core.exception.GetException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
+import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,10 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
         return getService().getModelClass().getSimpleName();
     }
 
+    protected ExtendedRequest<? extends Event> newExtendedRequest() {
+        return new ExtendedGenericEventRequest(extendedParameters, r2dbcDialect);
+    }
+
     @Operation(summary = "Find all Events", description = "Finds all Events in the database", tags = { "Events" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
@@ -51,16 +56,17 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
     })
     @GetMapping
     public Flux<Event> findAll(ServerHttpResponse response, ServerHttpRequest request) {
-        ExtendedGenericEventRequest extendedGenericEventRequest = new ExtendedGenericEventRequest(extendedParameters, r2dbcDialect);
+        @SuppressWarnings({"unchecked"})
+        ExtendedRequest<Event> extendedRequest = (ExtendedRequest<Event>)newExtendedRequest();
         try {
-            extendedGenericEventRequest.parseParameter(request.getQueryParams());
+            extendedRequest.parseParameter(request.getQueryParams());
         } catch (GetException getException) {
             return Flux.error(getException);
         }
 
-        return getService().findAllExtended(extendedGenericEventRequest)
+        return getService().findAllExtended(extendedRequest)
                 .doOnComplete(
-                        () -> extendedGenericEventRequest.insertHeaders(response, request)
+                        () -> extendedRequest.insertHeaders(response, request)
                 );
     }
 
