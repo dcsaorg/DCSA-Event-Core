@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.dcsa.core.controller.BaseController;
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.service.EventService;
-import org.dcsa.core.events.util.ExtendedGenericEventRequest;
 import org.dcsa.core.exception.GetException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
@@ -32,7 +31,7 @@ import java.util.UUID;
 
 @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
 @Tag(name = "Events", description = "The event API")
-public abstract class AbstractEventController<S extends EventService<Event>> extends BaseController<S, Event, UUID> {
+public abstract class AbstractEventController<S extends EventService<T>, T extends Event> extends BaseController<S, T, UUID> {
 
     @Autowired
     protected ExtendedParameters extendedParameters;
@@ -45,9 +44,7 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
         return getService().getModelClass().getSimpleName();
     }
 
-    protected ExtendedRequest<? extends Event> newExtendedRequest() {
-        return new ExtendedGenericEventRequest(extendedParameters, r2dbcDialect);
-    }
+    protected abstract ExtendedRequest<T> newExtendedRequest();
 
     @Operation(summary = "Find all Events", description = "Finds all Events in the database", tags = { "Events" })
     @ApiResponses(value = {
@@ -55,9 +52,8 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
                     content = @Content(array = @ArraySchema(schema = @Schema(implementation = Event.class))))
     })
     @GetMapping
-    public Flux<Event> findAll(ServerHttpResponse response, ServerHttpRequest request) {
-        @SuppressWarnings({"unchecked"})
-        ExtendedRequest<Event> extendedRequest = (ExtendedRequest<Event>)newExtendedRequest();
+    public Flux<T> findAll(ServerHttpResponse response, ServerHttpRequest request) {
+        ExtendedRequest<T> extendedRequest = newExtendedRequest();
         try {
             extendedRequest.parseParameter(request.getQueryParams());
         } catch (GetException getException) {
@@ -79,7 +75,7 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
     })
     @GetMapping(value="{id}", produces = "application/json")
     @Override
-    public Mono<Event> findById(@PathVariable UUID id) {
+    public Mono<T> findById(@PathVariable UUID id) {
         return super.findById(id);
     }
 
@@ -89,21 +85,21 @@ public abstract class AbstractEventController<S extends EventService<Event>> ext
     })
     @PostMapping(consumes = "application/json", produces = "application/json")
     @Override
-    public Mono<Event> create(@Valid @RequestBody Event event) {
+    public Mono<T> create(@Valid @RequestBody T event) {
         return super.create(event);
     }
 
     @PutMapping({"{id}"})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ApiResponse(responseCode = "403", description = "Changes to events are not permitted")
-    public Mono<Event> update(@PathVariable UUID id, @RequestBody Event event) {
+    public Mono<T> update(@PathVariable UUID id, @RequestBody T event) {
         return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ApiResponse(responseCode = "403", description = "Deletion of events are not permitted")
-    public Mono<Void> delete(@RequestBody Event event) {
+    public Mono<Void> delete(@RequestBody T event) {
         return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
 
