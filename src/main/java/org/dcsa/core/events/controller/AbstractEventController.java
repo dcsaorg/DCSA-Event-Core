@@ -1,14 +1,5 @@
 package org.dcsa.core.events.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.dcsa.core.controller.BaseController;
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.service.EventService;
@@ -30,7 +21,6 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-@Tag(name = "Events", description = "The event API")
 public abstract class AbstractEventController<S extends EventService<T>, T extends Event> extends BaseController<S, T, UUID> {
 
     @Autowired
@@ -46,11 +36,6 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
 
     protected abstract ExtendedRequest<T> newExtendedRequest();
 
-    @Operation(summary = "Find all Events", description = "Finds all Events in the database", tags = { "Events" })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = Event.class))))
-    })
     @GetMapping
     public Flux<T> findAll(ServerHttpResponse response, ServerHttpRequest request) {
         ExtendedRequest<T> extendedRequest = newExtendedRequest();
@@ -66,23 +51,12 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
                 );
     }
 
-    @Operation(summary = "Find Event by ID", description = "Returns a single Event", tags = { "Event" }, parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", description="Id of the Event to be obtained. Cannot be empty.", required=true),
-    })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation"),
-            @ApiResponse(responseCode = "404", description = "Event not found")
-    })
     @GetMapping(value="{id}", produces = "application/json")
     @Override
     public Mono<T> findById(@PathVariable UUID id) {
         return super.findById(id);
     }
 
-    @Operation(summary = "Save any type of event", description = "Saves any type of event", tags = { "Events" })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successful operation")
-    })
     @PostMapping(consumes = "application/json", produces = "application/json")
     @Override
     public Mono<T> create(@Valid @RequestBody T event) {
@@ -91,21 +65,18 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
 
     @PutMapping({"{id}"})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ApiResponse(responseCode = "403", description = "Changes to events are not permitted")
     public Mono<T> update(@PathVariable UUID id, @RequestBody T event) {
         return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ApiResponse(responseCode = "403", description = "Deletion of events are not permitted")
     public Mono<Void> delete(@RequestBody T event) {
         return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
 
     @DeleteMapping({"{id}"})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ApiResponse(responseCode = "403", description = "Deletion of events are not permitted")
     public Mono<Void> deleteById(@PathVariable UUID id) {
         return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
