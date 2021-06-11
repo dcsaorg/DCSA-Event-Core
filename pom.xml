@@ -18,9 +18,9 @@
 	<properties>
 		<java.version>11</java.version>
         <groovy.version>3.0.2</groovy.version>
-		<dcsa.version>0.8.2-SNAPSHOT</dcsa.version>
-		<dcsa.tag/>
-		<dcsa.artifacttype/>
+		<dcsa.version>0.8.2</dcsa.version>
+		<dcsa.core.tag/>
+		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
 	</properties>
 
 	<dependencies>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.dcsa</groupId>
 			<artifactId>dcsa_core</artifactId>
-			<version>${dcsa.version}${dcsa.tag}${dcsa.artifacttype}</version>
+			<version>${dcsa.version}${dcsa.core.tag}${dcsa.artifacttype}</version>
 		</dependency>
 
 		<dependency>
