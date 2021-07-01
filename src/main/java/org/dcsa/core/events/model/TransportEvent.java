@@ -13,6 +13,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @JsonTypeName("TRANSPORT")
 public class TransportEvent extends Event {
 
+    @Column("transport_event_type_code")
+    private String transportEventTypeCode;
+
     @Column("delay_reason_code")
     private String delayReasonCode;
 

@@ -1,6 +1,5 @@
 package org.dcsa.core.events.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,11 +13,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @JsonTypeName("EQUIPMENT")
 public class EquipmentEvent extends Event {
 
-    @JsonProperty("equipmentReference")
+    @Column("equipment_event_type_code")
+    private String equipmentEventTypeCode;
+
     @Column("equipment_reference")
     private String equipmentReference;
 
-    @JsonProperty("emptyIndicatorCode")
     @Column("empty_indicator_code")
     private EmptyIndicatorCode emptyIndicatorCode;
 

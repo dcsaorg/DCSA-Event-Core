@@ -126,7 +126,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
         Table eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
-        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentId");
+        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentID");
         Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
         Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
         Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);

@@ -52,6 +52,4 @@ public class Event extends AuditBase implements Message {
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;
 
-    @Column("event_type_code")
-    private String eventTypeCode;
 }
