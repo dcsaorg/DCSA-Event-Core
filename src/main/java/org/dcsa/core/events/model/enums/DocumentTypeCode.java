@@ -1,6 +1,8 @@
 package org.dcsa.core.events.model.enums;
 
-public enum ShipmentInformationTypeCode {
+public enum DocumentTypeCode {
+    BKG,
+    @Deprecated
     BOK,
     SHI,
     VGM,

@@ -13,6 +13,7 @@ import org.dcsa.core.extendedrequest.QueryField;
 import org.dcsa.core.extendedrequest.QueryFields;
 import org.dcsa.core.query.DBEntityAnalysis;
 import org.dcsa.core.util.ReflectUtility;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.data.relational.core.sql.Join;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
@@ -125,7 +126,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
         Table eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
-        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentId");
+        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentID");
         Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
         Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
         Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
@@ -141,6 +142,9 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             }
             while (currentClass != Event.class) {
                 for (Field field : currentClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Transient.class)) {
+                        continue;
+                    }
                     QueryField queryField = QueryFields.queryFieldFromField(Event.class, field, clazz, eventTable, true);
                     if (seen.add(queryField.getJsonName())) {
                         builder = builder.registerQueryField(queryField);
