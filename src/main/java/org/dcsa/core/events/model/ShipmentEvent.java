@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.enums.DocumentTypeCode;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Table("shipment_event")
@@ -20,8 +20,13 @@ public class ShipmentEvent extends Event {
     @Column("document_type_code")
     private DocumentTypeCode documentTypeCode;
 
-    @Column("shipment_id")
-    private UUID shipmentID;
+    @Column("document_id")
+    @Size(max = 100)
+    private UUID documentId;
+
+    @Column("reason")
+    @Size(max = 100)
+    private String reason;
 
     @JsonProperty("shipmentInformationTypeCode")
     public DocumentTypeCode getShipmentInformationTypeCode() {
