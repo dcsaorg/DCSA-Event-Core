@@ -7,6 +7,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.List;
+import java.util.UUID;
+
 @Table("transport_event")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -27,4 +30,7 @@ public class TransportEvent extends Event {
 
     @Transient
     private TransportCall transportCall;
+
+    @Transient
+    private List<Reference> references;
 }
