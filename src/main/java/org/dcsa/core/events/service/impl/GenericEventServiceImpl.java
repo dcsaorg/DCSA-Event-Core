@@ -43,22 +43,17 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
         Flux<Event> events = super.findAllExtended(extendedRequest);
 
-        Flux<TransportEvent> transportEvents = events
-                .filter(event -> event.getEventType() == EventType.TRANSPORT)
-                .map(event -> (TransportEvent) event)
-                .flatMap(transportEventService::mapTransportCall)
-                .flatMap(transportEventService::mapReferences)
-                .flatMap(transportEventService::mapDocumentReferences);
-
-        Flux<ShipmentEvent> shipmentEvents = events
-                .filter(event -> event.getEventType() == EventType.SHIPMENT)
-                .map(event -> (ShipmentEvent) event);
-
-        Flux<EquipmentEvent> equipmentEvents = events
-                .filter(event -> event.getEventType() == EventType.EQUIPMENT)
-                .map(event -> (EquipmentEvent) event);
-
-        return Flux.merge(transportEvents, shipmentEvents, equipmentEvents);
+        return events.flatMap(event -> {
+            switch (event.getEventType()) {
+                case TRANSPORT:
+                    return Mono.just((TransportEvent) event)
+                            .flatMap(transportEventService::mapTransportCall)
+                            .flatMap(transportEventService::mapReferences)
+                            .flatMap(transportEventService::mapDocumentReferences);
+                default:
+                    return Mono.just(event);
+            }
+        });
     }
 
     @Override
