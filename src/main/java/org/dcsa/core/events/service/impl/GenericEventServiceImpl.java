@@ -1,8 +1,10 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.*;
-import org.dcsa.core.events.model.enums.EventType;
+import org.dcsa.core.events.model.EquipmentEvent;
+import org.dcsa.core.events.model.Event;
+import org.dcsa.core.events.model.ShipmentEvent;
+import org.dcsa.core.events.model.TransportEvent;
 import org.dcsa.core.events.repository.EventRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.GenericEventService;
@@ -46,10 +48,9 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         return events.flatMap(event -> {
             switch (event.getEventType()) {
                 case TRANSPORT:
-                    return Mono.just((TransportEvent) event)
-                            .flatMap(transportEventService::mapTransportCall)
-                            .flatMap(transportEventService::mapReferences)
-                            .flatMap(transportEventService::mapDocumentReferences);
+                    return transportEventService.loadRelatedEntities((TransportEvent) event);
+                case EQUIPMENT:
+                    return equipmentEventService.loadRelatedEntities((EquipmentEvent) event);
                 default:
                     return Mono.just(event);
             }
