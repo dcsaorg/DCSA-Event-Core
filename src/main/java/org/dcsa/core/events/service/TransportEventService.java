@@ -8,4 +8,6 @@ public interface TransportEventService extends EventService<TransportEvent> {
     Flux<TransportEvent> mapTransportCall(Flux<TransportEvent> transportEvents);
 
     Mono<TransportEvent> mapReferences(TransportEvent transportEvents);
+
+    Mono<TransportEvent> mapDocumentReferences(TransportEvent transportEvent);
 }
