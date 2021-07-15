@@ -46,6 +46,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         Flux<TransportEvent> transportEvents = events
                 .filter(event -> event.getEventType() == EventType.TRANSPORT)
                 .map(event -> (TransportEvent) event)
+                .flatMap(transportEventService::mapTransportCall)
                 .flatMap(transportEventService::mapReferences)
                 .flatMap(transportEventService::mapDocumentReferences);
 

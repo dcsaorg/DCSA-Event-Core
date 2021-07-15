@@ -8,6 +8,7 @@ import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.TransportCallRepository;
 import org.dcsa.core.events.service.TransportCallService;
+import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.dcsa.core.events.repository.TransportEventRepository;
 import org.dcsa.core.events.service.TransportEventService;
@@ -28,6 +29,9 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     private TransportCallRepository transportCallRepository;
 
     @Autowired
+    private TransportCallTOService transportCallTOService;
+
+    @Autowired
     private ReferenceRepository referenceRepository;
 
 
@@ -43,16 +47,17 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     }
 
     @Override
-    public Flux<TransportEvent> mapTransportCall(Flux<TransportEvent> transportEvents){
-        return transportEvents
-                .flatMap(transportEvent ->
-                        transportCallService.findById(transportEvent.getTransportCallID())
-                                .doOnNext(transportEvent::setTransportCall)
-                                .thenReturn(transportEvent));
+    public Mono<TransportEvent> mapTransportCall(TransportEvent transportEvent){
+        return transportCallTOService
+                .findById(transportEvent.getTransportCallID())
+                .doOnNext(transportEvent::setTransportCall)
+                .thenReturn(transportEvent);
     }
 
     @Override
     public Mono<TransportEvent> mapReferences(TransportEvent transportEvent) {
+        // FIXME: Remove comment after test
+        // Flux<Reference> references = transportCallRepository.findShipmentIDByTransportCallID("770b7624-403d-11eb-b44b-d3f4ad185387")
         Flux<Reference> references = transportCallRepository
                 .findShipmentIDByTransportCallID(transportEvent.getTransportCallID())
                 .flatMapMany(referenceRepository::findByShipmentID);
