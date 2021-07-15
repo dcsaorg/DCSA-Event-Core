@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
-import org.dcsa.core.events.repository.ReferenceRepository;
-import org.dcsa.core.events.repository.TransportCallRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.GenericEventService;
 import org.dcsa.core.events.service.ShipmentEventService;
@@ -48,7 +46,8 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         Flux<TransportEvent> transportEvents = events
                 .filter(event -> event.getEventType() == EventType.TRANSPORT)
                 .map(event -> (TransportEvent) event)
-                .flatMap(transportEventService::mapReferences);
+                .flatMap(transportEventService::mapReferences)
+                .flatMap(transportEventService::mapDocumentReferences);
 
         Flux<ShipmentEvent> shipmentEvents = events
                 .filter(event -> event.getEventType() == EventType.SHIPMENT)

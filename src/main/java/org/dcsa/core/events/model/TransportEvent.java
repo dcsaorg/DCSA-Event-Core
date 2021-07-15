@@ -3,11 +3,15 @@ package org.dcsa.core.events.model;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dcsa.core.events.model.enums.DocumentReferenceType;
+import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Table("transport_event")
@@ -30,6 +34,9 @@ public class TransportEvent extends Event {
 
     @Transient
     private TransportCall transportCall;
+
+    @Transient
+    private List<DocumentReferenceTO> documentReferences;
 
     @Transient
     private List<Reference> references;

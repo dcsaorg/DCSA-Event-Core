@@ -3,6 +3,8 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.TransportEvent;
+import org.dcsa.core.events.model.enums.DocumentReferenceType;
+import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.TransportCallRepository;
 import org.dcsa.core.events.service.TransportCallService;
@@ -56,6 +58,19 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
                 .flatMapMany(referenceRepository::findByShipmentID);
         return references.collectList()
                 .doOnNext(transportEvent::setReferences)
+                .thenReturn(transportEvent);
+    }
+
+    @Override
+    public Mono<TransportEvent> mapDocumentReferences(TransportEvent transportEvent) {
+        Flux<DocumentReferenceTO> bookingReferences = transportCallRepository
+                .findBookingReferencesByTransportCallID(transportEvent.getTransportCallID())
+                .map(bRef -> DocumentReferenceTO.of(DocumentReferenceType.BKG, bRef));
+        Flux<DocumentReferenceTO> transportDocumentReferences = transportCallRepository
+                .findTransportDocumentReferencesByTransportCallID(transportEvent.getTransportCallID())
+                .map(tRef -> DocumentReferenceTO.of(DocumentReferenceType.TRD, tRef));
+        return Flux.merge(bookingReferences, transportDocumentReferences).collectList()
+                .doOnNext(transportEvent::setDocumentReferences)
                 .thenReturn(transportEvent);
     }
 }
