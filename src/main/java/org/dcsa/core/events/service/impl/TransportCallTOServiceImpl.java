@@ -16,4 +16,5 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     public TransportCallTORepository getRepository() {
         return transportCallTORepository;
     }
+
 }
