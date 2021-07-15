@@ -56,8 +56,6 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
 
     @Override
     public Mono<TransportEvent> mapReferences(TransportEvent transportEvent) {
-        // FIXME: Remove comment after test
-        // Flux<Reference> references = transportCallRepository.findShipmentIDByTransportCallID("770b7624-403d-11eb-b44b-d3f4ad185387")
         Flux<Reference> references = transportCallRepository
                 .findShipmentIDByTransportCallID(transportEvent.getTransportCallID())
                 .flatMapMany(referenceRepository::findByShipmentID);
