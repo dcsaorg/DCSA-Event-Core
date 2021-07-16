@@ -23,14 +23,13 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
     Flux<String> findBookingReferencesByTransportCallID(String transportCallID);
 
     @Query("SELECT transport_call.*" +
-    " FROM facility, transport, transport_call" +
-    " WHERE un_location_code = :unLocationCode" +
-    " AND facility.facility_smdg_code = :smdgCode" +
-    " AND transport_call.facility_id = facility.id" +
-    " AND transport.mode_of_transport = (SELECT mode_of_transport_code FROM dcsa_im_v3_0.mode_of_transport WHERE mode_of_transport.dcsa_transport_type = :modeOfTransport)" +
-    " AND transport.vessel_imo_number = :vesselIMONumber" +
-    " AND (transport.load_transport_call_id = transport_call.id OR transport_call.id = transport.discharge_transport_call_id)"
-    )
+            " FROM facility, transport, transport_call" +
+            " WHERE un_location_code = :unLocationCode" +
+            " AND facility.facility_smdg_code = :smdgCode" +
+            " AND transport_call.facility_id = facility.id" +
+            " AND transport.mode_of_transport = (SELECT mode_of_transport_code FROM dcsa_im_v3_0.mode_of_transport WHERE mode_of_transport.dcsa_transport_type = :modeOfTransport)" +
+            " AND transport.vessel_imo_number = :vesselIMONumber" +
+            " AND (transport.load_transport_call_id = transport_call.id OR transport_call.id = transport.discharge_transport_call_id)")
     Mono<TransportCall> getTransportCall(String unLocationCode, String smdgCode, String modeOfTransport, String vesselIMONumber);
 
     @Query("SELECT DISTINCT transport_document.transport_document_reference from dcsa_im_v3_0.transport_document transport_document"
