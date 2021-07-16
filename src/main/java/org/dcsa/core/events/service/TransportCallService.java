@@ -1,6 +1,7 @@
 package org.dcsa.core.events.service;
 
 import org.dcsa.core.events.model.Reference;
+import org.dcsa.core.events.model.Seal;
 import org.dcsa.core.events.model.TransportCall;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.service.BaseService;
@@ -13,4 +14,6 @@ public interface TransportCallService extends BaseService<TransportCall, String>
     Mono<List<DocumentReferenceTO>> findDocumentReferencesForTransportCallID(String transportCallID);
 
     Mono<List<Reference>> findReferencesForTransportCallID(String transportCallID);
+
+    Mono<List<Seal>> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference);
 }

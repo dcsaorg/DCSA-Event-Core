@@ -40,6 +40,9 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                                 .doOnNext(equipmentEvent::setReferences)
                                 .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
                                 .doOnNext(equipmentEvent::setDocumentReferences)
+                                .then(Mono.justOrEmpty(event.getEquipmentReference()))
+                                .flatMap(equipmentReference -> transportCallService.findSealsForTransportCallIDAndEquipmentReference(event.getTransportCallID(), equipmentReference))
+                                .doOnNext(equipmentEvent::setSeals)
                                 .thenReturn(equipmentEvent)
                 );
     }
