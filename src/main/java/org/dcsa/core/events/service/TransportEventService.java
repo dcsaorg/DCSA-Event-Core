@@ -4,9 +4,7 @@ import org.dcsa.core.events.model.TransportEvent;
 import reactor.core.publisher.Mono;
 
 public interface TransportEventService extends EventService<TransportEvent> {
+    Mono<TransportEvent> loadRelatedEntities(TransportEvent event);
+
     Mono<TransportEvent> mapTransportCall(TransportEvent transportEvent);
-
-    Mono<TransportEvent> mapReferences(TransportEvent transportEvent);
-
-    Mono<TransportEvent> mapDocumentReferences(TransportEvent transportEvent);
 }
