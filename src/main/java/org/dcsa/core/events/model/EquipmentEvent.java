@@ -38,4 +38,7 @@ public class EquipmentEvent extends Event {
 
     @Transient
     private List<Reference> references;
+
+    @Transient
+    private List<Seal> seals;
 }

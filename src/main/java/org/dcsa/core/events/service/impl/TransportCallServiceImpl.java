@@ -2,6 +2,7 @@ package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
+import org.dcsa.core.events.model.Seal;
 import org.dcsa.core.events.model.TransportCall;
 import org.dcsa.core.events.model.TransportEvent;
 import org.dcsa.core.events.model.enums.DocumentReferenceType;
@@ -43,6 +44,12 @@ public class TransportCallServiceImpl extends ExtendedBaseServiceImpl<TransportC
         return transportCallRepository
                 .findShipmentIDByTransportCallID(transportCallID)
                 .flatMapMany(referenceRepository::findByShipmentID)
+                .collectList();
+    }
+
+    @Override
+    public Mono<List<Seal>> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference) {
+        return transportCallRepository.findSealsForTransportCallIDAndEquipmentReference(transportCallID, equipmentReference)
                 .collectList();
     }
 
