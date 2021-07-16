@@ -23,6 +23,9 @@ public class ShipmentEvent extends Event {
     @Column("document_id")
     private String documentID;
 
+    @Column("reason")
+    private String reason;
+
     @JsonProperty("shipmentID")
     public UUID getShipmentID() {
         if (documentTypeCode == DocumentTypeCode.SHI) {

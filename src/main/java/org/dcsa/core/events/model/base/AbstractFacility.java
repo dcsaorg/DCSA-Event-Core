@@ -37,6 +37,6 @@ public class AbstractFacility {
     private String facilitySMGDCode;
 
     @JsonIgnore
-    @Column("location")
+    @Column("location_id")
     private String locationID;
 }
