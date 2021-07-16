@@ -22,11 +22,19 @@ public class ShipmentEvent extends Event {
 
     @Column("document_id")
     @Size(max = 100)
-    private UUID documentId;
+    private String documentID;
 
     @Column("reason")
     @Size(max = 100)
     private String reason;
+
+    @JsonProperty("shipmentID")
+    public UUID getShipmentID() {
+        if (documentTypeCode == DocumentTypeCode.SHI) {
+            return UUID.fromString(documentID);
+        }
+        return null;
+    }
 
     @JsonProperty("shipmentInformationTypeCode")
     public DocumentTypeCode getShipmentInformationTypeCode() {

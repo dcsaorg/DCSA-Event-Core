@@ -1,6 +1,7 @@
 package org.dcsa.core.events.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -33,6 +34,7 @@ public class Address {
     private String floor;
 
     @Column("postal_code")
+    @JsonProperty("postCode")
     @Size(max = 10)
     private String postalCode;
 
