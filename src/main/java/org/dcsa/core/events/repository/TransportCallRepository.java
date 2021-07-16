@@ -39,4 +39,14 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
             + " WHERE shipment_equipment.equipment_reference = :equipmentReference"
             + " AND (transport.load_transport_call_id = :transportCallID OR transport.discharge_transport_call_id = :transportCallID)")
     Flux<Seal> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference);
+
+    @Query("SELECT transport_call.* FROM transport_call"
+            + " JOIN facility ON (facility.id = transport_call.facility_id)"
+            + " JOIN transport ON (transport.load_transport_call_id = transport_call.id OR transport.discharge_transport_call_id = transport_call.id)"
+            + " JOIN mode_of_transport ON (mode_of_transport.mode_of_transport_code = transport.mode_of_transport)"
+            + " WHERE transport.vessel_imo_number = :vesselIMONumber"
+            + " AND mode_of_transport.dcsa_transport_type = :modeOfTransport"
+            + " AND facility.facility_smdg_code = :facilitySMDGCode"
+            + " AND facility.un_location_code = :UNLocationCode")
+    Mono<TransportCall> getTransportCall(String UNLocationCode, String facilitySMDGCode, String modeOfTransport, String vesselIMONumber);
 }
