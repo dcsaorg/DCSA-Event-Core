@@ -42,7 +42,17 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
         ExtendedRequest<TransportCallTO> extendedRequest = newExtendedRequest();
         extendedRequest.parseParameter(Map.of("transportCallID", List.of(id)));
         return transportCallTORepository.findAllExtended(extendedRequest)
-                .single();
+                .take(2)
+                .collectList()
+                .flatMap(transportCallTOs -> {
+                    if (transportCallTOs.size() > 1) {
+                        throw new AssertionError("transportID is not unique");
+                    }
+                    if (transportCallTOs.isEmpty()) {
+                        return Mono.empty();
+                    }
+                    return Mono.just(transportCallTOs.get(0));
+                });
     }
 
     @Override
