@@ -126,7 +126,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
         Table eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
-        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentID");
+        String shipmentEventDocumentIDColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
         Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
         Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
         Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
@@ -156,7 +156,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         if (includesShipmentEvents) {
             builder = builder
                     .join(Join.JoinType.JOIN, eventTable, shipmentTable)
-                    .onEqualsThen(shipmentEventShipmentIdColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
+                    .onEqualsThen(shipmentEventDocumentIDColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
                     .chainJoin(shipmentEquipmentTable)
                     .onEqualsThen(SHIPMENT_TABLE_ID_COLUMN_NAME, SHIPMENT_EQUIPMENT_SHIPMENT_ID_COLUMN_NAME)
                     .chainJoin(cargoItemTable)
