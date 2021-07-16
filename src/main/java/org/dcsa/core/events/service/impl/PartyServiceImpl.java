@@ -29,7 +29,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
     }
 
     @Override
-    public Mono<PartyTO> ensureResolvable(PartyTO partyTO){
+    public Mono<PartyTO> ensureResolvable(PartyTO partyTO) {
         Address address = partyTO.getAddress();
         Mono<PartyTO> partyTOMono;
         if (address != null) {
@@ -41,11 +41,10 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
         }
 
         return partyTOMono
-                .flatMap(pTo -> Util.resolveModelReference(
+                .flatMap(pTo -> Util.createOrFindByContent(
                         pTo,
                         partyRepository::findByContent,
-                        pTO -> this.create(pTO.toParty()),
-                        "Party"
+                        pTO -> this.create(pTO.toParty())
                 )).map(party -> party.toPartyTO(partyTO.getAddress()));
     }
 }
