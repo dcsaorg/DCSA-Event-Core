@@ -51,6 +51,8 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
                     return transportEventService.loadRelatedEntities((TransportEvent) event);
                 case EQUIPMENT:
                     return equipmentEventService.loadRelatedEntities((EquipmentEvent) event);
+                case SHIPMENT:
+                    return shipmentEventService.loadRelatedEntities((ShipmentEvent)event);
                 default:
                     return Mono.just(event);
             }
