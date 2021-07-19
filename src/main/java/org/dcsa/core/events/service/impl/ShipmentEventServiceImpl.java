@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -43,54 +42,60 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
             .apply(
                 shipmentEvent,
                 referenceRepository.findByCarrierBookingReference(shipmentEvent.getDocumentID()))
-            .doOnNext(
+            .flatMap(
                 se ->
-                    transformDocRefs
-                        .apply(
-                            DocumentReferenceType.BKG,
-                            Flux.merge(
+                    Flux.merge(
+                            transformDocRefs.apply(
+                                DocumentReferenceType.TRD,
                                 shipmentEventRepository
                                     .findTransportDocumentRefsByCarrierBookingRef(
-                                        se.getDocumentID()),
-                                Flux.just(se.getDocumentID())))
-                        .doOnNext(se::setDocumentReferences)
-                        .subscribe());
+                                        se.getDocumentID())),
+                            transformDocRefs.apply(
+                                DocumentReferenceType.BKG, Flux.just(se.getDocumentID())))
+                        .collectList()
+                        .doOnNext(shipmentEvent::setDocumentReferences)
+                        .thenReturn(shipmentEvent));
       case TRD:
         return shipmentEventReferences
             .apply(
                 shipmentEvent,
                 referenceRepository.findByTransportDocumentReference(shipmentEvent.getDocumentID()))
-            .doOnNext(
+            .flatMap(
                 se ->
-                    transformDocRefs
-                        .apply(
-                            DocumentReferenceType.TRD,
-                            Flux.merge(
+                    Flux.merge(
+                            transformDocRefs.apply(
+                                DocumentReferenceType.BKG,
                                 shipmentEventRepository
                                     .findCarrierBookingRefsByTransportDocumentRef(
-                                        se.getDocumentID()),
-                                Flux.just(se.getDocumentID())))
-                        .doOnNext(se::setDocumentReferences)
-                        .subscribe());
+                                        se.getDocumentID())),
+                            transformDocRefs.apply(
+                                DocumentReferenceType.TRD, Flux.just(se.getDocumentID())))
+                        .collectList()
+                        .doOnNext(shipmentEvent::setDocumentReferences)
+                        .thenReturn(shipmentEvent));
       case SHI:
         return shipmentEventReferences
             .apply(
                 shipmentEvent,
                 referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
-            .doOnNext(
+            .flatMap(
                 se ->
-                    transformDocRefs
-                        .apply(
-                            DocumentReferenceType.SHI,
-                            Flux.merge(
-                                shipmentEventRepository.findCarrierBookingRefsByShipmentId(
-                                    se.getShipmentID()),
-                                shipmentEventRepository.findTransportDocumentRefsByShipmentId(
-                                    se.getShipmentID())))
-                        .doOnNext(se::setDocumentReferences)
-                        .subscribe());
+                    Flux.merge(
+                            transformDocRefs.apply(
+                                DocumentReferenceType.BKG,
+                                shipmentEventRepository
+                                    .findCarrierBookingRefsByShippingInstructionID(
+                                        se.getDocumentID())),
+                            transformDocRefs.apply(
+                                DocumentReferenceType.TRD,
+                                shipmentEventRepository
+                                    .findTransportDocumentRefsByShippingInstructionID(
+                                        se.getDocumentID())))
+                        .collectList()
+                        .doOnNext(shipmentEvent::setDocumentReferences)
+                        .thenReturn(shipmentEvent));
       default:
-        return Mono.justOrEmpty(shipmentEvent);
+        return Mono.just(shipmentEvent);
     }
   }
 
@@ -104,8 +109,7 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
                               .doOnNext(shipmentEvent::setReferences)
                               .thenReturn(shipmentEvent));
 
-  private final BiFunction<DocumentReferenceType, Flux<String>, Mono<List<DocumentReferenceTO>>>
+  private final BiFunction<DocumentReferenceType, Flux<String>, Flux<DocumentReferenceTO>>
       transformDocRefs =
-          (dcRt, docRefsFlux) ->
-              docRefsFlux.map(dRef -> DocumentReferenceTO.of(dcRt, dRef)).collectList();
+          (dcRt, docRefsFlux) -> docRefsFlux.map(dRef -> DocumentReferenceTO.of(dcRt, dRef));
 }

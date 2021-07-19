@@ -35,12 +35,13 @@ public interface ShipmentEventRepository extends ExtendedRepository<ShipmentEven
       "SELECT DISTINCT td.transport_document_reference FROM transport_document td "
           + "JOIN shipping_instruction si ON td.shipping_instruction_id  = si .id "
           + "JOIN cargo_item ci ON si.id = ci.shipping_instruction_id "
-          + "WHERE ci.shipment_id = :shipmentId")
-  Flux<String> findTransportDocumentRefsByShipmentId(UUID shipmentId);
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
+  Flux<String> findTransportDocumentRefsByShippingInstructionID(String shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "WHERE s.id = :shipmentId")
-  Flux<String> findCarrierBookingRefsByShipmentId(UUID shipmentId);
+          + "JOIN cargo_item ci ON s.id = ci.shipment_id "
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
+  Flux<String> findCarrierBookingRefsByShippingInstructionID(String shippingInstructionID);
 }
