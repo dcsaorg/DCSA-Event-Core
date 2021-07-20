@@ -43,9 +43,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
 
     @Override
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
-        Flux<Event> events = super.findAllExtended(extendedRequest);
-
-        return events.flatMap(event -> {
+        return super.findAllExtended(extendedRequest).concatMap(event -> {
             switch (event.getEventType()) {
                 case TRANSPORT:
                     return transportEventService.loadRelatedEntities((TransportEvent) event);
