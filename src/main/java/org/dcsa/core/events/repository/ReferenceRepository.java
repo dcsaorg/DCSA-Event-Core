@@ -42,4 +42,14 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
           + "JOIN transport_document td2 ON  td2.shipping_instruction_id = si.id "
           + "WHERE td2.transport_document_reference = :transportDocumentReference ) ")
   Flux<Reference> findByTransportDocumentReference(String transportDocumentReference);
+
+  @Query(
+      "SELECT \"references\".* FROM \"references\" "
+          + "LEFT JOIN shipment s ON shipment_id = s.id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingReference "
+          + "OR shipping_instruction_id IN ( SELECT si.id from shipping_instruction si "
+          + "JOIN cargo_item ci ON ci.shipping_instruction_id = si.id "
+          + "JOIN shipment s ON ci.shipment_id = s.id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingReference)")
+  Flux<Reference> findByCarrierBookingReference(String carrierBookingReference);
 }
