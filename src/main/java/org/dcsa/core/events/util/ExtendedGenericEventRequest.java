@@ -47,9 +47,33 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String TRANSPORT_CALL_ID_COLUMN_NAME = "id";
 
     private static final String TRANSPORT_TABLE_NAME = "transport";
+    private static final String TRANSPORT_ID_COLUMN_NAME = "id";
     private static final String TRANSPORT_LOAD_TRANSPORT_CALL_ID_COLUMN_NAME = "load_transport_call_id";
     private static final String TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME = "discharge_transport_call_id";
     private static final String TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME = "vessel_imo_number";
+
+    private static final String SHIPMENT_TRANSPORT_TABLE_NAME = "shipment_transport";
+    private static final String SHIPMENT_TRANSPORT_TRANSPORT_ID_COLUMN_NAME = "transport_id";
+    private static final String SHIPMENT_TRANSPORT_COMMERCIAL_VOYAGE_ID_COLUMN_NAME = "commercial_voyage_id";
+
+    private static final String COMMERCIAL_VOYAGE_TRANSPORT_CALL_TABLE_NAME = "commercial_voyage_transport_call";
+    private static final String COMMERCIAL_VOYAGE_TRANSPORT_CALL_COMMERCIAL_VOYAGE_ID_COLUMN_NAME = "commercial_voyage_id";
+    private static final String COMMERCIAL_VOYAGE_TRANSPORT_CALL_TRANSPORT_CALL_ID_COLUMN_NAME = "transport_call_id";
+
+    private static final String TRANSPORT_CALL_VOYAGE_TABLE_NAME = "transport_call_voyage";
+    private static final String TRANSPORT_CALL_VOYAGE_TRANSPORT_CALL_ID_COLUMN_NAME = "transport_call_id";
+    private static final String TRANSPORT_CALL_VOYAGE_VOYAGE_ID_COLUMN_NAME = "voyage_id";
+
+    private static final String VOYAGE_TABLE_NAME = "voyage";
+    private static final String VOYAGE_ID_COLUMN_NAME = "id";
+    private static final String VOYAGE_CARRIER_VOYAGE_NUMBER_COLUMN_NAME = "carrier_voyage_number";
+    private static final String VOYAGE_SERVICE_ID_COLUMN_NAME = "service_id";
+    private static final String VOYAGE_CARRIER_VOYAGE_NUMBER_JSON_NAME = "carrierVoyageNumber";
+
+    private static final String SERVICE_TABLE_NAME = "service";
+    private static final String SERVICE_ID_COLUMN_NAME = "id";
+    private static final String SERVICE_CARRIER_SERVICE_CODE_COLUMN_NAME = "carrier_service_code";
+    private static final String SERVICE_CARRIER_SERVICE_CODE_JSON_NAME = "carrierServiceCode";
 
     private static final String SHIPMENT_TABLE_NAME = "shipment";
     private static final String SHIPMENT_TABLE_ID_COLUMN_NAME = "id";
@@ -183,6 +207,11 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
         Table transportCallTable = Table.create(TRANSPORT_CALL_TABLE_NAME);
         Table transportTable = Table.create(TRANSPORT_TABLE_NAME);
+        Table shipmentTransportTable = Table.create(SHIPMENT_TRANSPORT_TABLE_NAME);
+        Table commercialVoyageTransportCallTable = Table.create(COMMERCIAL_VOYAGE_TRANSPORT_CALL_TABLE_NAME);
+        Table transportCallVoyageTable = Table.create(TRANSPORT_CALL_VOYAGE_TABLE_NAME);
+        Table voyageTable = Table.create(VOYAGE_TABLE_NAME);
+        Table serviceTable = Table.create(SERVICE_TABLE_NAME);
 
         return builder
                 .join(Join.JoinType.JOIN, eventTable, transportCallTable)
@@ -190,9 +219,28 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .chainJoin(transportTable)
                 // FIXME: Needs "OR" join
                 .onEqualsThen(TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME)
-                .registerQueryField(
+                .registerQueryFieldThen(
                         SqlIdentifier.unquoted(TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME),
                         VESSEL_IMO_NUMBER_JSON_NAME,
+                        String.class
+                ).chainJoin(shipmentTransportTable)
+                .onEqualsThen(TRANSPORT_ID_COLUMN_NAME, SHIPMENT_TRANSPORT_TRANSPORT_ID_COLUMN_NAME)
+                .chainJoin(commercialVoyageTransportCallTable)
+                .onEqualsThen(SHIPMENT_TRANSPORT_COMMERCIAL_VOYAGE_ID_COLUMN_NAME,COMMERCIAL_VOYAGE_TRANSPORT_CALL_COMMERCIAL_VOYAGE_ID_COLUMN_NAME)
+                .chainJoin(transportCallVoyageTable)
+                .onEqualsThen(COMMERCIAL_VOYAGE_TRANSPORT_CALL_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_VOYAGE_TRANSPORT_CALL_ID_COLUMN_NAME)
+                .chainJoin(voyageTable)
+                .onEqualsThen(TRANSPORT_CALL_VOYAGE_VOYAGE_ID_COLUMN_NAME, VOYAGE_ID_COLUMN_NAME)
+                .registerQueryFieldThen(
+                        SqlIdentifier.unquoted(VOYAGE_CARRIER_VOYAGE_NUMBER_COLUMN_NAME),
+                        VOYAGE_CARRIER_VOYAGE_NUMBER_JSON_NAME,
+                        String.class
+                )
+                .chainJoin(serviceTable)
+                .onEqualsThen(VOYAGE_SERVICE_ID_COLUMN_NAME, SERVICE_ID_COLUMN_NAME)
+                .registerQueryField(
+                        SqlIdentifier.unquoted(SERVICE_CARRIER_SERVICE_CODE_COLUMN_NAME),
+                        SERVICE_CARRIER_SERVICE_CODE_JSON_NAME,
                         String.class
                 );
     }
