@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
-import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
-import org.dcsa.core.events.model.transferobjects.FacilityTO;
 import org.dcsa.core.model.AuditBase;
 import org.dcsa.core.model.ForeignKey;
 import org.springframework.data.annotation.Id;
@@ -17,7 +15,6 @@ import org.springframework.data.relational.core.sql.Join;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Objects;
 import java.util.UUID;
 
 @Table("vessel")
@@ -25,8 +22,6 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class Vessel extends AuditBase {
-
-    public static final Vessel NULL_VESSEL = new Vessel();
 
     @Column("vessel_imo_number")
     @Size(min = 7, max = 7)

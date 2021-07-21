@@ -16,8 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Address {
 
-    public static final Address NULL_ADDRESS = new Address();
-
     @Id
     @JsonIgnore
     private UUID id;

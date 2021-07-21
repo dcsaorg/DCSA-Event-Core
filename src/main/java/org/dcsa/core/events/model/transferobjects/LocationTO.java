@@ -17,11 +17,12 @@ import org.springframework.data.relational.core.sql.Join;
 @NoArgsConstructor
 public class LocationTO extends AbstractLocation {
 
-    public static final LocationTO NULL_LOCATION = new LocationTO();
-    public static final LocationTO NULL_LOCATION_WITH_NULL_ADDRESS = new LocationTO();
+    private static final Address NULL_ADDRESS = new Address();
+    private static final LocationTO NULL_LOCATION = new LocationTO();
+    private static final LocationTO NULL_LOCATION_WITH_NULL_ADDRESS = new LocationTO();
 
     static {
-        NULL_LOCATION_WITH_NULL_ADDRESS.setAddress(Address.NULL_ADDRESS);
+        NULL_LOCATION_WITH_NULL_ADDRESS.setAddress(NULL_ADDRESS);
     }
 
     @ForeignKey(fromFieldName = "addressID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
