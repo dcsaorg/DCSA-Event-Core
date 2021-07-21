@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,13 +21,11 @@ import java.util.Objects;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-// TODO: We need to do DISTINCT + (dischargeTransportCallID OR loadTransportCallID)
-// - Note LEFT OUTER JOIN because not all transport calls involve vessels.
-@JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "dischargeTransportCallID")
-@JoinedWithModel(lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+@JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "dischargeTransportCallID", rhsJoinAlias = "dischargeTransport", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+@JoinedWithModel(lhsJoinAlias = "dischargeTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "discharge_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+@JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "loadTransportCallID", rhsJoinAlias = "loadTransport", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+@JoinedWithModel(lhsJoinAlias = "loadTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "load_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
 public class TransportCallTO extends AbstractTransportCall {
-
-    private static final Vessel NULL_VESSEL = new Vessel();
 
     @Size(max = 5)
     @Transient
@@ -40,24 +39,54 @@ public class TransportCallTO extends AbstractTransportCall {
     @Transient
     private FacilityCodeListProvider facilityCodeListProvider;
 
-    @ForeignKey(fromFieldName = "facilityID", foreignFieldName = "facilityID")
+    @ForeignKey(fromFieldName = "facilityID", foreignFieldName = "facilityID", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+    @JsonIgnore
     @Transient
     private FacilityTO facility;
 
-    @MapEntity
+    @MapEntity(joinAlias = "discharge_vessel")
+    @JsonIgnore
     @Transient
-    private Vessel vessel;
+    private Vessel dischargeVessel;
 
-    public void setVessel(Vessel vessel) {
-        if (Objects.equals(NULL_VESSEL, vessel)) {
+    @MapEntity(joinAlias = "load_vessel")
+    @JsonIgnore
+    @Transient
+    private Vessel loadVessel;
+
+    private Vessel vesselOrNull(Vessel vessel) {
+        if (Objects.equals(Vessel.NULL_VESSEL, vessel)) {
             // Due to LEFT OUTER JOIN and @MapEntity, we can see a vessel consisting entirely of nulls.
             // Map that to a regular null (the vessel field is optional, but if it is present, then we
             // have mandatory "not null" fields to supply).
-            vessel = null;
+            return null;
         }
-        this.vessel = vessel;
+        return vessel;
     }
 
+    public void setDischargeVessel(Vessel vessel) {
+        this.dischargeVessel = vesselOrNull(vessel);
+    }
+
+    public void setLoadVessel(Vessel vessel) {
+        this.loadVessel = vesselOrNull(vessel);
+    }
+
+    @Transient
+    private Vessel vessel;
+
+    public Vessel getVessel() {
+        if (dischargeVessel == null) {
+            return loadVessel;
+        }
+        return dischargeVessel;
+    }
+
+    public void setVessel(Vessel vessel) {
+        this.vessel = vesselOrNull(vessel);
+    }
+
+    @ForeignKey(fromFieldName = "locationID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     @Transient
     private LocationTO location;
 
@@ -75,14 +104,16 @@ public class TransportCallTO extends AbstractTransportCall {
     }
 
     public void setFacility(FacilityTO facility) {
-        if (facility != null) {
+        if (facility != null && !facility.isNullFacility()) {
             UNLocationCode = facility.getUnLocationCode();
             if (facility.getFacilitySMGDCode() != null) {
                 facilityCode = facility.getFacilitySMGDCode();
                 facilityCodeListProvider = FacilityCodeListProvider.SMDG;
-            } else {
+            } else if (facility.getFacilityBICCode() != null) {
                 facilityCode = facility.getFacilityBICCode();
                 facilityCodeListProvider = FacilityCodeListProvider.BIC;
+            } else {
+                throw new IllegalArgumentException("Unsupported facility code list provider.");
             }
         } else {
             facilityCode = null;
