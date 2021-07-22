@@ -1,9 +1,12 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.enums.EmptyIndicatorCode;
+import org.dcsa.core.events.model.enums.EquipmentEventTypeCode;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.springframework.data.annotation.Transient;
@@ -19,7 +22,7 @@ import java.util.List;
 public class EquipmentEvent extends Event {
 
     @Column("equipment_event_type_code")
-    private String equipmentEventTypeCode;
+    private EquipmentEventTypeCode equipmentEventTypeCode;
 
     @Column("equipment_reference")
     private String equipmentReference;
@@ -41,4 +44,10 @@ public class EquipmentEvent extends Event {
 
     @Transient
     private List<Seal> seals;
+
+    @JsonProperty("eventTypeCode")
+    @Deprecated
+    public EquipmentEventTypeCode getEventTypeCode() {
+        return equipmentEventTypeCode;
+    }
 }
