@@ -23,6 +23,14 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Vessel extends AuditBase {
 
+    private static final Carrier NULL_CARRIER = new Carrier();
+    private static final Vessel NULL_VESSEL = new Vessel();
+    private static final Vessel NULL_VESSEL_WITH_NULL_CARRIER = new Vessel();
+
+    static {
+        NULL_VESSEL_WITH_NULL_CARRIER.setCarrier(NULL_CARRIER);
+    }
+
     @Column("vessel_imo_number")
     @Size(min = 7, max = 7)
     @Pattern(regexp = "[0-9]{7}")
@@ -73,4 +81,9 @@ public class Vessel extends AuditBase {
 
     @Transient
     private CarrierCodeListProvider vesselOperatorCarrierCodeListProvider;
+
+    @JsonIgnore
+    public boolean isNullVessel() {
+        return this.equals(NULL_VESSEL_WITH_NULL_CARRIER) || this.equals(NULL_VESSEL);
+    }
 }
