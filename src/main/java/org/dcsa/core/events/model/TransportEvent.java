@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dcsa.core.events.model.enums.TransportEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.springframework.data.annotation.Transient;
@@ -19,7 +20,7 @@ import java.util.List;
 public class TransportEvent extends Event {
 
     @Column("transport_event_type_code")
-    private String transportEventTypeCode;
+    private TransportEventTypeCode transportEventTypeCode;
 
     @Column("delay_reason_code")
     private String delayReasonCode;
@@ -43,5 +44,11 @@ public class TransportEvent extends Event {
     @Deprecated
     public String getVesselScheduleChangeRemark() {
         return changeRemark;
+    }
+
+    @JsonProperty("eventTypeCode")
+    @Deprecated
+    public TransportEventTypeCode getEventTypeCode() {
+        return transportEventTypeCode;
     }
 }
