@@ -59,7 +59,7 @@ public class Vessel extends AuditBase {
     private Carrier carrier;
 
     public void setCarrier(Carrier carrier) {
-        if (carrier != null) {
+        if (carrier != null && !carrier.equals(NULL_CARRIER)) {
             if (carrier.getSmdgCode() != null) {
                 vesselOperatorCarrierCode = carrier.getSmdgCode();
                 vesselOperatorCarrierCodeListProvider = CarrierCodeListProvider.SMDG;
