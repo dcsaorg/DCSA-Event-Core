@@ -10,14 +10,14 @@
 	</parent>
 	<groupId>org.dcsa</groupId>
 	<artifactId>dcsa_event_core</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>DCSA-Event-Core</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>11</java.version>
-		<dcsa.version>0.8.7</dcsa.version>
+		<dcsa.version>0.8.9</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
 	</properties>
