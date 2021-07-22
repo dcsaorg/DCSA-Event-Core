@@ -58,7 +58,12 @@ public class Vessel extends AuditBase {
             } else if (carrier.getNmftaCode() != null) {
                 vesselOperatorCarrierCode = carrier.getNmftaCode();
                 vesselOperatorCarrierCodeListProvider = CarrierCodeListProvider.NMFTA;
+            } else {
+                throw new IllegalArgumentException("Unsupported carrier code list provider.");
             }
+        } else {
+            vesselOperatorCarrierCode = null;
+            vesselOperatorCarrierCodeListProvider = null;
         }
         this.carrier = carrier;
     }
