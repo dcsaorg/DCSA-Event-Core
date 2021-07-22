@@ -27,8 +27,6 @@ import java.util.Objects;
 @JoinedWithModel(lhsJoinAlias = "loadTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "load_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
 public class TransportCallTO extends AbstractTransportCall {
 
-    private static final Vessel NULL_VESSEL = new Vessel();
-
     @Size(max = 5)
     @Transient
     @JsonProperty("UNLocationCode")
@@ -57,7 +55,7 @@ public class TransportCallTO extends AbstractTransportCall {
     private Vessel loadVessel;
 
     private Vessel vesselOrNull(Vessel vessel) {
-        if (Objects.equals(NULL_VESSEL, vessel)) {
+        if (vessel.isNullVessel()) {
             // Due to LEFT OUTER JOIN and @MapEntity, we can see a vessel consisting entirely of nulls.
             // Map that to a regular null (the vessel field is optional, but if it is present, then we
             // have mandatory "not null" fields to supply).
