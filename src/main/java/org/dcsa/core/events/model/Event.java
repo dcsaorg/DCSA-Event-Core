@@ -17,7 +17,8 @@ import java.util.UUID;
 @Table("aggregated_events")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true,
+                      value = {"carrierBookingReference"})
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -49,7 +50,6 @@ public class Event extends AuditBase {
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;
 
-    @JsonIgnore
     @Column("carrier_booking_reference")
     private String carrierBookingReference;
 }
