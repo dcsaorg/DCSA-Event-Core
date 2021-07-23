@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import lombok.SneakyThrows;
+import org.dcsa.core.events.model.EquipmentEvent;
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.model.ShipmentEvent;
+import org.dcsa.core.events.model.TransportCall;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.extendedrequest.QueryField;
@@ -36,6 +38,18 @@ import java.util.Set;
 public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
     private static final String TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME = "transportDocumentReference";
+    private static final String TRANSPORT_DOCUMENT_ID_JSON_NAME = "transportDocumentID";
+    private static final String TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME = "transportDocumentTypeCode";
+    private static final String VESSEL_IMO_NUMBER_JSON_NAME = "vesselIMONumber";
+
+    private static final String EVENT_TRANSPORT_CALL_ID_COLUMN_NAME = "transport_call_id";
+    private static final String TRANSPORT_CALL_TABLE_NAME = "transport_call";
+    private static final String TRANSPORT_CALL_ID_COLUMN_NAME = "id";
+
+    private static final String TRANSPORT_TABLE_NAME = "transport";
+    private static final String TRANSPORT_LOAD_TRANSPORT_CALL_ID_COLUMN_NAME = "load_transport_call_id";
+    private static final String TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME = "discharge_transport_call_id";
+    private static final String TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME = "vessel_imo_number";
 
     private static final String SHIPMENT_TABLE_NAME = "shipment";
     private static final String SHIPMENT_TABLE_ID_COLUMN_NAME = "id";
@@ -49,13 +63,19 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String CARGO_ITEM_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "shipping_instruction_id";
 
     private static final String SHIPPING_INSTRUCTION_TABLE_NAME = "shipping_instruction";
+    private static final String SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME = "transport_document_type";
     private static final String SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "id";
 
     private static final String TRANSPORT_DOCUMENT_TABLE_NAME = "transport_document";
     private static final String TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "shipping_instruction_id";
     private static final String TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME = "transport_document_reference";
 
-    private static final Set<String> JSON_FIELDS_REQUIRING_DISTINCT = Set.of(TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME);
+    private static final Set<String> JSON_FIELDS_REQUIRING_DISTINCT = Set.of(
+            TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
+            TRANSPORT_DOCUMENT_ID_JSON_NAME,
+            TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,
+            VESSEL_IMO_NUMBER_JSON_NAME
+    );
 
     private static final String EVENT_TYPE_FIELD_NAME;
     private static final Map<String, Constructor<? extends Event>> NAME2CONSTRUCTOR;
@@ -126,19 +146,17 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
         Table eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
-        String shipmentEventDocumentIDColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
-        Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
-        Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
-        Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
-        Table shippingInstructionsTable = Table.create(SHIPPING_INSTRUCTION_TABLE_NAME);
-        Table transportDocumentTable = Table.create(TRANSPORT_DOCUMENT_TABLE_NAME);
         boolean includesShipmentEvents = false;
+        boolean needsTransportCall = false;
 
 
         for (Class<?> clazz : modelSubClasses) {
             Class<?> currentClass = clazz;
             if (ShipmentEvent.class.isAssignableFrom(currentClass)) {
                 includesShipmentEvents = true;
+            }
+            if (TransportCall.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass)) {
+                needsTransportCall = true;
             }
             while (currentClass != Event.class) {
                 for (Field field : currentClass.getDeclaredFields()) {
@@ -154,24 +172,60 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             }
         }
         if (includesShipmentEvents) {
-            builder = builder
-                    .join(Join.JoinType.JOIN, eventTable, shipmentTable)
-                    .onEqualsThen(shipmentEventDocumentIDColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
-                    .chainJoin(shipmentEquipmentTable)
-                    .onEqualsThen(SHIPMENT_TABLE_ID_COLUMN_NAME, SHIPMENT_EQUIPMENT_SHIPMENT_ID_COLUMN_NAME)
-                    .chainJoin(cargoItemTable)
-                    .onEqualsThen(SHIPMENT_EQUIPMENT_ID_COLUMN_NAME, CARGO_ITEM_TABLE_SHIPMENT_EQUIPMENT_ID_COLUMN_NAME)
-                    .chainJoin(shippingInstructionsTable)
-                    .onEqualsThen(CARGO_ITEM_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME, SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
-                    .chainJoin(transportDocumentTable)
-                    .onEqualsThen(SHIPPING_INSTRUCTION_ID_COLUMN_NAME, TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
-                    .registerQueryField(
-                            SqlIdentifier.unquoted(TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME),
-                            TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
-                            String.class
-                    );
+            builder = queryParametersForShipmentEvents(builder, eventTable);
+        }
+        if (needsTransportCall) {
+            builder = queryParameterForTransportCall(builder, eventTable);
         }
         return builder;
+    }
+
+    private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
+        Table transportCallTable = Table.create(TRANSPORT_CALL_TABLE_NAME);
+        Table transportTable = Table.create(TRANSPORT_TABLE_NAME);
+
+        return builder
+                .join(Join.JoinType.JOIN, eventTable, transportCallTable)
+                .onEqualsThen(EVENT_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_ID_COLUMN_NAME)
+                .chainJoin(transportTable)
+                // FIXME: Needs "OR" join
+                .onEqualsThen(TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME)
+                .registerQueryField(
+                        SqlIdentifier.unquoted(TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME),
+                        VESSEL_IMO_NUMBER_JSON_NAME,
+                        String.class
+                );
+    }
+
+    private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
+        // FIXME - this is incorrect (should join with a table based on the value of documentTypeCode)
+        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentID");
+        Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
+        Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
+        Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
+        Table shippingInstructionsTable = Table.create(SHIPPING_INSTRUCTION_TABLE_NAME);
+        Table transportDocumentTable = Table.create(TRANSPORT_DOCUMENT_TABLE_NAME);
+        return builder
+                .join(Join.JoinType.JOIN, eventTable, shipmentTable)
+                .onEqualsThen(shipmentEventShipmentIdColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
+                .chainJoin(shipmentEquipmentTable)
+                .onEqualsThen(SHIPMENT_TABLE_ID_COLUMN_NAME, SHIPMENT_EQUIPMENT_SHIPMENT_ID_COLUMN_NAME)
+                .chainJoin(cargoItemTable)
+                .onEqualsThen(SHIPMENT_EQUIPMENT_ID_COLUMN_NAME, CARGO_ITEM_TABLE_SHIPMENT_EQUIPMENT_ID_COLUMN_NAME)
+                .chainJoin(shippingInstructionsTable)
+                .onEqualsThen(CARGO_ITEM_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME, SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
+                .registerQueryFieldThen(
+                        SqlIdentifier.unquoted(SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME),
+                        TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,
+                        String.class
+                )
+                .chainJoin(transportDocumentTable)
+                .onEqualsThen(SHIPPING_INSTRUCTION_ID_COLUMN_NAME, TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
+                .registerQueryFieldThen(
+                        SqlIdentifier.unquoted(TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME),
+                        TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
+                        String.class
+                ).registerQueryFieldAlias(TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME, TRANSPORT_DOCUMENT_ID_JSON_NAME);
     }
 
     @Override
