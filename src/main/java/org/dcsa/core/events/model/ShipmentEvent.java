@@ -52,9 +52,6 @@ public class ShipmentEvent extends Event {
     }
 
     @Transient
-    private List<DocumentReferenceTO> documentReferences;
-
-    @Transient
     private List<Reference> references;
 
     @JsonProperty("eventTypeCode")
