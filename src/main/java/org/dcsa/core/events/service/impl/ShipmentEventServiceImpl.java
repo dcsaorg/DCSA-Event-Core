@@ -3,8 +3,6 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.ShipmentEvent;
-import org.dcsa.core.events.model.enums.DocumentReferenceType;
-import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
 import org.dcsa.core.events.service.ShipmentEventService;
@@ -42,58 +40,19 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
             .apply(
                 shipmentEvent,
                 referenceRepository.findByCarrierBookingReference(shipmentEvent.getDocumentID()))
-            .flatMap(
-                se ->
-                    Flux.merge(
-                            transformDocRefs.apply(
-                                DocumentReferenceType.TRD,
-                                shipmentEventRepository
-                                    .findTransportDocumentRefsByCarrierBookingRef(
-                                        se.getDocumentID())),
-                            transformDocRefs.apply(
-                                DocumentReferenceType.BKG, Flux.just(se.getDocumentID())))
-                        .collectList()
-                        .doOnNext(shipmentEvent::setDocumentReferences)
-                        .thenReturn(shipmentEvent));
+            .thenReturn(shipmentEvent);
       case TRD:
         return shipmentEventReferences
             .apply(
                 shipmentEvent,
                 referenceRepository.findByTransportDocumentReference(shipmentEvent.getDocumentID()))
-            .flatMap(
-                se ->
-                    Flux.merge(
-                            transformDocRefs.apply(
-                                DocumentReferenceType.BKG,
-                                shipmentEventRepository
-                                    .findCarrierBookingRefsByTransportDocumentRef(
-                                        se.getDocumentID())),
-                            transformDocRefs.apply(
-                                DocumentReferenceType.TRD, Flux.just(se.getDocumentID())))
-                        .collectList()
-                        .doOnNext(shipmentEvent::setDocumentReferences)
-                        .thenReturn(shipmentEvent));
+            .thenReturn(shipmentEvent);
       case SHI:
         return shipmentEventReferences
             .apply(
                 shipmentEvent,
                 referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
-            .flatMap(
-                se ->
-                    Flux.merge(
-                            transformDocRefs.apply(
-                                DocumentReferenceType.BKG,
-                                shipmentEventRepository
-                                    .findCarrierBookingRefsByShippingInstructionID(
-                                        se.getDocumentID())),
-                            transformDocRefs.apply(
-                                DocumentReferenceType.TRD,
-                                shipmentEventRepository
-                                    .findTransportDocumentRefsByShippingInstructionID(
-                                        se.getDocumentID())))
-                        .collectList()
-                        .doOnNext(shipmentEvent::setDocumentReferences)
-                        .thenReturn(shipmentEvent));
+            .thenReturn(shipmentEvent);
       default:
         return Mono.just(shipmentEvent);
     }
@@ -109,7 +68,4 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
                               .doOnNext(shipmentEvent::setReferences)
                               .thenReturn(shipmentEvent));
 
-  private final BiFunction<DocumentReferenceType, Flux<String>, Flux<DocumentReferenceTO>>
-      transformDocRefs =
-          (dcRt, docRefsFlux) -> docRefsFlux.map(dRef -> DocumentReferenceTO.of(dcRt, dRef));
 }
