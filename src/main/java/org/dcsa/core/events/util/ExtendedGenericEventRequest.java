@@ -77,6 +77,8 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
     private static final String SHIPMENT_TABLE_NAME = "shipment";
     private static final String SHIPMENT_TABLE_ID_COLUMN_NAME = "id";
+    private static final String SHIPMENT_CARRIER_BOOKING_REFERENCE_JSON_NAME = "carrierBookingReference";
+    private static final String SHIPMENT_BOOKING_REFERENCE_JSON_NAME = "bookingReference";
 
     private static final String SHIPMENT_EQUIPMENT_TABLE_NAME = "shipment_equipment";
     private static final String SHIPMENT_EQUIPMENT_ID_COLUMN_NAME = "id";
@@ -195,6 +197,9 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 currentClass = currentClass.getSuperclass();
             }
         }
+
+        builder.registerQueryFieldAlias(SHIPMENT_CARRIER_BOOKING_REFERENCE_JSON_NAME, SHIPMENT_BOOKING_REFERENCE_JSON_NAME);
+
         if (includesShipmentEvents) {
             builder = queryParametersForShipmentEvents(builder, eventTable);
         }
@@ -247,7 +252,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
         // FIXME - this is incorrect (should join with a table based on the value of documentTypeCode)
-        String shipmentEventShipmentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "shipmentID");
+        String shipmentEventdocumentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
         Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
         Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
         Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
@@ -255,7 +260,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         Table transportDocumentTable = Table.create(TRANSPORT_DOCUMENT_TABLE_NAME);
         return builder
                 .join(Join.JoinType.JOIN, eventTable, shipmentTable)
-                .onEqualsThen(shipmentEventShipmentIdColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
+                .onEqualsThen(shipmentEventdocumentIdColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
                 .chainJoin(shipmentEquipmentTable)
                 .onEqualsThen(SHIPMENT_TABLE_ID_COLUMN_NAME, SHIPMENT_EQUIPMENT_SHIPMENT_ID_COLUMN_NAME)
                 .chainJoin(cargoItemTable)

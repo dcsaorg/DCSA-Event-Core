@@ -1,9 +1,6 @@
 package org.dcsa.core.events.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.enums.EventClassifierCode;
@@ -52,4 +49,6 @@ public class Event extends AuditBase {
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;
 
+    @Column("carrier_booking_reference")
+    private String carrierBookingReference;
 }
