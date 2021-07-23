@@ -49,6 +49,7 @@ public class Event extends AuditBase {
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;
 
+    @JsonIgnore
     @Column("carrier_booking_reference")
     private String carrierBookingReference;
 }
