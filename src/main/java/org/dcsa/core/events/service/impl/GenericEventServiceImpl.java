@@ -5,6 +5,7 @@ import org.dcsa.core.events.model.EquipmentEvent;
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.model.ShipmentEvent;
 import org.dcsa.core.events.model.TransportEvent;
+import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.GenericEventService;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 @Service
@@ -57,14 +59,37 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         });
     }
 
-    @Override
-    public Mono<Event> findById(UUID id) {
-        return Mono.<Event>empty()
-                .switchIfEmpty(transportEventService.findById(id).cast(Event.class))
-                .switchIfEmpty(shipmentEventService.findById(id).cast(Event.class))
-                .switchIfEmpty(equipmentEventService.findById(id).cast(Event.class))
-                .switchIfEmpty(Mono.error(new NotFoundException("No event was found with id: " + id)));
-    }
+  @Override
+  public Mono<Event> findById(UUID id) {
+    return Mono.<Event>empty()
+        .switchIfEmpty(
+            transportEventService
+                .findById(id)
+                .flatMap(transportEventService::loadRelatedEntities)
+                .doOnNext(applyEventType))
+        .switchIfEmpty(
+            shipmentEventService
+                .findById(id)
+                .flatMap(shipmentEventService::loadRelatedEntities)
+                .doOnNext(applyEventType))
+        .switchIfEmpty(
+            equipmentEventService
+                .findById(id)
+                .flatMap(equipmentEventService::loadRelatedEntities)
+                .doOnNext(applyEventType))
+        .switchIfEmpty(Mono.error(new NotFoundException("No event was found with id: " + id)));
+  }
+
+  private final Consumer<Event> applyEventType =
+      (Event event) -> {
+        if (event instanceof TransportEvent) {
+          event.setEventType(EventType.TRANSPORT);
+        } else if (event instanceof ShipmentEvent) {
+          event.setEventType(EventType.SHIPMENT);
+        } else if (event instanceof EquipmentEvent) {
+          event.setEventType(EventType.EQUIPMENT);
+        }
+      };
 
     @Override
     public Mono<Event> create(Event event) {

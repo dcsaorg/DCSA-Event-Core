@@ -1,10 +1,14 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.ModeOfTransport;
 import org.dcsa.core.events.model.TransportCall;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
+import org.dcsa.core.events.repository.ModeOfTransportRepository;
+import org.dcsa.core.events.repository.ServiceRepository;
 import org.dcsa.core.events.repository.TransportCallTORepository;
+import org.dcsa.core.events.repository.VoyageRepository;
 import org.dcsa.core.events.service.LocationService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
@@ -18,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +30,9 @@ import java.util.Map;
 public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<TransportCallTORepository, TransportCallTO, String> implements TransportCallTOService {
     private final LocationService locationService;
     private final TransportCallTORepository transportCallTORepository;
+    private final ModeOfTransportRepository modeOfTransportRepository;
+    private final VoyageRepository voyageRepository;
+    private final ServiceRepository serviceRepository;
     private final TransportCallService transportCallService;
     private final ExtendedParameters extendedParameters;
     private final R2dbcDialect r2dbcDialect;
@@ -51,7 +57,31 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                     if (transportCallTOs.isEmpty()) {
                         return Mono.empty();
                     }
-                    return Mono.just(transportCallTOs.get(0));
+                    TransportCallTO transportCallTO = transportCallTOs.get(0);
+
+                    return Mono.just(transportCallTO)
+                            .flatMap(
+                                    tcTo ->
+                                            modeOfTransportRepository
+                                                    .findByTransportCallID(transportCallTO.getTransportCallID())
+                                                    .map(ModeOfTransport::getDcsaTransportType))
+                            .doOnNext(transportCallTO::setModeOfTransport)
+                            .thenReturn(transportCallTO)
+                            .flatMap(
+                                    tcTo -> voyageRepository.findByTransportCallID(tcTo.getTransportCallID()))
+                            .doOnNext(
+                                    voyage ->
+                                            transportCallTO.setCarrierVoyageNumber(
+                                                    null != voyage ? voyage.getCarrierVoyageNumber() : null))
+                            .flatMap(
+                                    voyage ->
+                                            null != voyage.getServiceID()
+                                                    ? serviceRepository
+                                                    .findById(voyage.getServiceID())
+                                                    .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
+                                                    : Mono.empty())
+                            .doOnNext(transportCallTO::setCarrierServiceCode)
+                            .thenReturn(transportCallTO);
                 });
     }
 

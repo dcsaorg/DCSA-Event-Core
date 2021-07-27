@@ -1,9 +1,10 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.Equipment;
 import org.dcsa.core.events.model.EquipmentEvent;
-import org.dcsa.core.events.model.TransportEvent;
 import org.dcsa.core.events.repository.EquipmentEventRepository;
+import org.dcsa.core.events.repository.EquipmentRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Service
 public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
     private final EquipmentEventRepository equipmentEventRepository;
+    private final EquipmentRepository equipmentRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
 
@@ -43,6 +45,11 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                                 .then(Mono.justOrEmpty(event.getEquipmentReference()))
                                 .flatMap(equipmentReference -> transportCallService.findSealsForTransportCallIDAndEquipmentReference(event.getTransportCallID(), equipmentReference))
                                 .doOnNext(equipmentEvent::setSeals)
+                                .thenReturn(equipmentEvent)
+                                .flatMap(ee ->
+                                        equipmentRepository.findByEquipmentReference(ee.getEquipmentReference())
+                                                            .map(Equipment::getIsoEquipmentCode))
+                                .doOnNext(equipmentEvent::setIsoEquipmentCode)
                                 .thenReturn(equipmentEvent)
                 );
     }
