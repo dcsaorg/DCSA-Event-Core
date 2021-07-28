@@ -14,6 +14,7 @@ import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,17 +23,15 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Primary
 public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
 
     @Autowired
     private ShipmentEventService shipmentEventService;
-
     @Autowired
     private TransportEventService transportEventService;
-
     @Autowired
     private EquipmentEventService equipmentEventService;
-
     @Autowired
     private EventRepository eventRepository;
 

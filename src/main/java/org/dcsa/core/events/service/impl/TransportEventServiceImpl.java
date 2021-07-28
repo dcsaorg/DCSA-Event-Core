@@ -35,15 +35,15 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
         return mapTransportCall(event)
                 .flatMap(transportEvent ->
                         transportCallService.findReferencesForTransportCallID(event.getTransportCallID())
-                            .doOnNext(transportEvent::setReferences)
-                            .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
-                            .doOnNext(transportEvent::setDocumentReferences)
-                            .thenReturn(transportEvent)
+                                .doOnNext(transportEvent::setReferences)
+                                .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
+                                .doOnNext(transportEvent::setDocumentReferences)
+                                .thenReturn(transportEvent)
                 );
     }
 
     @Override
-    public Mono<TransportEvent> mapTransportCall(TransportEvent transportEvent){
+    public Mono<TransportEvent> mapTransportCall(TransportEvent transportEvent) {
         return transportCallTOService
                 .findById(transportEvent.getTransportCallID())
                 .doOnNext(transportEvent::setTransportCall)
