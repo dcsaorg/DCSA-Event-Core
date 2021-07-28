@@ -45,9 +45,8 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                                 .then(Mono.justOrEmpty(event.getEquipmentReference()))
                                 .flatMap(equipmentReference -> transportCallService.findSealsForTransportCallIDAndEquipmentReference(event.getTransportCallID(), equipmentReference))
                                 .doOnNext(equipmentEvent::setSeals)
-                                .thenReturn(equipmentEvent)
-                                .flatMap(ee ->
-                                        equipmentRepository.findByEquipmentReference(ee.getEquipmentReference())
+                                .flatMap(sealList ->
+                                        equipmentRepository.findByEquipmentReference(equipmentEvent.getEquipmentReference())
                                                             .map(Equipment::getIsoEquipmentCode))
                                 .doOnNext(equipmentEvent::setIsoEquipmentCode)
                                 .thenReturn(equipmentEvent)

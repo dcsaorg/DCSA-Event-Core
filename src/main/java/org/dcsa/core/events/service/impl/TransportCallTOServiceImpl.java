@@ -66,9 +66,8 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                                                     .findByTransportCallID(transportCallTO.getTransportCallID())
                                                     .map(ModeOfTransport::getDcsaTransportType))
                             .doOnNext(transportCallTO::setModeOfTransport)
-                            .thenReturn(transportCallTO)
                             .flatMap(
-                                    tcTo -> voyageRepository.findByTransportCallID(tcTo.getTransportCallID()))
+                                    mot -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
                             .doOnNext(
                                     voyage ->
                                             transportCallTO.setCarrierVoyageNumber(
