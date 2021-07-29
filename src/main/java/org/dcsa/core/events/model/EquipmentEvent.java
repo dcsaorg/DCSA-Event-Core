@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.enums.EmptyIndicatorCode;
 import org.dcsa.core.events.model.enums.EquipmentEventTypeCode;
-import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.springframework.data.annotation.Transient;
@@ -26,6 +25,10 @@ public class EquipmentEvent extends Event {
 
     @Column("equipment_reference")
     private String equipmentReference;
+
+    @Transient
+    @JsonProperty("ISOEquipmentCode")
+    private String isoEquipmentCode;
 
     @Column("empty_indicator_code")
     private EmptyIndicatorCode emptyIndicatorCode;

@@ -253,20 +253,11 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
         // FIXME - this is incorrect (should join with a table based on the value of documentTypeCode)
         String shipmentEventdocumentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
-        Table shipmentTable = Table.create(SHIPMENT_TABLE_NAME);
-        Table shipmentEquipmentTable = Table.create(SHIPMENT_EQUIPMENT_TABLE_NAME);
-        Table cargoItemTable = Table.create(CARGO_ITEM_TABLE_NAME);
         Table shippingInstructionsTable = Table.create(SHIPPING_INSTRUCTION_TABLE_NAME);
         Table transportDocumentTable = Table.create(TRANSPORT_DOCUMENT_TABLE_NAME);
         return builder
-                .join(Join.JoinType.JOIN, eventTable, shipmentTable)
-                .onEqualsThen(shipmentEventdocumentIdColumn, SHIPMENT_TABLE_ID_COLUMN_NAME)
-                .chainJoin(shipmentEquipmentTable)
-                .onEqualsThen(SHIPMENT_TABLE_ID_COLUMN_NAME, SHIPMENT_EQUIPMENT_SHIPMENT_ID_COLUMN_NAME)
-                .chainJoin(cargoItemTable)
-                .onEqualsThen(SHIPMENT_EQUIPMENT_ID_COLUMN_NAME, CARGO_ITEM_TABLE_SHIPMENT_EQUIPMENT_ID_COLUMN_NAME)
-                .chainJoin(shippingInstructionsTable)
-                .onEqualsThen(CARGO_ITEM_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME, SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
+                .join(Join.JoinType.JOIN, eventTable, shippingInstructionsTable)
+                .onEqualsThen(shipmentEventdocumentIdColumn, SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
                 .registerQueryFieldThen(
                         SqlIdentifier.unquoted(SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME),
                         TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,

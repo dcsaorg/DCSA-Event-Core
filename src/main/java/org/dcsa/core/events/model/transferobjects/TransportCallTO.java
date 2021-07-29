@@ -16,7 +16,6 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.sql.Join;
 
 import javax.validation.constraints.Size;
-import java.util.Objects;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,6 +25,12 @@ import java.util.Objects;
 @JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "loadTransportCallID", rhsJoinAlias = "loadTransport", joinType = Join.JoinType.LEFT_OUTER_JOIN)
 @JoinedWithModel(lhsJoinAlias = "loadTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "load_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
 public class TransportCallTO extends AbstractTransportCall {
+
+    @Transient
+    private String carrierServiceCode;
+
+    @Transient
+    private String carrierVoyageNumber;
 
     @Size(max = 5)
     @Transient
@@ -89,6 +94,9 @@ public class TransportCallTO extends AbstractTransportCall {
     @ForeignKey(fromFieldName = "locationID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     @Transient
     private LocationTO location;
+
+    @Transient
+    private String modeOfTransport;
 
     public LocationTO getLocation() {
         if (location != null && !location.isNullLocation()) {
