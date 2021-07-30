@@ -3,6 +3,7 @@ package org.dcsa.core.events.controller;
 import org.dcsa.core.controller.BaseController;
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.service.EventService;
+import org.dcsa.core.events.util.RequestValidator;
 import org.dcsa.core.exception.GetException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.UUID;
 
 @RequestMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -36,8 +38,13 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
 
     protected abstract ExtendedRequest<T> newExtendedRequest();
 
+    protected RequestValidator newRequestValidator(){
+        return (Map<String, String> queryParams) -> {};
+    }
+
     @GetMapping
-    public Flux<T> findAll(ServerHttpResponse response, ServerHttpRequest request) {
+    public Flux<T> findAll(@RequestParam Map<String, String> queryParams, ServerHttpResponse response, ServerHttpRequest request) {
+        newRequestValidator().validate(queryParams);
         ExtendedRequest<T> extendedRequest = newExtendedRequest();
         try {
             extendedRequest.parseParameter(request.getQueryParams());
