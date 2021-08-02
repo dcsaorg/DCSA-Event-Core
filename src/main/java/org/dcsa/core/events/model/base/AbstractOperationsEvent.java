@@ -56,10 +56,4 @@ public class AbstractOperationsEvent extends Event {
 
     @Column("vessel_position")
     private String vesselPositionID;
-
-    @Transient
-    private TransportCallTO transportCall;
-
-    @Transient
-    private LocationTO vesselPosition;
 }
