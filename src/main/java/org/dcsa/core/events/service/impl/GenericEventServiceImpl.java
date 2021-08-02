@@ -30,7 +30,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
 
     @Override
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
-        throw new NotImplementedException();
+        return super.findAllExtended(extendedRequest);
     }
 
     @Override
