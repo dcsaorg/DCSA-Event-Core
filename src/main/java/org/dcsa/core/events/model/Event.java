@@ -27,7 +27,8 @@ import java.util.UUID;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = EquipmentEvent.class, name="EQUIPMENT"),
         @JsonSubTypes.Type(value = TransportEvent.class, name="TRANSPORT"),
-        @JsonSubTypes.Type(value = ShipmentEvent.class, name="SHIPMENT")
+        @JsonSubTypes.Type(value = ShipmentEvent.class, name="SHIPMENT"),
+        @JsonSubTypes.Type(value = OperationsEvent.class, name="OPERATIONS")
 })
 public class Event extends AuditBase {
 
