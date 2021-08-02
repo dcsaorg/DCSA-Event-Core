@@ -11,12 +11,6 @@ import java.util.UUID;
 @Table("service")
 public class Service {
 
-  public static class Constraints {
-    private Constraints() {}
-
-    public static final Integer CARRIER_SERVICE_CODE_SIZE = 5;
-  }
-
   @Id private UUID id;
 
   @Column("carrier_id")

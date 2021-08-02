@@ -11,12 +11,6 @@ import javax.validation.constraints.Size;
 @Table("equipment")
 public class Equipment {
 
-  public static class Constraints {
-    private Constraints() {}
-
-    public static final Integer EQUIPMENT_REFERENCE_SIZE = 15;
-  }
-
   @Id
   @Column("equipment_reference")
   @Size(max = 15)

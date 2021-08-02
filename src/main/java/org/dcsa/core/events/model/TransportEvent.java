@@ -19,12 +19,6 @@ import java.util.List;
 @JsonTypeName("TRANSPORT")
 public class TransportEvent extends Event {
 
-  public static class Constraints {
-    private Constraints() {}
-
-    public static final Integer TRANSPORT_CALL_ID_SIZE = 100;
-  }
-
     @Column("transport_event_type_code")
     private TransportEventTypeCode transportEventTypeCode;
 
