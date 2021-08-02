@@ -1,18 +1,13 @@
 package org.dcsa.core.events.service.impl;
 
-import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
-import org.dcsa.core.events.repository.PendingEventRepository;
 import org.dcsa.core.events.service.*;
-import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -20,8 +15,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-@Service
-@Primary
 public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
 
     private final ShipmentEventService shipmentEventService;
@@ -35,7 +28,6 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         return eventRepository;
     }
 
-    // TODO: Throw exception, only have implementation in inherited classes
     @Override
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
         throw new NotImplementedException();
@@ -44,13 +36,6 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
     @Override
     public Mono<Event> findById(UUID id) {
         throw new NotImplementedException();
-//
-//        return Mono.<Event>empty()
-//                .switchIfEmpty(getTransportEventRelatedEntities(id))
-//                .switchIfEmpty(getShipmentEventRelatedEntities(id))
-//                .switchIfEmpty(getEquipmentEventRelatedEntities(id))
-//                .switchIfEmpty(getOperationsEventRelatedEntities(id))
-//                .switchIfEmpty(Mono.error(new NotFoundException("No event was found with id: " + id)));
     }
 
     public Mono<TransportEvent> getTransportEventRelatedEntities(UUID id) {
