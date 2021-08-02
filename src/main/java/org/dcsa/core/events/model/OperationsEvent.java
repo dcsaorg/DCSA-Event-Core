@@ -31,9 +31,6 @@ public class OperationsEvent extends Event {
     @Column("publisher_role")
     private String publisherRole;
 
-    @Column("publisher_code_list_provider")
-    private String publisherCodeListProvider;
-
     @Column("event_location")
     private String eventLocation;
 
@@ -43,8 +40,8 @@ public class OperationsEvent extends Event {
     @Column("facility_type_code")
     private String facilityTypeCode;
 
-    @Column("change_remark")
-    private String changeRemark;
+    @Column("remark")
+    private String remark;
 
     @Column("delay_reason_code")
     private String delayReasonCode;
