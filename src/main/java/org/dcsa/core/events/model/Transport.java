@@ -13,6 +13,12 @@ import java.util.UUID;
 @Table("transport")
 public class Transport {
 
+  public static class Constraints {
+    private Constraints() {}
+
+    public static final Integer VESSEL_IMO_NUMBER_SIZE = 7;
+  }
+
     @Id
     @Column("id")
     private UUID transportID;

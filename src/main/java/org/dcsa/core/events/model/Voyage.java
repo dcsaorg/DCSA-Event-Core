@@ -11,6 +11,12 @@ import java.util.UUID;
 @Table("voyage")
 public class Voyage {
 
+  public static class Constraints {
+    private Constraints() {}
+
+    public static final Integer CARRIER_VOYAGE_NUMBER_SIZE = 50;
+  }
+
     @Id
     private UUID id;
 

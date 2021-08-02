@@ -32,6 +32,12 @@ import java.util.UUID;
 })
 public class Event extends AuditBase {
 
+  public static class Constraints {
+    private Constraints() {}
+
+    public static final Integer CARRIER_BOOKING_REFERENCE_SIZE = 35;
+  }
+
     @Id
     @Column("event_id")
     private UUID eventID;
