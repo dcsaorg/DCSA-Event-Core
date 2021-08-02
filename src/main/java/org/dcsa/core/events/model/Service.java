@@ -10,6 +10,7 @@ import java.util.UUID;
 @Data
 @Table("service")
 public class Service {
+
   @Id private UUID id;
 
   @Column("carrier_id")

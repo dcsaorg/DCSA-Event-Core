@@ -36,7 +36,6 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
 
     protected abstract ExtendedRequest<T> newExtendedRequest();
 
-    @GetMapping
     public Flux<T> findAll(ServerHttpResponse response, ServerHttpRequest request) {
         ExtendedRequest<T> extendedRequest = newExtendedRequest();
         try {
