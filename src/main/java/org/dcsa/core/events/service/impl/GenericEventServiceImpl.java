@@ -44,18 +44,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
 
     @Override
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
-        return super.findAllExtended(extendedRequest).concatMap(event -> {
-            switch (event.getEventType()) {
-                case TRANSPORT:
-                    return transportEventService.loadRelatedEntities((TransportEvent) event);
-                case EQUIPMENT:
-                    return equipmentEventService.loadRelatedEntities((EquipmentEvent) event);
-                case SHIPMENT:
-                    return shipmentEventService.loadRelatedEntities((ShipmentEvent)event);
-                default:
-                    return Mono.just(event);
-            }
-        });
+        return super.findAllExtended(extendedRequest);
     }
 
   @Override
