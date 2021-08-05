@@ -13,6 +13,6 @@ public interface ModeOfTransportRepository extends ExtendedRepository<ModeOfTran
       "SELECT mot.* from transport t " +
               "JOIN mode_of_transport mot " +
               "ON t.mode_of_transport = mot.mode_of_transport_code " +
-              "WHERE t.discharge_transport_call_id = :transportCallID")
+              "WHERE t.discharge_transport_call_id = :transportCallID or t.load_transport_call_id = :transportCallID")
   Mono<ModeOfTransport> findByTransportCallID(String transportCallID);
 }
