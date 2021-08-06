@@ -32,7 +32,7 @@ public class OperationsEvent extends Event {
     private String publisherRole;
 
     @Column("event_location")
-    private String eventLocation;
+    private String eventLocationID;
 
     @Column("port_call_service_type_code")
     private PortCallServiceTypeCode portCallServiceTypeCode;
@@ -51,6 +51,9 @@ public class OperationsEvent extends Event {
 
     @Transient
     private TransportCallTO transportCall;
+
+    @Transient
+    private LocationTO eventLocation;
 
     @Transient
     private LocationTO vesselPosition;
