@@ -75,11 +75,4 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
                 .thenReturn(operationsEvent);
     }
-
-    @Override
-    public Mono<OperationsEvent> create(OperationsEvent operationsEvent) {
-        operationsEvent.setTransportCallID(operationsEvent.getTransportCall().getTransportCallID());
-        operationsEvent.setPublisher(operationsEvent.getPublisher());
-        return super.save(operationsEvent);
-    }
 }
