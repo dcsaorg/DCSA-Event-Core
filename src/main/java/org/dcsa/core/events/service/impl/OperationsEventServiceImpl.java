@@ -49,7 +49,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
         if (operationsEvent.getTransportCallID() == null) return Mono.empty();
         return transportCallTOService
                 .findById(operationsEvent.getTransportCallID())
-                .doOnNext(transportCall -> operationsEvent.setTransportCall(MappingUtils.instanceFrom(transportCall, TransportCallTO::new, AbstractTransportCall.class)))
+                .doOnNext(operationsEvent::setTransportCall)
                 .thenReturn(operationsEvent);
     }
     private Mono<OperationsEvent> getAndSetPublisher(OperationsEvent operationsEvent) {
