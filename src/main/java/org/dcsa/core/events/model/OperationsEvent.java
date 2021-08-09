@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.FacilityTypeCode;
 import org.dcsa.core.events.model.enums.OperationsEventTypeCode;
 import org.dcsa.core.events.model.enums.PortCallServiceTypeCode;
+import org.dcsa.core.events.model.enums.PublisherRole;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
@@ -31,7 +32,7 @@ public class OperationsEvent extends Event {
     private OperationsEventTypeCode operationsEventTypeCode;
 
     @Column("publisher_role")
-    private String publisherRole;
+    private PublisherRole publisherRole;
 
     @Column("event_location")
     private String eventLocationID;
