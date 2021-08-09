@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dcsa.core.events.model.enums.FacilityTypeCode;
 import org.dcsa.core.model.AuditBase;
+import org.dcsa.core.validator.EnumSubset;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -27,7 +29,8 @@ public class AbstractTransportCall extends AuditBase {
 
     @Size(max = 4)
     @Column("facility_type_code")
-    private String facilityTypeCode;
+    @EnumSubset(anyOf = {"BOCR", "CLOC", "COFS", "COYA", "OFFD", "DEPO", "INTE", "POTE"})
+    private FacilityTypeCode facilityTypeCode;
 
     @Size(max = 50)
     @Column("other_facility")
