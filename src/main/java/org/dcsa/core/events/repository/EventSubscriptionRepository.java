@@ -1,0 +1,37 @@
+package org.dcsa.core.events.repository;
+
+import org.dcsa.core.events.model.EventSubscription;
+import org.dcsa.core.events.model.enums.EventType;
+import org.dcsa.core.repository.ExtendedRepository;
+import org.dcsa.core.events.model.EventSubscriptionEventType;
+import org.springframework.data.r2dbc.repository.Modifying;
+import org.springframework.data.r2dbc.repository.Query;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface EventSubscriptionRepository extends ExtendedRepository<EventSubscription, UUID> {
+
+  @Modifying
+  @Query(
+      "INSERT INTO event_subscription_event_types (subscription_id, event_type)"
+          + " VALUES (:subscriptionID, :eventType)")
+  Mono<Void> insertEventTypeForSubscription(UUID subscriptionID, EventType eventType);
+
+  @Query(
+      "SELECT event_type FROM event_subscription_event_types"
+          + " WHERE subscription_id = :subscriptionID")
+  Flux<String> findEventTypesForSubscription(UUID subscriptionID);
+
+  @Modifying
+  @Query("DELETE FROM event_subscription_event_types WHERE subscription_id = :subscriptionID")
+  Mono<Void> deleteEventTypesForSubscription(UUID subscriptionID);
+
+  @Query(
+      "SELECT event_subscription_event_types.* FROM event_subscription_event_types"
+          + " WHERE subscription_id IN (:subscriptionIDs)"
+          + " ORDER BY subscription_id, event_type")
+  Flux<EventSubscriptionEventType> findEventTypesForSubscriptionIDIn(List<UUID> subscriptionIDs);
+}
