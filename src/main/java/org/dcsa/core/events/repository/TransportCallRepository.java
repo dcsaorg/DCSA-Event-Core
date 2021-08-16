@@ -49,4 +49,63 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
             + " AND facility.facility_smdg_code = :facilitySMDGCode"
             + " AND facility.un_location_code = :UNLocationCode")
     Mono<TransportCall> getTransportCall(String UNLocationCode, String facilitySMDGCode, String modeOfTransport, String vesselIMONumber);
+
+  @Query(
+      "SELECT shipping_instruction.transport_document_type FROM shipping_instruction shipping_instruction"
+          + " JOIN transport_document transport_document ON transport_document.shipping_instruction_id = shipping_instruction.id"
+          + " WHERE transport_document.transport_document_reference = :transportDocumentReference")
+  Mono<String> findTransportDocumentTypeCodeByTransportDocumentReference(
+      String transportDocumentReference);
+
+  @Query(
+      "SELECT DISTINCT voyage.carrier_voyage_number FROM voyage voyage"
+          + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
+          + " WHERE transport_call_voyage.transport_call_id = :transportCallID")
+  Flux<String> findCarrierVoyageNumbersByTransportCallID(String transportCallID);
+
+  @Query(
+      "SELECT DISTINCT service.carrier_service_code FROM service service"
+          + " JOIN voyage voyage ON voyage.service_id = service.id"
+          + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
+          + " WHERE transport_call_voyage.transport_call_id = :transportCallID")
+  Flux<String> findCarrierServiceCodesByTransportCallID(String transportCallID);
+
+  @Query(
+      "SELECT DISTINCT tc.id FROM transport_call tc "
+          + "JOIN transport t "
+          + "ON t.load_transport_call_id = tc.id "
+          + "JOIN shipment_transport st "
+          + "ON st.transport_id = t.id "
+          + "JOIN shipment s "
+          + "ON s.id = st.shipment_id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingRef")
+  Flux<String> findTransportCallIDByCarrierBookingRef(String carrierBookingRef);
+
+  @Query(
+      "SELECT DISTINCT tc.id FROM transport_call tc "
+          + "JOIN transport t "
+          + "ON t.load_transport_call_id = tc.id "
+          + "JOIN shipment_transport st "
+          + "ON st.transport_id = t.id "
+          + "JOIN shipment s "
+          + "ON s.id = st.shipment_id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingRef")
+  Flux<String> findTransportCallIDByShippingInstructionID(String shippingInstructionID);
+
+  @Query(
+      "SELECT DISTINCT tc.id FROM transport_call tc "
+          + "JOIN transport t "
+          + "ON t.load_transport_call_id = tc.id "
+          + "JOIN shipment_transport st "
+          + "ON st.transport_id = t.id "
+          + "JOIN shipment s "
+          + "ON s.id = st.shipment_id "
+          + "LEFT JOIN cargo_item ci "
+          + "ON ci.shipment_id = s.id"
+          + "LEFT JOIN references r "
+          + "ON r.shipment_id = s.id "
+          + "JOIN transport_document td "
+          + "ON (td.shipping_instruction_id = ci.shipping_instruction_id OR td.shipping_instruction_id = r.shipping_instruction_id)"
+          + "WHERE td.transport_document_reference = :transportDocumentRef")
+  Flux<String> findTransportCallIDByTransportDocumentRef(String transportDocumentRef);
 }
