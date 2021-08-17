@@ -15,7 +15,9 @@ public interface CarrierRepository extends ExtendedRepository<Carrier, UUID> {
     )
     Mono<Carrier> getCarrierBySMdgCode(String smdgCode);
 
-    @Query("SELECT carrier FROM carrier WHERE carrier.nmfta_code =:NmftaCode")
+    @Query("SELECT carrier.*"
+            + "  FROM carrier"
+            + "  WHERE carrier.nmfta_code =:NmftaCode "
+    )
     Mono<Carrier> getCarrierByNmftaCode(String NmftaCode);
 }
-
