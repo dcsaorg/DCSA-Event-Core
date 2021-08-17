@@ -40,6 +40,11 @@ public abstract class AbstractEventSubscriptionController<
     return new ExtendedRequest<>(extendedParameters, r2dbcDialect, clazz);
   }
 
+  @Override
+  public String getType() {
+    return "EventSubscription";
+  }
+
   @GetMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
   public Mono<T> findById(@PathVariable UUID id) {

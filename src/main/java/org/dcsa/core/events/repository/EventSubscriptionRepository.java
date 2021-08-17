@@ -1,10 +1,7 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.*;
-import org.dcsa.core.events.model.enums.EquipmentEventTypeCode;
-import org.dcsa.core.events.model.enums.EventType;
-import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
-import org.dcsa.core.events.model.enums.TransportEventTypeCode;
+import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
@@ -43,6 +40,13 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
   Mono<Void> insertEquipmentEventTypeForSubscription(
       UUID subscriptionID, EquipmentEventTypeCode equipmentEventTypeCode);
 
+  @Modifying
+  @Query(
+          "INSERT INTO event_subscription_operations_event_type (subscription_id, operations_event_type_code)"
+                  + " VALUES (:subscriptionID, :operationsEventTypeCode)")
+  Mono<Void> insertOperationsEventTypeForSubscription(
+          UUID subscriptionID, OperationsEventTypeCode operationsEventTypeCode);
+
   @Query(
       "SELECT event_type FROM event_subscription_event_types"
           + " WHERE subscription_id = :subscriptionID")
@@ -63,6 +67,11 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " WHERE subscription_id = :subscriptionID")
   Flux<String> findEquipmentEventTypesForSubscriptionID(UUID subscriptionID);
 
+  @Query(
+          "SELECT operations_event_type_code FROM event_subscription_operations_event_type"
+                  + " WHERE subscription_id = :subscriptionID")
+  Flux<String> findOperationsEventTypesForSubscriptionID(UUID subscriptionID);
+
   @Modifying
   @Query("DELETE FROM event_subscription_event_types WHERE subscription_id = :subscriptionID")
   Mono<Void> deleteEventTypesForSubscription(UUID subscriptionID);
@@ -81,6 +90,11 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
   @Query(
       "DELETE FROM event_subscription_equipment_event_type WHERE subscription_id = :subscriptionID")
   Mono<Void> deleteEquipmentEventTypesForSubscriptionID(UUID subscriptionID);
+
+  @Modifying
+  @Query(
+          "DELETE FROM event_subscription_operations_event_type WHERE subscription_id = :subscriptionID")
+  Mono<Void> deleteOperationsEventTypesForSubscriptionID(UUID subscriptionID);
 
   @Query(
       "SELECT event_subscription_event_types.* FROM event_subscription_event_types"
@@ -108,6 +122,13 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " ORDER BY subscription_id, equipment_event_type_code")
   Flux<EventSubscriptionEquipmentEventType> findEquipmentEventTypesForSubscriptionIDIn(
       List<UUID> subscriptionIDs);
+
+  @Query(
+          "SELECT event_subscription_operations_event_type.* FROM event_subscription_operations_event_type"
+                  + " WHERE subscription_id IN (:subscriptionIDs)"
+                  + " ORDER BY subscription_id, operations_event_type_code")
+  Flux<EventSubscriptionOperationsEventType> findOperationsEventTypesForSubscriptionIDIn(
+          List<UUID> subscriptionIDs);
 
   @Query(
       "SELECT es.* FROM event_subscription es"

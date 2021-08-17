@@ -2,6 +2,7 @@ package org.dcsa.core.events.service.impl;
 
 import org.dcsa.core.events.model.EventSubscription;
 import org.dcsa.core.events.model.base.AbstractEventSubscription;
+import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.model.transferobjects.EventSubscriptionSecretUpdateTO;
 import org.dcsa.core.events.service.EventSubscriptionService;
 import org.dcsa.core.events.service.EventSubscriptionTOService;
@@ -10,8 +11,12 @@ import org.dcsa.core.service.impl.BaseServiceImpl;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class EventSubscriptionTOServiceImpl<
         T extends AbstractEventSubscription, S extends EventSubscriptionService>
@@ -22,8 +27,6 @@ public abstract class EventSubscriptionTOServiceImpl<
   protected abstract Flux<T> mapManyD2TO(Flux<EventSubscription> eventSubscriptionFlux);
 
   protected abstract Mono<T> mapSingleD2TO(Mono<EventSubscription> eventSubscriptionMono);
-
-  protected Function<T, EventSubscription> eventSubscriptionTOToEventSubscription;
 
   @Override
   public Flux<T> findAll() {
@@ -66,4 +69,13 @@ public abstract class EventSubscriptionTOServiceImpl<
   public UUID getIdOfEntity(T entity) {
     return entity.getSubscriptionID();
   }
+
+  protected final Function<String, List<EventType>> stringToEventTypeList =
+      s -> {
+        if (s.contains(",")) {
+          return Arrays.stream(s.split(",")).map(EventType::valueOf).collect(Collectors.toList());
+        } else {
+          return Stream.of(s).map(EventType::valueOf).collect(Collectors.toList());
+        }
+      };
 }
