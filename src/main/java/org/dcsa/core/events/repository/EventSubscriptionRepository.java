@@ -161,7 +161,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " JOIN event_subscription_equipment_event_type eseet"
           + "   ON eseet.subscription_id = es.subscription_id"
           + " WHERE eset.event_type = :eventType"
-          + "    AND event_subscription_equipment_event_type.equipment_event_type_code = :equipmentEventTypeCode"
+          + "   AND event_subscription_equipment_event_type.equipment_event_type_code = :equipmentEventTypeCode"
           + "   AND equipment_reference IS NULL OR equipment_reference = :equipmentReference"
           + "   AND (carrier_booking_reference IS NULL OR carrier_booking_reference IN :carrierBookingReferences)"
           + "   AND (transport_document_reference IS NULL OR transport_document_reference IN :transportDocumentReferences)"

@@ -51,20 +51,20 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
     Mono<TransportCall> getTransportCall(String UNLocationCode, String facilitySMDGCode, String modeOfTransport, String vesselIMONumber);
 
   @Query(
-      "SELECT shipping_instruction.transport_document_type FROM shipping_instruction shipping_instruction"
+      "SELECT shipping_instruction.transport_document_type FROM shipping_instruction"
           + " JOIN transport_document transport_document ON transport_document.shipping_instruction_id = shipping_instruction.id"
           + " WHERE transport_document.transport_document_reference = :transportDocumentReference")
   Mono<String> findTransportDocumentTypeCodeByTransportDocumentReference(
       String transportDocumentReference);
 
   @Query(
-      "SELECT DISTINCT voyage.carrier_voyage_number FROM voyage voyage"
+      "SELECT DISTINCT voyage.carrier_voyage_number FROM voyage"
           + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
           + " WHERE transport_call_voyage.transport_call_id = :transportCallID")
   Flux<String> findCarrierVoyageNumbersByTransportCallID(String transportCallID);
 
   @Query(
-      "SELECT DISTINCT service.carrier_service_code FROM service service"
+      "SELECT DISTINCT service.carrier_service_code FROM service"
           + " JOIN voyage voyage ON voyage.service_id = service.id"
           + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
           + " WHERE transport_call_voyage.transport_call_id = :transportCallID")

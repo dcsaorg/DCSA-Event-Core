@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AbstractEventSubscription extends AuditBase {
+public abstract class AbstractEventSubscription extends AuditBase {
 
   @Id
   @Column("subscription_id")

@@ -4,10 +4,19 @@ import org.dcsa.core.events.model.ShipmentEquipment;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ShipmentEquipmentRepository extends ExtendedRepository<ShipmentEquipment, UUID> {
+
+  Flux<ShipmentEquipment> findAllByShipmentIDIn(List<UUID> shipmentIDs);
+
+  Mono<ShipmentEquipment> findByEquipmentReference(String equipmentReference);
+
+  Mono<Void> deleteByEquipmentReferenceInAndShipmentIDIn(
+      List<String> equipmentReferences, List<UUID> shipmentIDs);
 
   @Query(
       "SELECT DISTINCT se.equipment_reference FROM shipment_equipment se "

@@ -8,7 +8,6 @@ import org.dcsa.core.events.model.transferobjects.EventSubscriptionSecretUpdateT
 import org.dcsa.core.events.service.EventSubscriptionTOService;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.GetException;
-import org.dcsa.core.exception.UpdateException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
@@ -21,7 +20,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.Objects;
 import java.util.UUID;
 
 @RequestMapping(
@@ -45,12 +43,6 @@ public abstract class AbstractEventSubscriptionController<
     return "EventSubscription";
   }
 
-  @GetMapping("{id}")
-  @ResponseStatus(HttpStatus.OK)
-  public Mono<T> findById(@PathVariable UUID id) {
-    return getService().findById(id);
-  }
-
   @GetMapping
   public Flux<T> findAll(ServerHttpResponse response, ServerHttpRequest request) {
     ExtendedRequest<EventSubscription> extendedRequest =
@@ -70,6 +62,7 @@ public abstract class AbstractEventSubscriptionController<
             });
   }
 
+  @Override
   @PostMapping(consumes = "application/json", produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   public Mono<T> create(@Valid @RequestBody T eventSubscriptionTO) {
@@ -87,18 +80,4 @@ public abstract class AbstractEventSubscriptionController<
     return getService().updateSecret(id, eventSubscriptionSecretUpdateTO);
   }
 
-  @PutMapping("{id}")
-  @ResponseStatus(HttpStatus.OK)
-  public Mono<T> update(@PathVariable UUID id, @Valid @RequestBody T eventSubscriptionTO) {
-    if (!Objects.equals(id, eventSubscriptionTO.getSubscriptionID())) {
-      return Mono.error(new UpdateException("Id in url does not match id in body"));
-    }
-    return getService().update(eventSubscriptionTO);
-  }
-
-  @DeleteMapping("{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Void> deleteById(@PathVariable UUID id) {
-    return getService().deleteById(id);
-  }
 }
