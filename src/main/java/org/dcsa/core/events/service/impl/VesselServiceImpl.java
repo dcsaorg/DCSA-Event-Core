@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
+import org.dcsa.core.events.service.CarrierService;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
@@ -27,7 +29,7 @@ import org.dcsa.core.extendedrequest.ExtendedParameters;
 public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, String> implements VesselService {
 
     private final VesselRepository vesselRepository;
-    private final CarrierRepository carrierRepository;
+    private final CarrierService carrierService;
     private final ExtendedParameters extendedParameters;
     private final R2dbcDialect r2dbcDialect;
 
@@ -75,38 +77,27 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
                 });
     }
 
-    private Mono<Carrier> mapEntity(Vessel vessel){
-       Function<String, Mono<Carrier>> method;
-        if (vessel.getVesselOperatorCarrierCode() == null) {
+    private Mono<Carrier> mapEntity(Vessel vessel) {
+        CarrierCodeListProvider carrierCodeListProvider = vessel.getVesselOperatorCarrierCodeListProvider();
+        String carrierCode = vessel.getVesselOperatorCarrierCode();
+        if (carrierCodeListProvider == null) {
             throw new CreateException("Vessel Operator code list provider is required");
         }
-        switch (vessel.getVesselOperatorCarrierCodeListProvider()) {
-            case SMDG:
-                method = carrierRepository::getCarrierBySMdgCode;
-                break;
-            case NMFTA:
-                method =  carrierRepository::getCarrierByNmftaCode;
-                break;
-            default:
-                throw new CreateException("Unsupported vessel operator carrier code list provider: " + vessel.getVesselOperatorCarrierCodeListProvider());
-        }
-        return method.apply(vessel.getVesselOperatorCarrierCode())
-                .switchIfEmpty(Mono.error(new CreateException("Cannot find any vessel operator with carrier code: "
-                    + vessel.getVesselOperatorCarrierCode() )));
+        return carrierService.findByCode(carrierCodeListProvider, carrierCode);
     }
 
     @Override
     public Mono<Vessel> preCreateHook(Vessel vessel) {
         return mapEntity(vessel)
                 .doOnNext(carrier -> vessel.setVesselOperatorCarrierID(carrier.getId()))
-                .doOnNext(carrier -> vessel.setCarrier(carrier))
+                .doOnNext(vessel::setCarrier)
                 .thenReturn(vessel);
     }
     @Override
     public Mono<Vessel> preUpdateHook(Vessel current, Vessel update) {
         return mapEntity(update)
                 .doOnNext(carrier -> update.setVesselOperatorCarrierID(carrier.getId()))
-                .doOnNext(carrier -> update.setCarrier(carrier))
+                .doOnNext(update::setCarrier)
                 .thenReturn(update);
     }
     public ExtendedRequest<Vessel> newExtendedRequest() {
