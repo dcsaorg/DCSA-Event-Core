@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.config.MessageServiceConfig;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.DocumentReferenceType;
+import org.dcsa.core.events.model.enums.OperationsEventTypeCode;
 import org.dcsa.core.events.model.enums.SignatureMethod;
 import org.dcsa.core.events.model.enums.TransportEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
@@ -35,6 +36,7 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
     private final TransportDocumentTypeRepository transportDocumentTypeRepository;
     private final ShipmentEquipmentRepository shipmentEquipmentRepository;
     private final TransportRepository transportRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public EventSubscriptionRepository getRepository() {
@@ -110,6 +112,8 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
                 return findSubscriptionsFor((ShipmentEvent) event);
             case TRANSPORT:
                 return findSubscriptionsFor((TransportEvent) event);
+          case OPERATIONS:
+                return findSubscriptionsFor((OperationsEvent) event);
             default:
                 throw new IllegalArgumentException("Unsupported event type.");
         }
@@ -161,7 +165,6 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
               List<String> documentTypeCodes = vnScTc.getT3();
 
               return eventSubscriptionRepository.findByEquipmentEventFields(
-                  equipmentEvent.getEventType(),
                   equipmentEvent.getEquipmentEventTypeCode(),
                   equipmentEvent.getEquipmentReference(),
                   carrierBookingReferences,
@@ -220,7 +223,7 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
         break;
       case SHI:
         carrierBookingReferences =
-            shipmentEventRepository
+            bookingRepository
                 .findCarrierBookingRefsByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
@@ -259,7 +262,7 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
         break;
       case TRD:
         carrierBookingReferences =
-            shipmentEventRepository
+            bookingRepository
                 .findCarrierBookingRefsByTransportDocumentRef(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
@@ -316,7 +319,6 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
         .flatMapMany(
             params ->
                 eventSubscriptionRepository.findByShipmentEventFields(
-                    shipmentEvent.getEventType(),
                     shipmentEvent.getShipmentEventTypeCode(),
                     params.getT1(),
                     params.getT2(),
@@ -363,9 +365,62 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
                     voyageNumbers, serviceCodes,
                     transportEventTypeCode, vesselIMONumber, transportCallID,
                     carrierBookingReferences, transportDocumentReferences,
-                    documentTypeCodes,
-                    transportEvent.getEventType()
+                    documentTypeCodes
             );
         });
     }
+
+  private Flux<EventSubscription> findSubscriptionsFor(OperationsEvent operationsEvent) {
+    Mono<List<String>> carrierVoyageNumbers =
+        transportCallRepository
+            .findCarrierVoyageNumbersByTransportCallID(operationsEvent.getTransportCallID())
+            .collectList();
+
+    Mono<List<String>> carrierServiceCodes =
+        transportCallRepository
+            .findCarrierServiceCodesByTransportCallID(operationsEvent.getTransportCallID())
+            .collectList();
+    OperationsEventTypeCode operationsEventTypeCode = operationsEvent.getOperationsEventTypeCode();
+
+    String vesselIMONumber = operationsEvent.getTransportCall().getVessel().getVesselIMONumber();
+
+    String transportCallID = operationsEvent.getTransportCallID();
+
+    Mono<List<String>> carrierBookingReferences =
+        bookingRepository
+            .findCarrierBookingRefsByTransportCallID(operationsEvent.getTransportCallID())
+            .collectList();
+    Mono<List<String>> transportDocumentReferences =
+        transportDocumentRepository
+            .findTransportDocumentReferencesByTransportCallID(operationsEvent.getTransportCallID())
+            .collectList();
+    Mono<List<String>> transportDocumentTypeCodes =
+        transportDocumentTypeRepository
+            .findCodesByTransportCallID(operationsEvent.getTransportCallID())
+            .collectList();
+
+    return Mono.zip(
+            carrierVoyageNumbers,
+            carrierServiceCodes,
+            carrierBookingReferences,
+            transportDocumentReferences,
+            transportDocumentTypeCodes)
+        .flatMapMany(
+            params -> {
+              List<String> cvns = params.getT1();
+              List<String> cscs = params.getT2();
+              List<String> cbrs = params.getT3();
+              List<String> tdrs = params.getT4();
+              List<String> tdtcs = params.getT5();
+              return eventSubscriptionRepository.findByOperationEventFields(
+                  operationsEventTypeCode,
+                  cbrs,
+                  tdrs,
+                  tdtcs,
+                  transportCallID,
+                  vesselIMONumber,
+                  cvns,
+                  cscs);
+            });
+  }
 }
