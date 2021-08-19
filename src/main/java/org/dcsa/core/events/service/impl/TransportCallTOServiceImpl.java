@@ -17,9 +17,7 @@ import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.dcsa.core.util.MappingUtils;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.List;
@@ -86,26 +84,12 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
 
     @Override
     public Mono<TransportCallTO> create(TransportCallTO transportCallTO) {
+        transportCallTO.setVessel(transportCallTO.getVessel());
         return Mono.justOrEmpty(transportCallTO.getLocation()).flatMap(locationService::ensureResolvable)
                 .flatMap(loc -> {
                     transportCallTO.setLocationID(loc.getId());
                     return transportCallService.create(MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class));
                 }).thenReturn(transportCallTO);
-    }
-
-    @Override
-    public Mono<TransportCallTO> update(TransportCallTO transportCall) {
-        return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
-    }
-
-    @Override
-    public Mono<Void> deleteById(String id) {
-        return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
-    }
-
-    @Override
-    public Mono<Void> delete(TransportCallTO transportCall) {
-        return Mono.error(new ResponseStatusException(HttpStatus.FORBIDDEN));
     }
 
     @Override
