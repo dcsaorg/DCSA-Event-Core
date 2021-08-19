@@ -212,28 +212,23 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
         Table transportCallTable = Table.create(TRANSPORT_CALL_TABLE_NAME);
         Table transportTable = Table.create(TRANSPORT_TABLE_NAME);
-        Table shipmentTransportTable = Table.create(SHIPMENT_TRANSPORT_TABLE_NAME);
-        Table commercialVoyageTransportCallTable = Table.create(COMMERCIAL_VOYAGE_TRANSPORT_CALL_TABLE_NAME);
         Table transportCallVoyageTable = Table.create(TRANSPORT_CALL_VOYAGE_TABLE_NAME);
         Table voyageTable = Table.create(VOYAGE_TABLE_NAME);
         Table serviceTable = Table.create(SERVICE_TABLE_NAME);
 
         return builder
-                .join(Join.JoinType.JOIN, eventTable, transportCallTable)
+                .join(Join.JoinType.LEFT_OUTER_JOIN, eventTable, transportCallTable)
                 .onEqualsThen(EVENT_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_ID_COLUMN_NAME)
-                .chainJoin(transportTable)
+                .chainJoin(Join.JoinType.LEFT_OUTER_JOIN, transportTable)
                 // FIXME: Needs "OR" join
                 .onEqualsThen(TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME)
-                .registerQueryFieldThen(
+                .registerQueryField(
                         SqlIdentifier.unquoted(TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME),
                         VESSEL_IMO_NUMBER_JSON_NAME,
                         String.class
-                ).chainJoin(shipmentTransportTable)
-                .onEqualsThen(TRANSPORT_ID_COLUMN_NAME, SHIPMENT_TRANSPORT_TRANSPORT_ID_COLUMN_NAME)
-                .chainJoin(commercialVoyageTransportCallTable)
-                .onEqualsThen(SHIPMENT_TRANSPORT_COMMERCIAL_VOYAGE_ID_COLUMN_NAME,COMMERCIAL_VOYAGE_TRANSPORT_CALL_COMMERCIAL_VOYAGE_ID_COLUMN_NAME)
-                .chainJoin(transportCallVoyageTable)
-                .onEqualsThen(COMMERCIAL_VOYAGE_TRANSPORT_CALL_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_VOYAGE_TRANSPORT_CALL_ID_COLUMN_NAME)
+                )
+                .join(Join.JoinType.JOIN, eventTable, transportCallVoyageTable)
+                .onEqualsThen(EVENT_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_VOYAGE_TRANSPORT_CALL_ID_COLUMN_NAME)
                 .chainJoin(voyageTable)
                 .onEqualsThen(TRANSPORT_CALL_VOYAGE_VOYAGE_ID_COLUMN_NAME, VOYAGE_ID_COLUMN_NAME)
                 .registerQueryFieldThen(
