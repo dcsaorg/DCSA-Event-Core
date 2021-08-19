@@ -21,6 +21,13 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
 
   @Modifying
   @Query(
+      "INSERT INTO event_subscription_transport_document_type (subscription_id, transport_document_type_code)"
+          + " VALUES (:subscriptionID, :transportDocumentTypeCode)")
+  Mono<Void> insertTransportDocumentEventTypeForSubscription(
+      UUID subscriptionID, TransportDocumentTypeCode transportDocumentTypeCode);
+
+  @Modifying
+  @Query(
       "INSERT INTO event_subscription_shipment_event_type (subscription_id, shipment_event_type_code)"
           + " VALUES (:subscriptionID, :shipmentEventTypeCode)")
   Mono<Void> insertShipmentEventTypeForSubscription(
@@ -53,6 +60,11 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
   Flux<String> findEventTypesForSubscription(UUID subscriptionID);
 
   @Query(
+      "SELECT transport_document_type_code FROM event_subscription_transport_document_type"
+          + " WHERE subscription_id = :subscriptionID")
+  Flux<String> findTransportDocumentEventTypesForSubscription(UUID subscriptionID);
+
+  @Query(
       "SELECT transport_event_type_code FROM event_subscription_transport_event_type"
           + " WHERE subscription_id = :subscriptionID")
   Flux<String> findTransportEventTypesForSubscriptionID(UUID subscriptionID);
@@ -75,6 +87,11 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
   @Modifying
   @Query("DELETE FROM event_subscription_event_types WHERE subscription_id = :subscriptionID")
   Mono<Void> deleteEventTypesForSubscription(UUID subscriptionID);
+
+  @Modifying
+  @Query(
+      "DELETE FROM event_subscription_transport_document_type WHERE subscription_id = :subscriptionID")
+  Mono<Void> deleteTransportDocumentEventTypesForSubscriptionID(UUID subscriptionID);
 
   @Modifying
   @Query(
@@ -101,6 +118,13 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " WHERE subscription_id IN (:subscriptionIDs)"
           + " ORDER BY subscription_id, event_type")
   Flux<EventSubscriptionEventType> findEventTypesForSubscriptionIDIn(List<UUID> subscriptionIDs);
+
+  @Query(
+      "SELECT event_subscription_transport_document_type.* FROM event_subscription_transport_document_type"
+          + " WHERE subscription_id IN (:subscriptionIDs)"
+          + " ORDER BY subscription_id, transport_document_type_code")
+  Flux<EventSubscriptionTransportDocumentEventType>
+      findTransportDocumentEventTypesForSubscriptionIDIn(List<UUID> subscriptionIDs);
 
   @Query(
       "SELECT event_subscription_transport_event_type.* FROM event_subscription_transport_event_type"

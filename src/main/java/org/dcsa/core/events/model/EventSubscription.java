@@ -32,9 +32,6 @@ public class EventSubscription extends AbstractEventSubscription implements Even
   @Column("transport_document_reference")
   private String transportDocumentReference;
 
-  @Column("transport_document_type_code")
-  private String transportDocumentTypeCode;
-
   @Column("transport_call_id")
   private String transportCallID;
 
