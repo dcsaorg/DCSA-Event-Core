@@ -9,15 +9,6 @@ import java.util.UUID;
 
 public interface CarrierRepository extends ExtendedRepository<Carrier, UUID> {
 
-    @Query("SELECT carrier.*"
-            + "  FROM carrier"
-            + "  WHERE carrier.smdg_code =:smdgCode "
-    )
     Mono<Carrier> findBySmdgCode(String smdgCode);
-
-    @Query("SELECT carrier.*"
-            + "  FROM carrier"
-            + "  WHERE carrier.nmfta_code =:NmftaCode "
-    )
     Mono<Carrier> findByNmftaCode(String NmftaCode);
 }
