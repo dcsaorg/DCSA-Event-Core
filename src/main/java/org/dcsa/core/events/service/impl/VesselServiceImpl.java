@@ -1,28 +1,24 @@
 package org.dcsa.core.events.service.impl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
-
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.Carrier;
+import org.dcsa.core.events.model.Vessel;
 import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
+import org.dcsa.core.events.repository.VesselRepository;
 import org.dcsa.core.events.service.CarrierService;
+import org.dcsa.core.events.service.VesselService;
+import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.NotFoundException;
+import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
+import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.util.ValidationUtils;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import org.dcsa.core.events.model.Carrier;
-import org.dcsa.core.events.repository.CarrierRepository;
-import org.dcsa.core.events.repository.VesselRepository;
-import org.dcsa.core.events.service.VesselService;
-import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.dcsa.core.util.ValidationUtils;
-import org.dcsa.core.events.model.Vessel;
-import org.dcsa.core.extendedrequest.ExtendedParameters;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -63,15 +59,25 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
     }
 
     @Override
-    public Mono<Vessel> findById(final String VesselIMONumber) {
+    public Mono<Vessel> findById(final String vesselIMONumber) {
+        try {
+            ValidationUtils.validateVesselIMONumber(vesselIMONumber);
+        } catch (IllegalArgumentException e) {
+            return Mono.error(new CreateException(e.getLocalizedMessage()));
+        }
         ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
-        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(String.valueOf(VesselIMONumber))));
+        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(vesselIMONumber)));
         return vesselRepository.findAllExtended(extendedRequest)
+                .take(2)
                 .collectList()
                 .flatMap(vessels -> {
-                    if(vessels.isEmpty()){
+                    if (vessels.size() > 1) {
+                        throw new AssertionError("vesselIMONumber should be unique but " + vesselIMONumber
+                                + " matched more than one entity");
+                    }
+                    if (vessels.isEmpty()){
                         return Mono.error(new NotFoundException("Cannot find any vessel operator with provided VesselIMONumber: "
-                                + VesselIMONumber ));
+                                + vesselIMONumber ));
                     }
                     return Mono.just(vessels.get(0));
                 });
