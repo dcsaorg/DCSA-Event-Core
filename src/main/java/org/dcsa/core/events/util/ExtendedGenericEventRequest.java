@@ -1,5 +1,6 @@
 package org.dcsa.core.events.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.r2dbc.spi.Row;
@@ -186,7 +187,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             }
             while (currentClass != Event.class) {
                 for (Field field : currentClass.getDeclaredFields()) {
-                    if (field.isAnnotationPresent(Transient.class)) {
+                    if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(JsonIgnore.class)) {
                         continue;
                     }
                     QueryField queryField = QueryFields.queryFieldFromField(Event.class, field, clazz, eventTable, true);
