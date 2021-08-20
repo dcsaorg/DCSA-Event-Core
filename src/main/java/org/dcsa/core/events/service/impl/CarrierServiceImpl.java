@@ -30,10 +30,10 @@ public class CarrierServiceImpl extends ExtendedBaseServiceImpl<CarrierRepositor
         Function<String, Mono<Carrier>> method;
         switch (Objects.requireNonNull(carrierCodeListProvider, "carrierCodeListProvider")) {
             case SMDG:
-                method = carrierRepository::getCarrierBySMdgCode;
+                method = carrierRepository::findBySmdgCode;
                 break;
             case NMFTA:
-                method =  carrierRepository::getCarrierByNmftaCode;
+                method = carrierRepository::findByNmftaCode;
                 break;
             default:
                 throw new CreateException("Unsupported vessel operator carrier code list provider: " + carrierCodeListProvider);
