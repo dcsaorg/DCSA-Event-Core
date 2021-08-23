@@ -60,7 +60,6 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                 .thenReturn(equipmentEvent);
     }
 
-    @Override
     public Mono<EquipmentEvent> insert(EquipmentEvent equipmentEvent) {
         return preCreateHook(equipmentEvent)
                 .flatMap(this::preSaveHook)

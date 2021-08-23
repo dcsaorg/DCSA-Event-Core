@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.base.AbstractLocation;
 import org.dcsa.core.events.model.base.AbstractParty;
-import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
-import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.service.LocationService;
 import org.dcsa.core.events.service.OperationsEventService;
@@ -52,6 +50,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .doOnNext(operationsEvent::setTransportCall)
                 .thenReturn(operationsEvent);
     }
+
     private Mono<OperationsEvent> getAndSetPublisher(OperationsEvent operationsEvent) {
         if (operationsEvent.getPublisherID() == null) return Mono.empty();
         return partyService
@@ -76,11 +75,9 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .thenReturn(operationsEvent);
     }
 
-    @Override
     public Mono<OperationsEvent> insert(OperationsEvent operationsEvent) {
         return preCreateHook(operationsEvent)
                 .flatMap(this::preSaveHook)
                 .flatMap(operationsEventRepository::insert);
-
     }
 }
