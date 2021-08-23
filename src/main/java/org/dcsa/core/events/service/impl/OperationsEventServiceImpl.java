@@ -75,4 +75,12 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
                 .thenReturn(operationsEvent);
     }
+
+    @Override
+    public Mono<OperationsEvent> insert(OperationsEvent operationsEvent) {
+        return preCreateHook(operationsEvent)
+                .flatMap(this::preSaveHook)
+                .flatMap(operationsEventRepository::insert);
+
+    }
 }

@@ -2,6 +2,7 @@ package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.TransportEvent;
+import org.dcsa.core.events.model.Vessel;
 import org.dcsa.core.events.repository.TransportEventRepository;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
@@ -50,4 +51,10 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
                 .thenReturn(transportEvent);
     }
 
+    @Override
+    public Mono<TransportEvent> insert(TransportEvent transportEvent) {
+        return preCreateHook(transportEvent)
+                .flatMap(this::preSaveHook)
+                .flatMap(transportEventRepository::insert);
+    }
 }
