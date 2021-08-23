@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.UUID;
 
 @Data
@@ -26,7 +25,6 @@ public abstract class AbstractEventSubscription extends AuditBase {
   @Column("schedule_id")
   protected String scheduleID;
 
-  @NotEmpty
   @Column("secret")
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   // Jackson encodes this in base64 by default
