@@ -148,7 +148,7 @@ public abstract class EventSubscriptionTOServiceImpl<
         .then();
   }
 
-  private Mono<Void> createOperationsEventType(T eventSubscriptionTO) {
+  protected Mono<Void> createOperationsEventType(T eventSubscriptionTO) {
 
     return Flux.fromIterable(getOperationsEventTypeCodesForTo(eventSubscriptionTO))
         .flatMap(
