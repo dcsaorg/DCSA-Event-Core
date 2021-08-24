@@ -85,11 +85,13 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     @Override
     public Mono<TransportCallTO> create(TransportCallTO transportCallTO) {
         transportCallTO.setVessel(transportCallTO.getVessel());
-        return Mono.justOrEmpty(transportCallTO.getLocation()).flatMap(locationService::ensureResolvable)
-                .flatMap(loc -> {
-                    transportCallTO.setLocationID(loc.getId());
-                    return transportCallService.create(MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class));
-                }).thenReturn(transportCallTO);
+        return Mono.justOrEmpty(transportCallTO.getLocation())
+                .flatMap(locationService::ensureResolvable)
+                .doOnNext(loc -> transportCallTO.setLocationID(loc.getId()))
+                // Force a non-empty Mono
+                .thenReturn(transportCallTO)
+                .flatMap(ignored -> transportCallService.create(MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class)))
+                .thenReturn(transportCallTO);
     }
 
     @Override
