@@ -49,5 +49,4 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
                 .doOnNext(transportEvent::setTransportCall)
                 .thenReturn(transportEvent);
     }
-
 }

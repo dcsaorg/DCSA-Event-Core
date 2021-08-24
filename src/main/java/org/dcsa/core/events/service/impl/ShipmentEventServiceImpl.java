@@ -32,40 +32,40 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
         return getRepository().findById(id);
     }
 
-  @Override
-  public Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent shipmentEvent) {
-    switch (shipmentEvent.getDocumentTypeCode()) {
-      case BKG:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByCarrierBookingReference(shipmentEvent.getDocumentID()))
-            .thenReturn(shipmentEvent);
-      case TRD:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByTransportDocumentReference(shipmentEvent.getDocumentID()))
-            .thenReturn(shipmentEvent);
-      case SHI:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
-            .thenReturn(shipmentEvent);
-      default:
-        return Mono.just(shipmentEvent);
+    @Override
+    public Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent shipmentEvent) {
+        switch (shipmentEvent.getDocumentTypeCode()) {
+            case BKG:
+                return shipmentEventReferences
+                        .apply(
+                                shipmentEvent,
+                                referenceRepository.findByCarrierBookingReference(shipmentEvent.getDocumentID()))
+                        .thenReturn(shipmentEvent);
+            case TRD:
+                return shipmentEventReferences
+                        .apply(
+                                shipmentEvent,
+                                referenceRepository.findByTransportDocumentReference(shipmentEvent.getDocumentID()))
+                        .thenReturn(shipmentEvent);
+            case SHI:
+                return shipmentEventReferences
+                        .apply(
+                                shipmentEvent,
+                                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
+                        .thenReturn(shipmentEvent);
+            default:
+                return Mono.just(shipmentEvent);
+        }
     }
-  }
 
-  private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>
-      shipmentEventReferences =
-          (se, rs) ->
-              Mono.justOrEmpty(se)
-                  .flatMap(
-                      shipmentEvent ->
-                          rs.collectList()
-                              .doOnNext(shipmentEvent::setReferences)
-                              .thenReturn(shipmentEvent));
+    private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>
+            shipmentEventReferences =
+            (se, rs) ->
+                    Mono.justOrEmpty(se)
+                            .flatMap(
+                                    shipmentEvent ->
+                                            rs.collectList()
+                                                    .doOnNext(shipmentEvent::setReferences)
+                                                    .thenReturn(shipmentEvent));
 
 }
