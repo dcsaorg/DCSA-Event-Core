@@ -50,7 +50,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .doOnNext(operationsEvent::setTransportCall)
                 .thenReturn(operationsEvent);
     }
-
+    
     private Mono<OperationsEvent> getAndSetPublisher(OperationsEvent operationsEvent) {
         if (operationsEvent.getPublisherID() == null) return Mono.empty();
         return partyService
@@ -73,11 +73,5 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .findById(operationsEvent.getVesselPositionID())
                 .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
                 .thenReturn(operationsEvent);
-    }
-
-    public Mono<OperationsEvent> insert(OperationsEvent operationsEvent) {
-        return preCreateHook(operationsEvent)
-                .flatMap(this::preSaveHook)
-                .flatMap(operationsEventRepository::insert);
     }
 }

@@ -1,7 +1,6 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.ShipmentEvent;
 import org.dcsa.core.events.repository.ReferenceRepository;
@@ -57,12 +56,6 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
             default:
                 return Mono.just(shipmentEvent);
         }
-    }
-
-    public Mono<ShipmentEvent> insert(ShipmentEvent shipmentEvent) {
-        return preCreateHook(shipmentEvent)
-                .flatMap(this::preSaveHook)
-                .flatMap(shipmentEventRepository::insert);
     }
 
     private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>

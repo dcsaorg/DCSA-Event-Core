@@ -2,9 +2,8 @@ package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.repository.ExtendedRepository;
-import org.dcsa.core.repository.InsertAddonRepository;
 
 import java.util.UUID;
 
-public interface OperationsEventRepository extends ExtendedRepository<OperationsEvent, UUID>, InsertAddonRepository<OperationsEvent> {
+public interface OperationsEventRepository extends ExtendedRepository<OperationsEvent, UUID> {
 }

@@ -59,10 +59,4 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                 .doOnNext(equipmentEvent::setTransportCall)
                 .thenReturn(equipmentEvent);
     }
-
-    public Mono<EquipmentEvent> insert(EquipmentEvent equipmentEvent) {
-        return preCreateHook(equipmentEvent)
-                .flatMap(this::preSaveHook)
-                .flatMap(equipmentEventRepository::insert);
-    }
 }
