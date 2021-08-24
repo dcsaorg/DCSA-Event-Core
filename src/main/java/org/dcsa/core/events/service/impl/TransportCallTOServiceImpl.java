@@ -57,15 +57,14 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                     }
                     TransportCallTO transportCallTO = transportCallTOs.get(0);
 
-                    return Mono.just(transportCallTO)
-                            .flatMap(
-                                    tcTo ->
-                                            modeOfTransportRepository
-                                                    .findByTransportCallID(transportCallTO.getTransportCallID())
-                                                    .map(ModeOfTransport::getDcsaTransportType))
+                    return modeOfTransportRepository
+                            .findByTransportCallID(transportCallTO.getTransportCallID())
+                            .map(ModeOfTransport::getDcsaTransportType)
                             .doOnNext(transportCallTO::setModeOfTransport)
+                            // Ensure non-empty (ModeOfTransport can be null)
+                            .thenReturn(transportCallTO)
                             .flatMap(
-                                    mot -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
+                                    ignored -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
                             .doOnNext(
                                     voyage ->
                                             transportCallTO.setCarrierVoyageNumber(
