@@ -13,9 +13,9 @@ public class TransportCallVoyage {
 
     @Id
     @Column("voyage_id")
-    protected UUID transportCallID;
+    protected UUID voyageID;
 
     @Column("transport_call_id")
-    private Integer transportCallSequenceNumber;
+    private String transportCallID;
 
 }
