@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dcsa.core.events.model.ModeOfTransport;
 import org.dcsa.core.events.model.Transport;
 import org.dcsa.core.events.model.Vessel;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
+import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.model.ForeignKey;
 import org.dcsa.core.model.JoinedWithModel;
@@ -20,10 +22,6 @@ import javax.validation.constraints.Size;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "dischargeTransportCallID", rhsJoinAlias = "dischargeTransport", joinType = Join.JoinType.LEFT_OUTER_JOIN)
-@JoinedWithModel(lhsJoinAlias = "dischargeTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "discharge_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
-@JoinedWithModel(lhsFieldName = "transportCallID", rhsModel = Transport.class, rhsFieldName = "loadTransportCallID", rhsJoinAlias = "loadTransport", joinType = Join.JoinType.LEFT_OUTER_JOIN)
-@JoinedWithModel(lhsJoinAlias = "loadTransport", lhsModel = Transport.class, lhsFieldName = "vesselIMONumber", rhsModel = Vessel.class, rhsFieldName = "vesselIMONumber", rhsJoinAlias = "load_vessel", joinType = Join.JoinType.LEFT_OUTER_JOIN)
 public class TransportCallTO extends AbstractTransportCall {
 
     @Transient
@@ -49,16 +47,6 @@ public class TransportCallTO extends AbstractTransportCall {
     @Transient
     private FacilityTO facility;
 
-    @MapEntity(joinAlias = "discharge_vessel")
-    @JsonIgnore
-    @Transient
-    private Vessel dischargeVessel;
-
-    @MapEntity(joinAlias = "load_vessel")
-    @JsonIgnore
-    @Transient
-    private Vessel loadVessel;
-
     private Vessel vesselOrNull(Vessel vessel) {
         if (vessel.isNullVessel()) {
             // Due to LEFT OUTER JOIN and @MapEntity, we can see a vessel consisting entirely of nulls.
@@ -69,23 +57,9 @@ public class TransportCallTO extends AbstractTransportCall {
         return vessel;
     }
 
-    public void setDischargeVessel(Vessel vessel) {
-        this.dischargeVessel = vesselOrNull(vessel);
-    }
-
-    public void setLoadVessel(Vessel vessel) {
-        this.loadVessel = vesselOrNull(vessel);
-    }
-
     @Transient
+    @ForeignKey(fromFieldName = "vesselIMONumber", foreignFieldName = "vesselIMONumber", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     private Vessel vessel;
-
-    public Vessel getVessel() {
-        if (dischargeVessel == null) {
-            return loadVessel;
-        }
-        return dischargeVessel;
-    }
 
     public void setVessel(Vessel vessel) {
         this.vessel = vesselOrNull(vessel);
@@ -96,7 +70,21 @@ public class TransportCallTO extends AbstractTransportCall {
     private LocationTO location;
 
     @Transient
-    private String modeOfTransport;
+    private DCSATransportType modeOfTransport;
+
+    @JsonIgnore
+    @ForeignKey(fromFieldName = "modeOfTransportID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+    @Transient
+    private ModeOfTransport modeOfTransportEntity;
+
+    // For loading the modeOfTransportEntity foreign key.
+    public void setModeOfTransportEntity(ModeOfTransport modeOfTransportEntity) {
+        if (modeOfTransportEntity != null) {
+            this.modeOfTransport = modeOfTransportEntity.getDcsaTransportType();
+            this.setModeOfTransportID(modeOfTransportEntity.getId());
+        }
+        this.modeOfTransportEntity = modeOfTransportEntity;
+    }
 
     public LocationTO getLocation() {
         if (location != null && !location.isNullLocation()) {

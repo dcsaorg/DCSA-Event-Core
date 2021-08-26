@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
 import org.dcsa.core.model.AuditBase;
 import org.dcsa.core.model.ForeignKey;
+import org.dcsa.core.validator.ValidVesselIMONumber;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.sql.Join;
 
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -32,8 +32,7 @@ public class Vessel extends AuditBase {
     }
 
     @Column("vessel_imo_number")
-    @Size(min = 7, max = 7)
-    @Pattern(regexp = "[0-9]{7}")
+    @ValidVesselIMONumber
     @Id
     private String vesselIMONumber;
 

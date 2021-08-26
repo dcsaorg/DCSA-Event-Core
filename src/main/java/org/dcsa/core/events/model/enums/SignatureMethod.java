@@ -3,6 +3,7 @@ package org.dcsa.core.events.model.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,25 @@ public enum SignatureMethod {
 
     public static Optional<SignatureMethod> byTag(String signatureMethodTag) {
         return Optional.ofNullable(BY_TAG.get(signatureMethodTag));
+    }
+
+    public byte[] generateSecret() {
+        if (this == SignatureMethod.PLAINTEXT_PASSWORD) {
+            throw new UnsupportedOperationException("Not implemented for method: " + this);
+        }
+        SecureRandom random = new SecureRandom();
+        final int length;
+        if (this.getMinKeyLength() == this.getMaxKeyLength()) {
+            length = this.getMaxKeyLength();
+        } else {
+            int diff = this.getMaxKeyLength() + this.getMinKeyLength();
+            length = this.getMinKeyLength() + random.nextInt(diff);
+            assert length >= this.getMinKeyLength();
+            assert length <= this.getMaxKeyLength();
+        }
+        byte[] secret = new byte[length];
+        random.nextBytes(secret);
+        return secret;
     }
 
     static {
