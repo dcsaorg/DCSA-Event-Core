@@ -65,17 +65,10 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                             .thenReturn(transportCallTO)
                             .flatMap(
                                     ignored -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
-                            .doOnNext(
-                                    voyage ->
-                                            transportCallTO.setCarrierVoyageNumber(
-                                                    null != voyage ? voyage.getCarrierVoyageNumber() : null))
-                            .flatMap(
-                                    voyage ->
-                                            null != voyage.getServiceID()
-                                                    ? serviceRepository
-                                                    .findById(voyage.getServiceID())
-                                                    .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
-                                                    : Mono.empty())
+                            .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
+                            .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
+                            .flatMap(serviceRepository::findById)
+                            .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
                             .doOnNext(transportCallTO::setCarrierServiceCode)
                             .thenReturn(transportCallTO);
                 });
