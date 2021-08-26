@@ -57,4 +57,6 @@ public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
           " ON td.shipping_instruction_id = ci.shipping_instruction_id " +
           "WHERE td.transport_document_reference = :transportDocumentRef")
   Flux<String> findCarrierVoyageNumbersByTransportDocumentRef(String transportDocumentRef);
+
+  Mono<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber);
 }

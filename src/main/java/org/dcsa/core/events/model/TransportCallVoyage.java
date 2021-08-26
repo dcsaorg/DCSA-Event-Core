@@ -12,6 +12,9 @@ import java.util.UUID;
 public class TransportCallVoyage {
 
     @Id
+    /* phoney */
+    protected UUID id;
+
     @Column("voyage_id")
     protected UUID voyageID;
 

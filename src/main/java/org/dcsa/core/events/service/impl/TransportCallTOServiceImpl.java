@@ -1,36 +1,36 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.ModeOfTransport;
-import org.dcsa.core.events.model.TransportCall;
+import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.*;
-import org.dcsa.core.events.service.LocationService;
-import org.dcsa.core.events.service.TransportCallService;
-import org.dcsa.core.events.service.TransportCallTOService;
-import org.dcsa.core.events.service.VesselService;
+import org.dcsa.core.events.service.*;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.dcsa.core.util.MappingUtils;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-@Service
+@org.springframework.stereotype.Service
 public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<TransportCallTORepository, TransportCallTO, String> implements TransportCallTOService {
+    private final CarrierService carrierService;
     private final LocationService locationService;
     private final TransportCallTORepository transportCallTORepository;
+    private final TransportCallVoyageService transportCallVoyageService;
     private final ModeOfTransportRepository modeOfTransportRepository;
     private final VesselRepository vesselRepository;
     private final VesselService vesselService;
     private final VoyageRepository voyageRepository;
+    private final VoyageService voyageService;
     private final ServiceRepository serviceRepository;
+    private final ServiceService serviceService;
     private final TransportCallService transportCallService;
     private final ExtendedParameters extendedParameters;
     private final R2dbcDialect r2dbcDialect;
@@ -76,6 +76,12 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
 
     @Override
     public Mono<TransportCallTO> create(TransportCallTO transportCallTO) {
+        if (transportCallTO.getCarrierVoyageNumber() == null ^ transportCallTO.getCarrierServiceCode() == null) {
+            if (transportCallTO.getCarrierServiceCode() == null) {
+                throw new IllegalArgumentException("Cannot create transport call where voyage code is present but service code is missing");
+            }
+            throw new IllegalArgumentException("Cannot create transport call where service code is present but voyage code is missing");
+        }
         return Mono.justOrEmpty(transportCallTO.getLocation())
                 .flatMap(locationService::ensureResolvable)
                 .doOnNext(loc -> transportCallTO.setLocationID(loc.getId()))
@@ -102,7 +108,37 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 })
                 .flatMap(transportCallService::create)
                 .doOnNext(transportCall -> transportCallTO.setTransportCallID(transportCall.getTransportCallID()))
+                .flatMap(ignored -> Mono.justOrEmpty(transportCallTO.getCarrierServiceCode()))
+                .flatMap(carrierServiceCode ->
+                    serviceService.findByCarrierServiceCode(carrierServiceCode)
+                            .switchIfEmpty(Mono.defer(() -> createService(carrierServiceCode, transportCallTO.getVessel()))
+                )).flatMap(service -> voyageService.findByCarrierVoyageNumber(transportCallTO.getCarrierVoyageNumber())
+                        .switchIfEmpty(Mono.defer(() -> {
+                            Voyage voyage = new Voyage();
+                            voyage.setCarrierVoyageNumber(transportCallTO.getCarrierVoyageNumber());
+                            voyage.setServiceID(service.getId());
+                            return voyageService.create(voyage);
+                })))
+                .flatMap(voyage -> transportCallVoyageService.findByTransportCallIDAndVoyageID(transportCallTO.getTransportCallID(), voyage.getId())
+                        .switchIfEmpty(Mono.defer(() -> {
+                            TransportCallVoyage transportCallVoyage = new TransportCallVoyage();
+                            transportCallVoyage.setTransportCallID(transportCallTO.getTransportCallID());
+                            transportCallVoyage.setVoyageID(voyage.getId());
+                            return transportCallVoyageService.create(transportCallVoyage);
+                })))
                 .thenReturn(transportCallTO);
+    }
+
+    private Mono<Service> createService(String carrierServiceCode, Vessel vessel) {
+        return carrierService.findByCode(
+                vessel.getVesselOperatorCarrierCodeListProvider(),
+                vessel.getVesselOperatorCarrierCode()
+        ).flatMap(carrier -> {
+            Service service = new Service();
+            service.setCarrierServiceCode(carrierServiceCode);
+            service.setCarrierID(carrier.getId());
+            return serviceService.create(service);
+        });
     }
 
     @Override
