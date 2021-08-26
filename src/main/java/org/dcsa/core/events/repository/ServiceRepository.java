@@ -5,6 +5,7 @@ import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -59,4 +60,6 @@ public interface ServiceRepository extends ExtendedRepository<Service, UUID> {
           + " ON td.shipping_instruction_id = ci.shipping_instruction_id "
           + "WHERE td.transport_document_reference = :transportDocumentRef")
   Flux<String> findCarrierServiceCodesByTransportDocumentRef(String transportDocumentRef);
+
+  Mono<Service> findByCarrierServiceCode(String carrierServiceCode);
 }
