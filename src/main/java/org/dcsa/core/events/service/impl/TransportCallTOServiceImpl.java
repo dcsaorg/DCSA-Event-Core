@@ -21,6 +21,7 @@ import java.util.Map;
 @org.springframework.stereotype.Service
 public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<TransportCallTORepository, TransportCallTO, String> implements TransportCallTOService {
     private final CarrierService carrierService;
+    private final FacilityService facilityService;
     private final LocationService locationService;
     private final TransportCallTORepository transportCallTORepository;
     private final TransportCallVoyageService transportCallVoyageService;
@@ -98,7 +99,13 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                         .switchIfEmpty(vesselService.create(vessel)))
                 // Force a non-empty Mono
                 .thenReturn(transportCallTO)
-                .map(ignored -> {
+                .flatMap(ignored ->
+                        facilityService.findByUNLocationCodeAndFacilityCode(
+                                transportCallTO.getUNLocationCode(),
+                                transportCallTO.getFacilityCodeListProvider(),
+                                transportCallTO.getFacilityCode()
+                        ).doOnNext(facility -> transportCallTO.setFacilityID(facility.getFacilityID()))
+                ).map(ignored -> {
                     TransportCall transportCall = MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class);
                     // When we receive an event via subscription, we need to preserve the original Transport ID.
                     if (transportCallTO.getTransportCallID() != null) {
