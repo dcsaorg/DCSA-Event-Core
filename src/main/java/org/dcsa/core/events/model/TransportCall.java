@@ -8,7 +8,6 @@ import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 
-import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -19,11 +18,13 @@ public class TransportCall extends AbstractTransportCall implements Persistable<
     @JsonIgnore
     private boolean isNewRecord;
 
+    @JsonIgnore
     @Override
     public String getId() {
         return this.transportCallID;
     }
 
+    @JsonIgnore
     @Override
     public boolean isNew() {
         return this.isNewRecord || this.getId() == null;

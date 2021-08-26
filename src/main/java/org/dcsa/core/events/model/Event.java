@@ -60,11 +60,13 @@ public class Event extends AuditBase implements Persistable<UUID> {
     @JsonIgnore
     private boolean isNewRecord;
 
+    @JsonIgnore
     @Override
     public UUID getId() {
         return this.eventID;
     }
 
+    @JsonIgnore
     @Override
     public boolean isNew() {
         return this.isNewRecord || this.getId() == null;
