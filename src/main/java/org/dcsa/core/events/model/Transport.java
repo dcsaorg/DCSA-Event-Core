@@ -25,10 +25,6 @@ public class Transport {
     @Size(max = 100)
     private String transportName;
 
-    @Column("mode_of_transport")
-    @Size(max = 3)
-    private String modeOfTransport;
-
     @JsonIgnore
     @Column("load_transport_call_id")
     private String loadTransportCallID;
@@ -36,10 +32,5 @@ public class Transport {
     @JsonIgnore
     @Column("discharge_transport_call_id")
     private String dischargeTransportCallID;
-
-    @JsonIgnore
-    @Column("vessel_imo_number")
-    private String vesselIMONumber;
-
 
 }

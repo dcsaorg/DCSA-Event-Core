@@ -5,13 +5,11 @@ import org.dcsa.core.events.model.ModeOfTransport;
 import org.dcsa.core.events.model.TransportCall;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
-import org.dcsa.core.events.repository.ModeOfTransportRepository;
-import org.dcsa.core.events.repository.ServiceRepository;
-import org.dcsa.core.events.repository.TransportCallTORepository;
-import org.dcsa.core.events.repository.VoyageRepository;
+import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.LocationService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
+import org.dcsa.core.events.service.VesselService;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
@@ -29,6 +27,8 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     private final LocationService locationService;
     private final TransportCallTORepository transportCallTORepository;
     private final ModeOfTransportRepository modeOfTransportRepository;
+    private final VesselRepository vesselRepository;
+    private final VesselService vesselService;
     private final VoyageRepository voyageRepository;
     private final ServiceRepository serviceRepository;
     private final TransportCallService transportCallService;
@@ -83,13 +83,32 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
 
     @Override
     public Mono<TransportCallTO> create(TransportCallTO transportCallTO) {
-        transportCallTO.setVessel(transportCallTO.getVessel());
         return Mono.justOrEmpty(transportCallTO.getLocation())
                 .flatMap(locationService::ensureResolvable)
                 .doOnNext(loc -> transportCallTO.setLocationID(loc.getId()))
                 // Force a non-empty Mono
+                .thenReturn(transportCallTO.getModeOfTransport())
+                .flatMap(modeOfTransportRepository::findByDcsaTransportType)
+                .switchIfEmpty(Mono.error(new IllegalStateException("Unknown DCSA Transport type: "
+                        + transportCallTO.getModeOfTransport()
+                        + " (is data loaded correctly into the database?")))
+                .doOnNext(modeOfTransport -> transportCallTO.setModeOfTransportID(modeOfTransport.getId()))
+                .then(Mono.justOrEmpty(transportCallTO.getVessel()))
+                .flatMap(vessel -> Mono.justOrEmpty(vessel.getVesselIMONumber())
+                        .flatMap(vesselRepository::findById)
+                        .switchIfEmpty(vesselService.create(vessel)))
+                // Force a non-empty Mono
                 .thenReturn(transportCallTO)
-                .flatMap(ignored -> transportCallService.create(MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class)))
+                .map(ignored -> {
+                    TransportCall transportCall = MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class);
+                    // When we receive an event via subscription, we need to preserve the original Transport ID.
+                    if (transportCallTO.getTransportCallID() != null) {
+                        transportCall.setNewRecord(true);
+                    }
+                    return transportCall;
+                })
+                .flatMap(transportCallService::create)
+                .doOnNext(transportCall -> transportCallTO.setTransportCallID(transportCall.getTransportCallID()))
                 .thenReturn(transportCallTO);
     }
 
