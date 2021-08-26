@@ -63,6 +63,9 @@ public class TransportCallTO extends AbstractTransportCall {
 
     public void setVessel(Vessel vessel) {
         this.vessel = vesselOrNull(vessel);
+        if (this.vessel != null) {
+            this.setVesselIMONumber(this.vessel.getVesselIMONumber());
+        }
     }
 
     @ForeignKey(fromFieldName = "locationID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
