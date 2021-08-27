@@ -197,7 +197,7 @@ public class MessageSignatureHandler {
                     }
                     final String signatureHeaderValue;
                     try {
-                        signatureHeaderValue = signatureFunction.computeSignatureString(
+                        signatureHeaderValue = signatureFunction.headerSignatureHeaderValue(
                                 eventSubscriptionState.getSigningKey(),
                                 bundleSerialized
                         );
