@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
@@ -35,9 +36,11 @@ public class TransportEvent extends Event {
     private TransportCallTO transportCall;
 
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<DocumentReferenceTO> documentReferences;
 
     @Transient
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Reference> references;
 
     @JsonProperty("vesselScheduleChangeRemark")
