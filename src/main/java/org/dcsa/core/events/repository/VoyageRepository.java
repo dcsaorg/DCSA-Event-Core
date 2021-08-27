@@ -12,10 +12,12 @@ import java.util.UUID;
 public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
 
   @Query(
-      "  SELECT v.* FROM voyage v "
+      "SELECT v.* FROM voyage v "
           + "JOIN transport_call_voyage tcv "
           + "ON v.id = tcv.voyage_id "
-          + "WHERE tcv.transport_call_id = :transportCallID")
+          + "WHERE tcv.transport_call_id = :transportCallID "
+          + "ORDER BY carrier_voyage_number DESC "
+          + "LIMIT 1")
   Mono<Voyage> findByTransportCallID(String transportCallID);
 
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
