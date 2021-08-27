@@ -36,10 +36,10 @@ public interface TransportDocumentTypeRepository
   Flux<String> findCodesByTransportDocumentReference(String transportDocumentReference);
 
   @Query(
-      "SELECT DISTINCT si.transport_document_type_code FROM shipping_instruction si "
+      "SELECT DISTINCT si.transport_document_type FROM shipping_instruction si "
           + "LEFT JOIN cargo_item ci ON si.id = ci.shipping_instruction_id "
           + "LEFT JOIN \"references\" r ON si.id = r.shipping_instruction_id "
           + "JOIN shipment_transport st ON (st.shipment_id = ci.shipment_id OR st.shipment_id = r.shipment_id) "
-          + "JOIN transport t WHERE t.load_transport_call_id = :transportCallID")
+          + "JOIN transport t ON st.transport_id = t.id WHERE t.load_transport_call_id = :transportCallID")
   Flux<String> findCodesByTransportCallID(String transportCallID);
 }
