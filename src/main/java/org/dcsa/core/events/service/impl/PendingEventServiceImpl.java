@@ -1,5 +1,7 @@
 package org.dcsa.core.events.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dcsa.core.events.model.PendingMessage;
@@ -53,6 +55,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
         Instant start = Instant.now();
         TransactionalOperator transactionalOperator = TransactionalOperator.create(transactionManager);
         log.info("Starting processUnmappedEventQueue task");
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Mono<Void> mapJob = pendingEventRepository.pollUnmappedEventID()
                 .checkpoint("Fetched unmappedEvent event")
@@ -61,11 +64,16 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                         Mono.zip(
                                 Mono.just(mappedEvent.getEventID()),
                                 eventSubscriptionService.findSubscriptionsFor(mappedEvent)
-                                        .map(eventSubscription -> {
+                                        .flatMap(eventSubscription -> {
                                             PendingMessage pendingMessage = new PendingMessage();
                                             pendingMessage.setEventID(mappedEvent.getEventID());
                                             pendingMessage.setSubscriptionID(eventSubscription.getSubscriptionID());
-                                            return pendingMessage;
+                                            try {
+                                                pendingMessage.setPayload(objectMapper.writeValueAsString(mappedEvent));
+                                            } catch (JsonProcessingException e) {
+                                                return Mono.error(e);
+                                            }
+                                            return Mono.just(pendingMessage);
                                         }).concatMap(this::create)
                                         .count()
                 )).doOnSuccess(tuple -> {
