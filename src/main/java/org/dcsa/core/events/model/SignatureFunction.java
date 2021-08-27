@@ -34,4 +34,8 @@ public interface SignatureFunction {
         byte[] computedSignature = computeSignature(key, payload);
         return MessageDigest.isEqual(computedSignature, providedSignature);
     }
+
+    default String headerSignatureHeaderValue(byte[] key, byte[] payload) throws Exception {
+        return getSignatureMethod().getSignatureMethodTag() + "=" + this.computeSignatureString(key, payload);
+    }
 }
