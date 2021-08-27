@@ -164,14 +164,14 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + "   ON eseet.subscription_id = es.subscription_id"
           + " WHERE eset.event_type = 'EQUIPMENT'"
           + "   AND (eseet.equipment_event_type_code IS NULL OR eseet.equipment_event_type_code = :equipmentEventTypeCode)"
-          + "   AND (es.equipment_reference IS NULL OR es.equipment_reference = :equipmentReference)"
-          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN :carrierBookingReferences)"
-          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN :transportDocumentReferences)"
-          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code = :transportDocumentTypeCodes)"
+          + "   AND (es.equipment_reference IS NULL OR es.equipment_reference = (:equipmentReference))"
+          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
+          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
+          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code = (:transportDocumentTypeCodes))"
           + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
-          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN :carrierVoyageNumbers)"
-          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN :carrierServiceCodes)")
+          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
+          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))")
   Flux<EventSubscription> findByEquipmentEventFields(
       EquipmentEventTypeCode equipmentEventTypeCode,
       String equipmentReference,
@@ -193,14 +193,14 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + "   ON esset.subscription_id = es.subscription_id"
           + " WHERE eset.event_type = 'SHIPMENT'"
           + "   AND (esset.shipment_event_type_code IS NULL OR esset.shipment_event_type_code = :shipmentEventTypeCode)"
-          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN :carrierBookingReferences)"
-          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN :transportDocumentReferences)"
-          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code = :transportDocumentTypeCodes)"
+          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
+          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
+          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code = (:transportDocumentTypeCodes))"
           + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallIDs)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumbers)"
-          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN :carrierVoyageNumbers)"
-          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN :carrierServiceCodes)"
-          + "   AND es.equipment_reference IS NULL OR es.equipment_reference IN :equipmentReference")
+          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
+          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))"
+          + "   AND es.equipment_reference IS NULL OR es.equipment_reference IN (:equipmentReference)")
   Flux<EventSubscription> findByShipmentEventFields(
       ShipmentEventTypeCode shipmentEventTypeCode,
       List<String> carrierBookingReferences,
@@ -221,14 +221,14 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " LEFT JOIN event_subscription_transport_event_type estet"
           + "   ON estet.subscription_id = es.subscription_id"
           + " WHERE eset.event_type = 'TRANSPORT'"
-          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN :carrierBookingReferences)"
-          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN :transportDocumentReferences)"
-          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN :transportDocumentTypeCodes)"
-          + "   AND (es.transport_event_type_code IS NULL OR es.transport_event_type_code = :transportEventTypeCode)"
+          + "   AND (estet.transport_event_type_code IS NULL OR estet.transport_event_type_code = :transportEventTypeCode)"
+          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
+          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
+          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN (:transportDocumentTypeCodes))"
           + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
-          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN :carrierVoyageNumbers)"
-          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN :carrierServiceCodes)"
+          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
+          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))"
           + "   AND es.equipment_reference IS NULL")
   Flux<EventSubscription> findByTransportEventFields(
       List<String> carrierVoyageNumbers,
@@ -249,15 +249,14 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + " LEFT JOIN event_subscription_operations_event_type esoet"
           + "   ON esoet.subscription_id = es.subscription_id"
           + " WHERE eset.event_type = 'OPERATIONS'"
-          + "   AND esoet.operations_event_type_code IS NULL OR esoet.operations_event_type_code = :operationsEventTypeCode"
-          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN :carrierBookingReferences)"
-          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN :transportDocumentReferences)"
-          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN :transportDocumentTypeCodes)"
-          + "   AND (es.transport_event_type_code IS NULL OR es.transport_event_type_code = :transportEventTypeCode)"
+          + "   AND (esoet.operations_event_type_code IS NULL OR esoet.operations_event_type_code = :operationsEventTypeCode)"
+          + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
+          + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
+          + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN (:transportDocumentTypeCodes))"
           + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
-          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN :carrierVoyageNumbers)"
-          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN :carrierServiceCodes)"
+          + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
+          + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))"
           + "   AND es.equipment_reference IS NULL")
   Flux<EventSubscription> findByOperationEventFields(
       OperationsEventTypeCode operationsEventTypeCode,

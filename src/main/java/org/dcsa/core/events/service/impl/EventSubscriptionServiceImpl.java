@@ -26,6 +26,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
+    private static final List<String> EMPTY_SQL_LIST;
+
+    static {
+        EMPTY_SQL_LIST = new ArrayList<>();
+        // This is not guaranteed to be correct, but it will work "most of the time".
+        EMPTY_SQL_LIST.add("");
+    }
+
     private final EventSubscriptionRepository eventSubscriptionRepository;
     private final MessageServiceConfig messageServiceConfig;
     private final TransportCallRepository transportCallRepository;
@@ -163,12 +171,30 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
               List<String> voyageNumbers = vnScTc.getT1();
               List<String> serviceCodes = vnScTc.getT2();
               List<String> documentTypeCodes = vnScTc.getT3();
+              List<String> carrierBookingRefs = carrierBookingReferences;
+              List<String> transportDocumentRefs = transportDocumentReferences;
+              // Force these to be null when empty to avoid invalid queries
+              if (voyageNumbers.isEmpty()) {
+                  voyageNumbers = emptySQLList();
+              }
+              if (serviceCodes.isEmpty()) {
+                  serviceCodes = emptySQLList();
+              }
+              if (documentTypeCodes.isEmpty()) {
+                  documentTypeCodes = emptySQLList();
+              }
+              if (carrierBookingRefs.isEmpty()) {
+                  carrierBookingRefs = emptySQLList();
+              }
+              if (transportDocumentRefs.isEmpty()) {
+                  transportDocumentRefs = emptySQLList();
+              }
 
               return eventSubscriptionRepository.findByEquipmentEventFields(
                   equipmentEvent.getEquipmentEventTypeCode(),
                   equipmentEvent.getEquipmentReference(),
-                  carrierBookingReferences,
-                  transportDocumentReferences,
+                  carrierBookingRefs,
+                  transportDocumentRefs,
                   documentTypeCodes,
                   equipmentEvent.getTransportCallID(),
                   vesselIMONumber,
@@ -360,11 +386,29 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
             List<String> voyageNumbers = vnScTc.getT1();
             List<String> serviceCodes = vnScTc.getT2();
             List<String> documentTypeCodes = vnScTc.getT3();
+            List<String> carrierBookingRefs = carrierBookingReferences;
+            List<String> transportDocumentRefs = transportDocumentReferences;
+            // Force these to be null when empty to avoid invalid queries
+            if (voyageNumbers.isEmpty()) {
+                voyageNumbers = emptySQLList();
+            }
+            if (serviceCodes.isEmpty()) {
+                serviceCodes = emptySQLList();
+            }
+            if (documentTypeCodes.isEmpty()) {
+                documentTypeCodes = emptySQLList();
+            }
+            if (carrierBookingRefs.isEmpty()) {
+                carrierBookingRefs = emptySQLList();
+            }
+            if (transportDocumentRefs.isEmpty()) {
+                transportDocumentRefs = emptySQLList();
+            }
 
             return eventSubscriptionRepository.findByTransportEventFields(
                     voyageNumbers, serviceCodes,
                     transportEventTypeCode, vesselIMONumber, transportCallID,
-                    carrierBookingReferences, transportDocumentReferences,
+                    carrierBookingRefs, transportDocumentRefs,
                     documentTypeCodes
             );
         });
@@ -412,6 +456,25 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
               List<String> cbrs = params.getT3();
               List<String> tdrs = params.getT4();
               List<String> tdtcs = params.getT5();
+
+              // Force these to be null when empty to avoid invalid queries
+              if (cvns.isEmpty()) {
+                  cvns = emptySQLList();
+              }
+              if (cscs.isEmpty()) {
+                  cscs = emptySQLList();
+              }
+              if (cbrs.isEmpty()) {
+                  cbrs = emptySQLList();
+              }
+              if (tdrs.isEmpty()) {
+                  tdrs = emptySQLList();
+              }
+              if (tdtcs.isEmpty()) {
+                  tdtcs = emptySQLList();
+              }
+
+
               return eventSubscriptionRepository.findByOperationEventFields(
                   operationsEventTypeCode,
                   cbrs,
@@ -422,5 +485,10 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
                   cvns,
                   cscs);
             });
+  }
+
+  @SuppressWarnings({"unchecked"})
+  private static <E> List<E> emptySQLList() {
+        return (List<E>)EMPTY_SQL_LIST;
   }
 }
