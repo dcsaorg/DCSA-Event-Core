@@ -96,11 +96,11 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
             cron = "${dcsa.pendingEventService.backgroundTasks.processPendingEventQueue.cronSchedule:15 */1 * * * *}"
     )
     public synchronized void processPendingEventQueue() {
-        if (processUnmappedEvent != null && !processUnmappedEvent.isDisposed()) {
+        if (processPendingEventQueue != null && !processPendingEventQueue.isDisposed()) {
             log.info("Skipping processPendingEventQueue task. Previous job is still on-going");
             return;
         }
-        processUnmappedEvent = null;
+        processPendingEventQueue = null;
         Instant start = Instant.now();
         TransactionalOperator transactionalOperator = TransactionalOperator.create(transactionManager);
         log.info("Starting processPendingEventQueue task");
