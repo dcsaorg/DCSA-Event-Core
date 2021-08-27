@@ -8,6 +8,7 @@ import org.dcsa.core.events.service.EventSubscriptionService;
 import org.dcsa.core.events.service.GenericEventService;
 import org.dcsa.core.events.service.PendingEventService;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.ReactiveTransactionManager;
@@ -27,7 +28,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
 
     private final PendingEventRepository pendingEventRepository;
     private final ReactiveTransactionManager transactionManager;
-    private final GenericEventService eventService;
+    private  GenericEventService eventService;
     private final EventSubscriptionService eventSubscriptionService;
     private final MessageSignatureHandler messageSignatureHandler;
 
@@ -149,4 +150,8 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
         }).subscribe();
     }
 
+    @Autowired
+    public void setEventService(GenericEventService eventService) {
+        this.eventService = eventService;
+    }
 }

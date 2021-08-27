@@ -8,8 +8,6 @@ import org.dcsa.core.events.repository.EventRepository;
 import org.dcsa.core.events.service.*;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,8 +15,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-@Service
-@Primary
 public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
 
     private final ShipmentEventService shipmentEventService;
