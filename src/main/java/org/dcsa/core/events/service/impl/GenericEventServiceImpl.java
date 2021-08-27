@@ -42,6 +42,11 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         throw new NotImplementedException();
     }
 
+    @Override
+    public Mono<Event> findByEventTypeAndEventID(EventType eventType, UUID eventID) {
+        return eventRepository.findByEventTypeAndEventID(eventType, eventID);
+    }
+
     public Mono<TransportEvent> getTransportEventRelatedEntities(UUID id) {
         return transportEventService
                 .findById(id)
