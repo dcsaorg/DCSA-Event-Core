@@ -2,11 +2,13 @@ package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.OperationsEvent;
+import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.model.base.AbstractLocation;
 import org.dcsa.core.events.model.base.AbstractParty;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.OperationsEventRepository;
+import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.LocationService;
 import org.dcsa.core.events.service.OperationsEventService;
 import org.dcsa.core.events.service.PartyService;
@@ -27,6 +29,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private final TransportCallTOService transportCallTOService;
     private final PartyService partyService;
     private final LocationService locationService;
+    private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
     public OperationsEventRepository getRepository() {
@@ -74,4 +77,17 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                 .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
                 .thenReturn(operationsEvent);
     }
+
+  @Override
+  public Mono<OperationsEvent> create(OperationsEvent operationsEvent) {
+    return super.create(operationsEvent)
+        .flatMap(
+            ope -> {
+              UnmappedEvent unmappedEvent = new UnmappedEvent();
+              unmappedEvent.setNewRecord(true);
+              unmappedEvent.setEventID(ope.getEventID());
+              unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
+              return unmappedEventRepository.save(unmappedEvent);
+            }).thenReturn(operationsEvent);
+  }
 }
