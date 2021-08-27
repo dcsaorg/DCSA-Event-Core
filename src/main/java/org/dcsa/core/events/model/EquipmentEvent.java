@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonTypeName("EQUIPMENT")
-public class EquipmentEvent extends Event {
+public class EquipmentEvent extends Event implements TransportCallBasedEvent {
 
     @Column("equipment_event_type_code")
     private EquipmentEventTypeCode equipmentEventTypeCode;

@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonTypeName("OPERATIONS")
-public class OperationsEvent extends Event {
+public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @JsonIgnore
     @Column("transport_call_id")
