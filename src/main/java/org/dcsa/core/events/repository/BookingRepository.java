@@ -29,7 +29,7 @@ public interface BookingRepository extends ExtendedRepository<Booking, String> {
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
           + "JOIN shipment_transport st ON s.id = st.shipment_id "
-          + "JOIN transport t ON st.transport_id = t.id"
+          + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
   Flux<String> findCarrierBookingRefsByTransportCallID(String transportCallID);
 }
