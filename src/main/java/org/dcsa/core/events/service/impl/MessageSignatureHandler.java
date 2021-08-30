@@ -67,6 +67,10 @@ public class MessageSignatureHandler {
     }
 
     public <T> Mono<SignatureResult<T>> verifyRequest(ServerHttpRequest request, String expectedSubscriptionID, byte[] key, Class<T> type) {
+        return verifyRequest(request, expectedSubscriptionID, key, converterForType(type));
+    }
+
+    public <T> Mono<SignatureResult<T>> verifyRequest(ServerHttpRequest request, String expectedSubscriptionID, byte[] key, Converter<T> converter) {
         List<String> signatureValues = request.getHeaders().get(SIGNATURE_HEADER_NAME);
         if (signatureValues == null || signatureValues.size() != 1) {
             SignatureResult<T> responsePayload;
@@ -136,7 +140,7 @@ public class MessageSignatureHandler {
                             s = SignatureResult.of("Valid",
                                     true,
                                     signatureFunction.getSignatureMethod(),
-                                    objectMapper.readValue(payload, type)
+                                    converter.apply(payload)
                             );
                         } else {
                             s = SignatureResult.of("Invalid; The signature provided in " + SIGNATURE_HEADER_NAME
@@ -147,6 +151,10 @@ public class MessageSignatureHandler {
                     }
                     return Mono.just(s);
                 });
+    }
+
+    private <T> Converter<T> converterForType(Class<T> clazz) {
+        return (payload -> objectMapper.readValue(payload, clazz));
     }
 
     public <T extends EventSubscriptionState> Mono<SubmissionResult<T>> emitMessage(
@@ -396,4 +404,8 @@ public class MessageSignatureHandler {
         private final boolean successful;
     }
 
+
+    public interface Converter<T> {
+        T apply(byte[] payload) throws Exception;
+    }
 }
