@@ -86,17 +86,34 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
 
     @Override
     public Mono<Event> create(Event event) {
-        switch (event.getEventType()) {
+        Mono<? extends Event> eventMono;
+        EventType eventType = event.getEventType();
+        String carrierBookingReference = event.getCarrierBookingReference();
+        // Clear these "pseudo-transient" field. They exist on reading from the database, but cannot
+        // be included in the create method as the fields do not exist in the table (they are from a view).
+        // When they are null, Spring R2DBC will omit them from the INSERT INTO and therefore it
+        // happens to work.  We restore the after we have passed them to the database.
+        event.setEventType(null);
+        event.setCarrierBookingReference(null);
+        switch (eventType) {
             case SHIPMENT:
-                return shipmentEventService.create((ShipmentEvent) event).cast(Event.class);
+                eventMono = shipmentEventService.create((ShipmentEvent) event);
+                break;
             case TRANSPORT:
-                return transportEventService.create((TransportEvent) event).cast(Event.class);
+                eventMono = transportEventService.create((TransportEvent) event);
+                break;
             case EQUIPMENT:
-                return equipmentEventService.create((EquipmentEvent) event).cast(Event.class);
+                eventMono = equipmentEventService.create((EquipmentEvent) event);
+                break;
             case OPERATIONS:
-                return operationsEventService.create((OperationsEvent) event).cast(Event.class);
+                eventMono = operationsEventService.create((OperationsEvent) event);
+                break;
             default:
                 return Mono.error(new IllegalStateException("Unexpected value: " + event.getEventType()));
         }
+        return eventMono.doOnNext(e -> {
+            e.setEventType(eventType);
+            e.setCarrierBookingReference(carrierBookingReference);
+        }).cast(Event.class);
     }
 }
