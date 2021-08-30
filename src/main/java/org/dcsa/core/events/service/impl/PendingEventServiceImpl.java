@@ -35,6 +35,8 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
     private final EventSubscriptionService eventSubscriptionService;
     private final MessageSignatureHandler messageSignatureHandler;
 
+    private final ObjectMapper objectMapper;
+
     private Disposable processUnmappedEvent;
     private Disposable processPendingEventQueue;
 
@@ -55,7 +57,6 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
         Instant start = Instant.now();
         TransactionalOperator transactionalOperator = TransactionalOperator.create(transactionManager);
         log.info("Starting processUnmappedEventQueue task");
-        ObjectMapper objectMapper = new ObjectMapper();
 
         Mono<Void> mapJob = pendingEventRepository.pollUnmappedEventID()
                 .checkpoint("Fetched unmappedEvent event")
