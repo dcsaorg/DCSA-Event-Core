@@ -80,14 +80,21 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
 
   @Override
   public Mono<OperationsEvent> create(OperationsEvent operationsEvent) {
-    return super.create(operationsEvent)
-        .flatMap(
-            ope -> {
-              UnmappedEvent unmappedEvent = new UnmappedEvent();
-              unmappedEvent.setNewRecord(true);
-              unmappedEvent.setEventID(ope.getEventID());
-              unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
-              return unmappedEventRepository.save(unmappedEvent);
-            }).thenReturn(operationsEvent);
+      return Mono.justOrEmpty(operationsEvent.getEventLocation())
+              .flatMap(locationService::ensureResolvable)
+              .doOnNext(loc -> operationsEvent.setEventLocationID(loc.getId()))
+              .then(Mono.justOrEmpty(operationsEvent.getVesselPosition()))
+              .flatMap(locationService::ensureResolvable)
+              .doOnNext(loc -> operationsEvent.setVesselPositionID(loc.getId()))
+              .thenReturn(operationsEvent)
+              .flatMap(super::create)
+              .flatMap(
+                      ope -> {
+                          UnmappedEvent unmappedEvent = new UnmappedEvent();
+                          unmappedEvent.setNewRecord(true);
+                          unmappedEvent.setEventID(ope.getEventID());
+                          unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
+                          return unmappedEventRepository.save(unmappedEvent);
+                      }).thenReturn(operationsEvent);
   }
 }
