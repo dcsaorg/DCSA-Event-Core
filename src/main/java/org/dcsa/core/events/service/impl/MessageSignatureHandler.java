@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -157,6 +158,16 @@ public class MessageSignatureHandler {
         return (payload -> objectMapper.readValue(payload, clazz));
     }
 
+    private Function<String, Map<?, ?>> deserializeToMap() {
+        return (payload -> {
+            try {
+                return objectMapper.readValue(payload, Map.class);
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException("Invalid payload stored in database", e);
+            }
+        });
+    }
+
     public <T extends EventSubscriptionState> Mono<SubmissionResult<T>> emitMessage(
             T eventSubscriptionState,
             Flux<? extends PendingMessage> messages
@@ -198,6 +209,7 @@ public class MessageSignatureHandler {
                     try {
                         bundleSerialized = objectMapper.writeValueAsBytes(messageBundle.stream()
                                 .map(PendingMessage::getPayload)
+                                .map(this.deserializeToMap())
                                 .collect(Collectors.toList())
                         );
                     } catch (JsonProcessingException e) {
