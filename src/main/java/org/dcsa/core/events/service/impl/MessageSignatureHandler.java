@@ -404,10 +404,15 @@ public class MessageSignatureHandler {
                                     }
                                 }
 
+                                boolean success = httpStatus == HttpStatus.NO_CONTENT;
+                                if (success) {
+                                    eventSubscriptionState.resetFailureState();
+                                }
+
                                 return Mono.just(SubmissionResult.of(
                                         eventSubscriptionState,
                                         messageBundle,
-                                        httpStatus == HttpStatus.NO_CONTENT
+                                        success
                                 ));
                             }).onErrorMap(WebClientRequestException.class, (ex) -> {
                                 Throwable cause = ex.getCause();
