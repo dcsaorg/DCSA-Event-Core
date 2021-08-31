@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dcsa.core.events.model.EventSubscription;
 import org.dcsa.core.events.model.PendingMessage;
 import org.dcsa.core.events.repository.PendingEventRepository;
 import org.dcsa.core.events.service.EventSubscriptionService;
@@ -154,7 +155,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
         TransactionalOperator transactionalOperator = TransactionalOperator.create(transactionManager);
         log.info("Starting processPendingEventQueue task");
 
-        Mono<Void> mapJob = pendingEventRepository.pollPendingEvent()
+        Mono<MessageSignatureHandler.SubmissionResult<EventSubscription>> mapJob = pendingEventRepository.pollPendingEvent()
                 .checkpoint("Fetched pending event")
                 .flatMap(pendingMessage ->
                         eventSubscriptionService.findById(pendingMessage.getSubscriptionID())
@@ -170,27 +171,39 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                             .thenMany(Flux.fromIterable(submissionResult.getPendingMessages()))
                             .concatMap(pendingEventRepository::insert)
                             .then(Mono.just(submissionResult));
-                }).doOnSuccess(submissionResult -> {
+                });
+
+        // Note due to database locking, parallel only operates on distinct subscription IDs.  Accordingly, the parallel
+        // only "matters" if there are multiple subscriptions.  On the positive side, it means we avoid conflicts when
+        // they will commit.
+        Mono<?> parallelJob = Flux.fromArray(EVENT_ARRAY)
+                .parallel(parallel)
+                .flatMap(ignored -> transactionalOperator.transactional(mapJob))
+                .sequential()
+                .collectList()
+                .doOnSuccess(submissionResults -> {
                     Instant finish = Instant.now();
                     Duration duration = Duration.between(start, finish);
-                    if (submissionResult == null) {
+                    for (MessageSignatureHandler.SubmissionResult<EventSubscription> submissionResult : submissionResults) {
+                        if (submissionResult.isSuccessful()) {
+                            for (PendingMessage pendingMessage : submissionResult.getPendingMessages()) {
+                                log.info("Submitted " + pendingMessage.getEventID() + " to subscription "
+                                        + submissionResult.getEventSubscription().getSubscriptionID());
+                            }
+                        } else {
+                            log.info("Delivery of pending messages to "
+                                    + submissionResult.getEventSubscription().getSubscriptionID()
+                                    + " failed (will retry later).");
+                        }
+                    }
+                    if (submissionResults.isEmpty()) {
                         log.info("No pending messages that can be send at the moment. The processPendingEventQueue job took "
                                 + duration);
-                    } else if (submissionResult.isSuccessful()) {
-                        log.info("Successfully submitted " + submissionResult.getPendingMessages().size()
-                                + " pending message(s). The processPendingEventQueue job took " + duration);
-                        for (PendingMessage pendingMessage : submissionResult.getPendingMessages()) {
-                            log.info("Submitted " + pendingMessage.getEventID() + " to subscription "
-                                    + submissionResult.getEventSubscription().getSubscriptionID());
-                        }
                     } else {
-                        log.info("Delivery of pending messages to " + submissionResult.getEventSubscription().getSubscriptionID()
-                                + " failed (will retry later). The processPendingEventQueue job took "
-                                + duration);
+                        log.info("The processPendingEventQueue job took " + duration);
                     }
-                }).then();
-
-        processPendingEventQueue = transactionalOperator.transactional(mapJob).doFinally((ignored) -> {
+                });
+        processPendingEventQueue = parallelJob.doFinally((ignored) -> {
             if (processPendingEventQueue != null) {
                 processPendingEventQueue.dispose();
             }
