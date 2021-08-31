@@ -11,6 +11,7 @@ import org.dcsa.core.events.service.GenericEventService;
 import org.dcsa.core.events.service.PendingEventService;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +30,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEventRepository, PendingMessage, UUID> implements PendingEventService {
+
+    private static final int EVENTS_PER_BATCH_JOB = 10;
+    // To make easier to do this with Flux which works on lists/arrays
+    private static final Object DUMMY_OBJECT = new Object();
+    private static final Object[] EVENT_ARRAY;
+
+    static {
+        EVENT_ARRAY = new Object[EVENTS_PER_BATCH_JOB];
+        for (int i = 0 ; i < EVENTS_PER_BATCH_JOB ; i++) {
+            EVENT_ARRAY[i] = DUMMY_OBJECT;
+        }
+    }
 
     private final PendingEventRepository pendingEventRepository;
     private final ReactiveTransactionManager transactionManager;
@@ -39,6 +53,9 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
 
     private Disposable processUnmappedEvent;
     private Disposable processPendingEventQueue;
+
+    @Value("${dcsa.pendingEventService.parallel:4}")
+    private int parallel;
 
     @Override
     public PendingEventRepository getRepository() {
@@ -61,7 +78,8 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
         TransactionalOperator transactionalOperator = TransactionalOperator.create(transactionManager);
         log.info("Starting processUnmappedEventQueue task");
 
-        Mono<Void> mapJob = pendingEventRepository.pollUnmappedEventID()
+
+        Mono<Tuple2<UUID, Long>> mapJob = pendingEventRepository.pollUnmappedEventID()
                 .checkpoint("Fetched unmappedEvent event")
                 .flatMap(eventService::findById)
                 .flatMap(mappedEvent ->
@@ -80,25 +98,39 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                                             return Mono.just(pendingMessage);
                                         }).concatMap(this::create)
                                         .count()
-                )).doOnSuccess(tuple -> {
+                                        .onErrorResume(ex -> {
+                                            log.warn("Error processing event ID " + mappedEvent.getEventID(), ex);
+                                            return Mono.just(-1L);
+                                        })
+                ));
+
+        Mono<?> parallelJob = Flux.fromArray(EVENT_ARRAY)
+                .parallel(parallel)
+                .flatMap(ignored -> transactionalOperator.transactional(mapJob))
+                .sequential()
+                .collectList()
+                .doOnSuccess(tupleList -> {
                     Instant finish = Instant.now();
                     Duration duration = Duration.between(start, finish);
-                    if (tuple != null) {
-                        UUID eventID = tuple.getT1();
-                        long count = tuple.getT2();
-                        if (count > 0) {
-                            log.info("Successfully generated " + count + " pending event(s) for event "
-                                    + eventID + ". The processUnmappedEventQueue job took " + duration);
-                        } else {
-                            log.info("No subscribers for event " + eventID + ". The processUnmappedEventQueue job took "
-                                    + duration);
+                    if (tupleList != null && !tupleList.isEmpty()) {
+                        for (Tuple2<UUID, Long> tuple : tupleList) {
+                            UUID eventID = tuple.getT1();
+                            long count = tuple.getT2();
+                            if (count > 0) {
+                                log.info("Successfully generated " + count + " pending event(s) for event "
+                                        + eventID + ".");
+                            } else if (count == 0) {
+                                log.info("No subscribers for event " + eventID);
+                            }
+                            // Ignore count < 0; those are errors and have already been logged at this stage.
                         }
+                        log.info("The processUnmappedEventQueue job took " + duration);
                     } else {
-                        log.info("No events to send. The processUnmappedEventQueue job took " + duration);
+                        log.info("No events to process. The processUnmappedEventQueue job took " + duration);
                     }
-                })
-                .then();
-        processUnmappedEvent = transactionalOperator.transactional(mapJob).doFinally((ignored) -> {
+                });
+
+        processUnmappedEvent = parallelJob.doFinally((ignored) -> {
             if (processUnmappedEvent != null) {
                 processUnmappedEvent.dispose();
             }
