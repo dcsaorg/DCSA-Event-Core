@@ -2,19 +2,29 @@ package org.dcsa.core.events.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.channel.ChannelOption;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dcsa.core.events.config.MessageServiceConfig;
+import org.dcsa.core.events.model.EventSubscriptionState;
 import org.dcsa.core.events.model.PendingMessage;
 import org.dcsa.core.events.model.SignatureFunction;
-import org.dcsa.core.events.model.EventSubscriptionState;
 import org.dcsa.core.events.model.SignatureResult;
 import org.dcsa.core.events.model.enums.SignatureMethod;
-import org.dcsa.core.events.config.MessageServiceConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -22,9 +32,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.SSLException;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,6 +44,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -39,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,6 +65,43 @@ public class MessageSignatureHandler {
     private static final String SUBSCRIPTION_ID_HEADER_NAME = "Subscription-ID";
     private static final String API_VERSION_HEADER_NAME = "API-Version";
     private static final Map<SignatureMethod, SignatureFunction> SIGNATURE_FUNCTION_MAP = new HashMap<>();
+
+    @Value("${dcsa.pendingEventService.subscriptionHandler.connectionTimeout:30s}")
+    private Duration connectTimeout;
+
+    @Value("${dcsa.pendingEventService.subscriptionHandler.readTimeout:30s}")
+    private Duration readTimeout;
+
+    @Value("${dcsa.pendingEventService.subscriptionHandler.writeTimeout:30s}")
+    private Duration writeTimeout;
+
+    @Value("${dcsa.pendingEventService.subscriptionHandler.followRedirects:false}")
+    private boolean followRedirects;
+
+    @Value("${dcsa.pendingEventService.subscriptionHandler.enableTLSValidation:true}")
+    private boolean enableTLSValidation;
+
+    @Getter
+    @Value("${dcsa.pendingEventService.enabled:true}")
+    private boolean pendingEventServiceEnabled;
+
+    // To make it easier to tell
+    @EventListener(ApplicationReadyEvent.class)
+    void logConfiguration() {
+        if (pendingEventServiceEnabled) {
+            log.info("Enabled pending event notification service.  Use dcsa.pendingEventService.enabled=true to activate it");
+            log.info("Customize delivery via dcsa.pendingEventService.subscriptionHandler.<option>. Valid <option> include:");
+            log.info("  connectionTimeout, readTimeout, writeTimeout, followRedirects, and enableTLSValidation");
+            // Expand on TLS validation as it affects security.
+            if (enableTLSValidation) {
+                log.info("TLS validation is enabled for subscription delivery. HTTPS callback URLS must all present valid TLS certificates.");
+            } else {
+                log.warn("TLS validation has been disabled for subscription delivery.  TLS validation errors will be ignored (allowing trivial MitM of the transport layer).");
+            }
+        } else {
+            log.info("Disabled pending event notification service.  Use dcsa.pendingEventService.enabled=true to activate it");
+        }
+    }
 
     static {
         declareKeyFunction(PlainPasswordFunction.INSTANCE);
@@ -193,10 +244,32 @@ public class MessageSignatureHandler {
             log.error(e.getLocalizedMessage(), e);
             throw e;
         }
+        long connectTimeOutMilliSeconds = connectTimeout.toMillis();
+        if (connectTimeOutMilliSeconds > Integer.MAX_VALUE) {
+            // Prevent overflow in the cast below
+            connectTimeOutMilliSeconds = Integer.MAX_VALUE;
+        }
+        HttpClient httpClient = HttpClient.create()
+                .followRedirect(followRedirects)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int)connectTimeOutMilliSeconds)
+                .doOnConnected(conn -> conn
+                    .addHandler(new ReadTimeoutHandler(readTimeout.toSeconds(), TimeUnit.SECONDS))
+                    .addHandler(new WriteTimeoutHandler(writeTimeout.toSeconds(), TimeUnit.SECONDS))
+                );
+        if (!enableTLSValidation) {
+            try {
+                SslContext sslContext = SslContextBuilder
+                        .forClient()
+                        .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                        .build();
+                httpClient = httpClient.secure(t -> t.sslContext(sslContext));
+            } catch (SSLException e) {
+                log.warn("Failed to disable TLS validation due to the following error (ignoring and trying anyway)", e);
+            }
+        }
         WebClient webClient = WebClient.builder()
-                // TODO: Disable redirects
-                // TODO: Set time outs
                 .defaultHeader("Content-Type", "application/json")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
         log.info("Extracting up to " + bundleSize + " messages to submit to " + eventSubscriptionState.getCallbackUrl());
         return messages.limitRequest(bundleSize)
