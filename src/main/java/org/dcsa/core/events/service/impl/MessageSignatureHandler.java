@@ -271,7 +271,6 @@ public class MessageSignatureHandler {
                 .defaultHeader("Content-Type", "application/json")
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
-        log.info("Extracting up to " + bundleSize + " messages to submit to " + eventSubscriptionState.getCallbackUrl());
         return messages.limitRequest(bundleSize)
                 .collectList()
                 .flatMap(messageBundle -> {
