@@ -49,6 +49,9 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
             cron = "${dcsa.pendingEventService.backgroundTasks.processUnmappedEventQueue.cronSchedule:45 */1 * * * *}"
     )
     public synchronized void processUnmappedEventQueue() {
+        if (!messageSignatureHandler.isPendingEventServiceEnabled()) {
+            return;
+        }
         if (processUnmappedEvent != null && !processUnmappedEvent.isDisposed()) {
             log.info("Skipping processUnmappedEventQueue task. Previous job is still on-going");
             return;
@@ -107,6 +110,9 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
             cron = "${dcsa.pendingEventService.backgroundTasks.processPendingEventQueue.cronSchedule:15 */1 * * * *}"
     )
     public synchronized void processPendingEventQueue() {
+        if (!messageSignatureHandler.isPendingEventServiceEnabled()) {
+            return;
+        }
         if (processPendingEventQueue != null && !processPendingEventQueue.isDisposed()) {
             log.info("Skipping processPendingEventQueue task. Previous job is still on-going");
             return;
