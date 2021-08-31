@@ -19,11 +19,13 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -334,6 +336,32 @@ public class MessageSignatureHandler {
                                         eventSubscriptionState,
                                         messageBundle,
                                         httpStatus == HttpStatus.NO_CONTENT
+                                ));
+                            }).onErrorMap(WebClientRequestException.class, (ex) -> {
+                                Throwable cause = ex.getCause();
+                                // Unwrap socket exceptions to enable us to use onErrorResume on them.
+                                if (cause instanceof SocketException) {
+                                    return cause;
+                                }
+                                return ex;
+                            }).onErrorResume(SocketException.class, (exception) -> {
+                                long delay = computeNextDelay(eventSubscriptionState);
+                                eventSubscriptionState.setAccumulatedRetryDelay(delay);
+                                eventSubscriptionState.setRetryAfter(OffsetDateTime.now().plusSeconds(delay));
+                                String statusMessage = "Message for " + callbackUrl + " failed due to a low level error: "
+                                        + exception.getLocalizedMessage() + ": Will retry after "
+                                        + eventSubscriptionState.getRetryAfter();
+                                log.debug(statusMessage);
+                                for (PendingMessage pendingMessage : messageBundle) {
+                                    pendingMessage.setRetryCount(pendingMessage.getRetryCount() + 1);
+                                    pendingMessage.setLastErrorMessage(statusMessage);
+                                    pendingMessage.setLastAttemptDateTime(attemptTime);
+                                }
+
+                                return Mono.just(SubmissionResult.of(
+                                        eventSubscriptionState,
+                                        messageBundle,
+                                        false
                                 ));
                             });
                 });
