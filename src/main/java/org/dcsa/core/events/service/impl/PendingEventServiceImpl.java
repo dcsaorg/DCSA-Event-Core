@@ -95,7 +95,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                     }
                 })
                 .then();
-        processUnmappedEvent = transactionalOperator.transactional(mapJob).doOnTerminate(() -> {
+        processUnmappedEvent = transactionalOperator.transactional(mapJob).doFinally((ignored) -> {
             if (processUnmappedEvent != null) {
                 processUnmappedEvent.dispose();
             }
@@ -152,7 +152,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                     }
                 }).then();
 
-        processPendingEventQueue = transactionalOperator.transactional(mapJob).doOnTerminate(() -> {
+        processPendingEventQueue = transactionalOperator.transactional(mapJob).doFinally((ignored) -> {
             if (processPendingEventQueue != null) {
                 processPendingEventQueue.dispose();
             }
