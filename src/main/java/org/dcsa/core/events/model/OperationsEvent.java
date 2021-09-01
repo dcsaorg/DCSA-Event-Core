@@ -34,6 +34,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     @Column("publisher_role")
     private PublisherRole publisherRole;
 
+    @JsonIgnore
     @Column("event_location")
     private String eventLocationID;
 
@@ -50,6 +51,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     @Column("delay_reason_code")
     private String delayReasonCode;
 
+    @JsonIgnore
     @Column("vessel_position")
     private String vesselPositionID;
 
@@ -62,6 +64,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     @Transient
     private LocationTO vesselPosition;
 
+    @JsonIgnore
     @Column("publisher")
     private String publisherID;
 
