@@ -46,12 +46,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String EVENT_TRANSPORT_CALL_ID_COLUMN_NAME = "transport_call_id";
     private static final String TRANSPORT_CALL_TABLE_NAME = "transport_call";
     private static final String TRANSPORT_CALL_ID_COLUMN_NAME = "id";
-
-    private static final String TRANSPORT_TABLE_NAME = "transport";
-    private static final String TRANSPORT_ID_COLUMN_NAME = "id";
-    private static final String TRANSPORT_LOAD_TRANSPORT_CALL_ID_COLUMN_NAME = "load_transport_call_id";
-    private static final String TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME = "discharge_transport_call_id";
-    private static final String TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME = "vessel_imo_number";
+    private static final String TRANSPORT_CALL_VESSEL_IMO_NUMBER_COLUMN_NAME = "vessel_imo_number";
 
     private static final String SHIPMENT_TRANSPORT_TABLE_NAME = "shipment_transport";
     private static final String SHIPMENT_TRANSPORT_TRANSPORT_ID_COLUMN_NAME = "transport_id";
@@ -212,7 +207,6 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
         Table transportCallTable = Table.create(TRANSPORT_CALL_TABLE_NAME);
-        Table transportTable = Table.create(TRANSPORT_TABLE_NAME);
         Table transportCallVoyageTable = Table.create(TRANSPORT_CALL_VOYAGE_TABLE_NAME);
         Table voyageTable = Table.create(VOYAGE_TABLE_NAME);
         Table serviceTable = Table.create(SERVICE_TABLE_NAME);
@@ -220,11 +214,8 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         return builder
                 .join(Join.JoinType.LEFT_OUTER_JOIN, eventTable, transportCallTable)
                 .onEqualsThen(EVENT_TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_CALL_ID_COLUMN_NAME)
-                .chainJoin(Join.JoinType.LEFT_OUTER_JOIN, transportTable)
-                // FIXME: Needs "OR" join
-                .onEqualsThen(TRANSPORT_CALL_ID_COLUMN_NAME, TRANSPORT_DISCHARGE_TRANSPORT_CALL_ID_COLUMN_NAME)
                 .registerQueryField(
-                        SqlIdentifier.unquoted(TRANSPORT_VESSEL_IMO_NUMBER_COLUMN_NAME),
+                        SqlIdentifier.unquoted(TRANSPORT_CALL_VESSEL_IMO_NUMBER_COLUMN_NAME),
                         VESSEL_IMO_NUMBER_JSON_NAME,
                         String.class
                 )

@@ -42,9 +42,8 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
 
     @Query("SELECT transport_call.* FROM transport_call"
             + " JOIN facility ON (facility.id = transport_call.facility_id)"
-            + " JOIN transport ON (transport.load_transport_call_id = transport_call.id OR transport.discharge_transport_call_id = transport_call.id)"
-            + " JOIN mode_of_transport ON (mode_of_transport.mode_of_transport_code = transport.mode_of_transport)"
-            + " WHERE transport.vessel_imo_number = :vesselIMONumber"
+            + " JOIN mode_of_transport ON (mode_of_transport.mode_of_transport_code = transport_call.mode_of_transport)"
+            + " WHERE transport_call.vessel_imo_number = :vesselIMONumber"
             + " AND mode_of_transport.dcsa_transport_type = :modeOfTransport"
             + " AND facility.facility_smdg_code = :facilitySMDGCode"
             + " AND facility.un_location_code = :UNLocationCode")
