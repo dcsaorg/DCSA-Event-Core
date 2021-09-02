@@ -7,6 +7,7 @@ import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.events.service.TransportEventService;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,6 +19,9 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     private final TransportEventRepository transportEventRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
+
+    @Value("${dcsa.events.transport-event-map-references-and-document-references:true}")
+    private boolean mapReferences;
 
     @Override
     public TransportEventRepository getRepository() {
@@ -32,14 +36,17 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
 
     @Override
     public Mono<TransportEvent> loadRelatedEntities(TransportEvent event) {
-        return mapTransportCall(event)
-                .flatMap(transportEvent ->
-                        transportCallService.findReferencesForTransportCallID(event.getTransportCallID())
-                                .doOnNext(transportEvent::setReferences)
-                                .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
-                                .doOnNext(transportEvent::setDocumentReferences)
-                                .thenReturn(transportEvent)
-                );
+        if (mapReferences) {
+            return mapTransportCall(event)
+                    .flatMap(transportEvent ->
+                            transportCallService.findReferencesForTransportCallID(event.getTransportCallID())
+                                    .doOnNext(transportEvent::setReferences)
+                                    .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
+                                    .doOnNext(transportEvent::setDocumentReferences)
+                                    .thenReturn(transportEvent)
+                    );
+        }
+        return mapTransportCall(event);
     }
 
     @Override
