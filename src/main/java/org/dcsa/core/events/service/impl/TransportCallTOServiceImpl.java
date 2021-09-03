@@ -6,6 +6,7 @@ import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.*;
+import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
@@ -94,11 +95,16 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                         + " (is data loaded correctly into the database?")))
                 .doOnNext(modeOfTransport -> transportCallTO.setModeOfTransportID(modeOfTransport.getId()))
                 .then(Mono.justOrEmpty(transportCallTO.getVessel()))
-                .flatMap(vessel -> Mono.justOrEmpty(vessel.getVesselIMONumber())
-                        .flatMap(vesselRepository::findById)
-                        .switchIfEmpty(vesselService.create(vessel)))
+                .flatMap(vessel ->
+                        vesselService.findById(vessel.getVesselIMONumber())
+                        .onErrorResume(NotFoundException.class,
+                                (e) -> carrierService.findByCode(vessel.getVesselOperatorCarrierCodeListProvider(), vessel.getVesselOperatorCarrierCode())
+                                .flatMap(carrier -> {
+                                    vessel.setCarrier(carrier);
+                                    return vesselService.create(vessel);
+                                }))
                 // Force a non-empty Mono
-                .thenReturn(transportCallTO)
+                ).thenReturn(transportCallTO)
                 .flatMap(ignored ->
                         facilityService.findByUNLocationCodeAndFacilityCode(
                                 transportCallTO.getUNLocationCode(),
