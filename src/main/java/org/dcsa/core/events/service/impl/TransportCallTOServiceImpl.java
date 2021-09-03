@@ -102,9 +102,10 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                                 .flatMap(carrier -> {
                                     vessel.setCarrier(carrier);
                                     return vesselService.create(vessel);
-                                }))
+                                })))
+                .doOnNext(transportCallTO::setVessel)
                 // Force a non-empty Mono
-                ).thenReturn(transportCallTO)
+                .thenReturn(transportCallTO)
                 .flatMap(ignored ->
                         facilityService.findByUNLocationCodeAndFacilityCode(
                                 transportCallTO.getUNLocationCode(),
