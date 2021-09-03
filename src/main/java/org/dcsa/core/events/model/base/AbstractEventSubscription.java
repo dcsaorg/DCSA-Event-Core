@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +23,7 @@ public abstract class AbstractEventSubscription extends AuditBase {
   @Column("callback_url")
   protected String callbackUrl;
 
+  @JsonIgnore
   @Column("schedule_id")
   protected String scheduleID;
 
