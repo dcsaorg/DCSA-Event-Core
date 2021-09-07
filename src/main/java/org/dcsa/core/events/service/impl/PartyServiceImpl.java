@@ -47,19 +47,23 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
         }
 
         return partyTOMono
-                .flatMap(pTo -> Util.createOrFindByContent(
-                        pTo,
-                        partyRepository::findByContent,
-                        pTO -> this.create(pTO.toParty())
-                )).flatMap(party ->
-                        Flux.fromIterable(
-                                partyTO.getIdentifyingCodes()
-                                        .stream().map(idc -> mapIdCodeToPartyCLRA.apply(party.getId(), idc))
-                                        .collect(Collectors.toList()))
-                                .flatMap(partyCodeListResponsibleAgencyRepository::save)
-                                .then()
-                                .thenReturn(party))
-                                .map(party -> party.toPartyTO(partyTO.getAddress(), partyTO.getIdentifyingCodes()));
+            .flatMap(
+                pTo ->
+                    Util.createOrFindByContent(
+                        pTo, partyRepository::findByContent, pTO -> this.create(pTO.toParty())))
+            .flatMap(
+                party ->
+                    Flux.fromIterable(
+                            partyTO.getIdentifyingCodes().stream()
+                                .map(idc -> mapIdCodeToPartyCLRA.apply(party.getId(), idc))
+                                .collect(Collectors.toList()))
+                        .flatMap(partyCodeListResponsibleAgencyRepository::save)
+                        .then()
+                        .thenReturn(party))
+            .map(
+                party ->
+                    party.toPartyTO(
+                        partyTO.getNmftaCode(), partyTO.getAddress(), partyTO.getIdentifyingCodes()));
     }
 
     private final BiFunction<String, PartyTO.IdentifyingCode, PartyCodeListResponsibleAgency> mapIdCodeToPartyCLRA = (partyId, idc) -> {
