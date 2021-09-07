@@ -39,8 +39,20 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
 
     @Override
     public Flux<TransportCallTO> findAll() {
-        ExtendedRequest<TransportCallTO> extendedRequest = newExtendedRequest();
-        return transportCallTORepository.findAllExtended(extendedRequest);
+        return findAllExtended(newExtendedRequest());
+    }
+    @Override
+    public Flux<TransportCallTO> findAllExtended(ExtendedRequest<TransportCallTO> extendedRequest) {
+        return transportCallTORepository.findAllExtended(extendedRequest)
+                .concatMap(transportCallTO ->
+                        voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID())
+                                .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
+                                .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
+                                .flatMap(serviceRepository::findById)
+                                .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
+                                .doOnNext(transportCallTO::setCarrierServiceCode)
+                                .thenReturn(transportCallTO)
+                );
     }
 
     @Override
