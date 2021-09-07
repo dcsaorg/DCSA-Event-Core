@@ -9,6 +9,7 @@ import org.dcsa.core.util.MappingUtils;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,13 +22,14 @@ public class Party extends AbstractParty implements SetId<String> {
     @Column("address_id")
     private UUID addressID;
 
-    public PartyTO toPartyTO(Address address) {
+    public PartyTO toPartyTO(Address address, List<PartyTO.IdentifyingCode> identifyingCodes) {
         PartyTO partyTO = MappingUtils.instanceFrom(this, PartyTO::new, AbstractParty.class);
         UUID providedAddressID = address != null ? address.getId() : null;
         if (!Objects.equals(addressID, providedAddressID)) {
             throw new IllegalArgumentException("address does not match addressID");
         }
         partyTO.setAddress(address);
+        partyTO.setIdentifyingCodes(identifyingCodes);
         return partyTO;
     }
 }

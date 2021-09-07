@@ -10,12 +10,16 @@ import org.dcsa.core.events.model.base.AbstractParty;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, String>, SetId<String> {
 
     private Address address;
+
+    private List<IdentifyingCode> identifyingCodes;
 
     @Override
     public boolean isSolelyReferenceToModel() {
@@ -32,5 +36,11 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
             party.setAddressID(address.getId());
         }
         return party;
+    }
+
+    @Data
+    public static class IdentifyingCode {
+        private String codeListResponsibleAgencyCode;
+        private String partyCode;
     }
 }

@@ -9,25 +9,23 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface PartyRepository extends ExtendedRepository<Party, String> {
-    Mono<Party> findByAddressIDAndPartyNameAndTaxReference1AndTaxReference2AndPublicKeyAndNmftaCode(
+    Mono<Party> findByAddressIDAndPartyNameAndTaxReference1AndTaxReference2AndPublicKey(
             UUID addressID,
             String partyName,
             String taxReference1,
             String taxReference2,
-            String publicKey,
-            String nmftaCode
+            String publicKey
     );
 
     default Mono<Party> findByContent(PartyTO partyTO) {
         Address address = partyTO.getAddress();
         UUID addressID = address != null ? address.getId() : null;
-        return findByAddressIDAndPartyNameAndTaxReference1AndTaxReference2AndPublicKeyAndNmftaCode(
+        return findByAddressIDAndPartyNameAndTaxReference1AndTaxReference2AndPublicKey(
                 addressID,
                 partyTO.getPartyName(),
                 partyTO.getTaxReference1(),
                 partyTO.getTaxReference2(),
-                partyTO.getPublicKey(),
-                partyTO.getNmftaCode()
+                partyTO.getPublicKey()
         );
     }
 

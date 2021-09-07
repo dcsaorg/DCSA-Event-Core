@@ -30,8 +30,4 @@ public class AbstractParty implements GetId<String> {
     @Column("public_key")
     @Size(max = 500)
     private String publicKey;
-
-    @Column("nmfta_code")
-    @Size(max = 4)
-    private String nmftaCode;
 }
