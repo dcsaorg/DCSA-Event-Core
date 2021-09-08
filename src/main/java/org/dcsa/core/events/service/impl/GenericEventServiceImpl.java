@@ -17,11 +17,11 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
 
-    private final ShipmentEventService shipmentEventService;
-    private final TransportEventService transportEventService;
-    private final EquipmentEventService equipmentEventService;
-    private final OperationsEventService operationsEventService;
-    private final EventRepository eventRepository;
+    protected final ShipmentEventService shipmentEventService;
+    protected final TransportEventService transportEventService;
+    protected final EquipmentEventService equipmentEventService;
+    protected final OperationsEventService operationsEventService;
+    protected final EventRepository eventRepository;
 
     @Override
     public EventRepository getRepository() {
