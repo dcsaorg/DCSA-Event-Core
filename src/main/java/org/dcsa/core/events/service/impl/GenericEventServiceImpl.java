@@ -6,16 +6,21 @@ import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
 import org.dcsa.core.events.service.*;
+import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
+
+    private final Set<EventType> ALL_EVENT_TYPES = Set.copyOf(EnumSet.allOf(EventType.class));
 
     protected final ShipmentEventService shipmentEventService;
     protected final TransportEventService transportEventService;
@@ -30,12 +35,38 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
 
     @Override
     public Flux<Event> findAllExtended(ExtendedRequest<Event> extendedRequest) {
-        return super.findAllExtended(extendedRequest);
+        Set<EventType> eventTypes = getSupportedEvents();
+        return super.findAllExtended(extendedRequest)
+                // TODO: Push this filter into the extendedRequest, so the database does not spend time on them.
+                .filter(e -> eventTypes.contains(e.getEventType()))
+                .concatMap(event -> {
+                    switch (event.getEventType()) {
+                        case TRANSPORT:
+                            return transportEventService.loadRelatedEntities((TransportEvent) event);
+                        case EQUIPMENT:
+                            return equipmentEventService.loadRelatedEntities((EquipmentEvent) event);
+                        case SHIPMENT:
+                            return shipmentEventService.loadRelatedEntities((ShipmentEvent) event);
+                        case OPERATIONS:
+                            return operationsEventService.loadRelatedEntities((OperationsEvent) event);
+                        default:
+                            throw new IllegalStateException("Unsupported event type: " + event.getClass());
+                    }
+                });
     }
 
     @Override
     public Mono<Event> findById(UUID id) {
-        throw new NotImplementedException();
+        return Mono.<Event>empty()
+                .switchIfEmpty(getTransportEventRelatedEntities(id))
+                .switchIfEmpty(getShipmentEventRelatedEntities(id))
+                .switchIfEmpty(getEquipmentEventRelatedEntities(id))
+                .switchIfEmpty(getOperationsEventRelatedEntities(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("No event was found with id: " + id)));
+    }
+
+    protected Set<EventType> getSupportedEvents() {
+        return ALL_EVENT_TYPES;
     }
 
     @Override
@@ -43,28 +74,40 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         return eventRepository.findByEventTypeAndEventID(eventType, eventID);
     }
 
-    public Mono<TransportEvent> getTransportEventRelatedEntities(UUID id) {
+    protected Mono<TransportEvent> getTransportEventRelatedEntities(UUID id) {
+        if (!getSupportedEvents().contains(EventType.TRANSPORT)) {
+            return Mono.empty();
+        }
         return transportEventService
                 .findById(id)
                 .flatMap(transportEventService::loadRelatedEntities)
                 .doOnNext(applyEventType);
     }
 
-    public Mono<ShipmentEvent> getShipmentEventRelatedEntities(UUID id) {
+    protected Mono<ShipmentEvent> getShipmentEventRelatedEntities(UUID id) {
+        if (!getSupportedEvents().contains(EventType.SHIPMENT)) {
+            return Mono.empty();
+        }
         return shipmentEventService
                 .findById(id)
                 .flatMap(shipmentEventService::loadRelatedEntities)
                 .doOnNext(applyEventType);
     }
 
-    public Mono<EquipmentEvent> getEquipmentEventRelatedEntities(UUID id) {
+    protected Mono<EquipmentEvent> getEquipmentEventRelatedEntities(UUID id) {
+        if (!getSupportedEvents().contains(EventType.EQUIPMENT)) {
+            return Mono.empty();
+        }
         return equipmentEventService
                 .findById(id)
                 .flatMap(equipmentEventService::loadRelatedEntities)
                 .doOnNext(applyEventType);
     }
 
-    public Mono<OperationsEvent> getOperationsEventRelatedEntities(UUID id) {
+    protected Mono<OperationsEvent> getOperationsEventRelatedEntities(UUID id) {
+        if (!getSupportedEvents().contains(EventType.OPERATIONS)) {
+            return Mono.empty();
+        }
         return operationsEventService
                 .findById(id)
                 .flatMap(operationsEventService::loadRelatedEntities)
@@ -81,6 +124,8 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
                     event.setEventType(EventType.EQUIPMENT);
                 } else if (event instanceof OperationsEvent) {
                     event.setEventType(EventType.OPERATIONS);
+                } else {
+                    throw new IllegalStateException("Unsupported event type: " + event.getClass());
                 }
             };
 
@@ -89,6 +134,9 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         Mono<? extends Event> eventMono;
         EventType eventType = event.getEventType();
         String carrierBookingReference = event.getCarrierBookingReference();
+        if (!getSupportedEvents().contains(event.getEventType())) {
+            throw new IllegalArgumentException("Unsupported event type: " + event.getEventType());
+        }
         // Clear these "pseudo-transient" field. They exist on reading from the database, but cannot
         // be included in the create method as the fields do not exist in the table (they are from a view).
         // When they are null, Spring R2DBC will omit them from the INSERT INTO and therefore it
