@@ -5,6 +5,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
+import org.dcsa.core.events.repository.PendingEventRepository;
 import org.dcsa.core.events.service.*;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
@@ -27,6 +28,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
     protected final EquipmentEventService equipmentEventService;
     protected final OperationsEventService operationsEventService;
     protected final EventRepository eventRepository;
+    protected final PendingEventRepository pendingEventRepository;
 
     @Override
     public EventRepository getRepository() {
@@ -159,7 +161,10 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
             default:
                 return Mono.error(new IllegalStateException("Unexpected value: " + event.getEventType()));
         }
-        return eventMono.doOnNext(e -> {
+        return eventMono.flatMap(
+                savedEvent -> pendingEventRepository.enqueueUnmappedEventID(event.getEventID())
+                .thenReturn(savedEvent)
+        ).doOnNext(e -> {
             e.setEventType(eventType);
             e.setCarrierBookingReference(carrierBookingReference);
         }).cast(Event.class);
