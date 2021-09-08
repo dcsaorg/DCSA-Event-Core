@@ -14,7 +14,6 @@ import org.dcsa.core.events.model.enums.CodeListResponsibleAgency;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
-import org.dcsa.core.exception.InvalidParameterException;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
         return party;
     }
 
-      public void adjustIdentifyingCodesIfNmftaIsPresent(){
+    public void adjustIdentifyingCodesIfNmftaIsPresent(){
           if (StringUtils.isNotEmpty(this.getNmftaCode())) {
               if (null != identifyingCodes
                       && !identifyingCodes.isEmpty()
@@ -57,8 +56,15 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
                                       CodeListResponsibleAgency.SCAC
                                               .getCode()
                                               .equals(idc.getCodeListResponsibleAgencyCode()))) {
-                  throw new InvalidParameterException(
-                          "nmfta code is present along with SCAC in identifyingCodes");
+
+                  for (IdentifyingCode idc : this.identifyingCodes) {
+                      if(CodeListResponsibleAgency.SCAC
+                              .getCode()
+                              .equals(idc.getCodeListResponsibleAgencyCode())){
+                            idc.setPartyCode(this.getNmftaCode());
+                      }
+                  }
+
               } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
                   this.identifyingCodes =
                           Collections.singletonList(

@@ -9,14 +9,12 @@ import org.dcsa.core.events.repository.PartyCodeListResponsibleAgencyRepository;
 import org.dcsa.core.events.repository.PartyRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.PartyService;
-import org.dcsa.core.events.util.Util;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -48,15 +46,13 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
 
         return partyTOMono
             .flatMap(
-                pTo ->
-                    Util.createOrFindByContent(
-                        pTo, partyRepository::findByContent, pTO -> this.create(pTO.toParty())))
+                pTo -> this.create(pTo.toParty()))
             .flatMap(
                 party ->
-                    Flux.fromIterable(
+                    Flux.fromStream(
                             partyTO.getIdentifyingCodes().stream()
                                 .map(idc -> mapIdCodeToPartyCLRA.apply(party.getId(), idc))
-                                .collect(Collectors.toList()))
+                                )
                         .flatMap(partyCodeListResponsibleAgencyRepository::save)
                         .then()
                         .thenReturn(party))
