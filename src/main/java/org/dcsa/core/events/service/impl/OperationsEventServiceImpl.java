@@ -47,7 +47,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     }
 
     private Mono<OperationsEvent> getAndSetTransportCall(OperationsEvent operationsEvent) {
-        if (operationsEvent.getTransportCallID() == null) return Mono.empty();
+        if (operationsEvent.getTransportCallID() == null) return Mono.just(operationsEvent);
         return transportCallTOService
                 .findById(operationsEvent.getTransportCallID())
                 .doOnNext(operationsEvent::setTransportCall)
@@ -55,7 +55,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     }
     
     private Mono<OperationsEvent> getAndSetPublisher(OperationsEvent operationsEvent) {
-        if (operationsEvent.getPublisherID() == null) return Mono.empty();
+        if (operationsEvent.getPublisherID() == null) return Mono.just(operationsEvent);
         return partyService
                 .findById(operationsEvent.getPublisherID())
                 .doOnNext(party -> operationsEvent.setPublisher(MappingUtils.instanceFrom(party, PartyTO::new, AbstractParty.class)))
@@ -63,7 +63,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     }
 
     private Mono<OperationsEvent> getAndSetEventLocation(OperationsEvent operationsEvent) {
-        if (operationsEvent.getEventLocationID() == null) return Mono.empty();
+        if (operationsEvent.getEventLocationID() == null) return Mono.just(operationsEvent);
         return locationService
                 .findById(operationsEvent.getEventLocationID())
                 .doOnNext(location -> operationsEvent.setEventLocation(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
@@ -71,7 +71,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     }
 
     private Mono<OperationsEvent> getAndSetVesselPosition(OperationsEvent operationsEvent) {
-        if (operationsEvent.getVesselPositionID() == null) return Mono.empty();
+        if (operationsEvent.getVesselPositionID() == null) return Mono.just(operationsEvent);
         return locationService
                 .findById(operationsEvent.getVesselPositionID())
                 .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
