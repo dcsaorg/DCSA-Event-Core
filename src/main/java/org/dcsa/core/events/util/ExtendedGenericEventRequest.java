@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
+import jdk.dynalink.Operation;
 import lombok.SneakyThrows;
-import org.dcsa.core.events.model.EquipmentEvent;
-import org.dcsa.core.events.model.Event;
-import org.dcsa.core.events.model.ShipmentEvent;
-import org.dcsa.core.events.model.TransportCall;
+import org.dcsa.core.events.model.*;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.extendedrequest.QueryField;
@@ -176,13 +174,18 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             Class<?> currentClass = clazz;
             if (ShipmentEvent.class.isAssignableFrom(currentClass)) {
                 includesShipmentEvents = true;
-            }
-            if (TransportCall.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass)) {
+            } else if (TransportCall.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass) || OperationsEvent.class.isAssignableFrom(currentClass)) {
                 needsTransportCall = true;
+            } else {
+                throw new IllegalStateException("Unsupported event subclass: " + currentClass.getSimpleName());
             }
             while (currentClass != Event.class) {
                 for (Field field : currentClass.getDeclaredFields()) {
-                    if (field.isAnnotationPresent(Transient.class) || field.isAnnotationPresent(JsonIgnore.class)) {
+                    /* Keep JsonIgnore because e.g. transportCallID is JsonIgnore because we do not show it.
+                     * However, we do need the transportCallID field to be known as we need it for looking up
+                     * the TransportCall afterwards.
+                     */
+                    if (field.isAnnotationPresent(Transient.class)) {
                         continue;
                     }
                     QueryField queryField = QueryFields.queryFieldFromField(Event.class, field, clazz, eventTable, true);
