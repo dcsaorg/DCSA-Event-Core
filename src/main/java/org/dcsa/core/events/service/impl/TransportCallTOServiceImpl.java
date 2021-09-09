@@ -109,12 +109,19 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 .then(Mono.justOrEmpty(transportCallTO.getVessel()))
                 .flatMap(vessel ->
                         vesselService.findById(vessel.getVesselIMONumber())
-                        .onErrorResume(NotFoundException.class,
-                                (e) -> carrierService.findByCode(vessel.getVesselOperatorCarrierCodeListProvider(), vessel.getVesselOperatorCarrierCode())
-                                .flatMap(carrier -> {
-                                    vessel.setCarrier(carrier);
-                                    return vesselService.create(vessel);
-                                })))
+                        .onErrorResume(NotFoundException.class, (e) -> {
+                            if (vessel.getVesselOperatorCarrierCodeListProvider() == null) {
+                                throw new IllegalArgumentException("Cannot create vessel where operator carrier code list provider is missing");
+                            }
+                            if (vessel.getVesselOperatorCarrierCode() == null) {
+                                throw new IllegalArgumentException("Cannot create vessel where operator carrier code is missing");
+                            }
+                            return carrierService.findByCode(vessel.getVesselOperatorCarrierCodeListProvider(), vessel.getVesselOperatorCarrierCode())
+                                    .flatMap(carrier -> {
+                                        vessel.setCarrier(carrier);
+                                        return vesselService.create(vessel);
+                                    });
+                        }))
                 .doOnNext(transportCallTO::setVessel)
                 // Force a non-empty Mono
                 .thenReturn(transportCallTO)
