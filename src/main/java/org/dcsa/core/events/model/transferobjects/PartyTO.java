@@ -1,21 +1,33 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
 import org.dcsa.core.events.model.SetId;
 import org.dcsa.core.events.model.base.AbstractParty;
+import org.dcsa.core.events.model.enums.CodeListResponsibleAgency;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@JsonPropertyOrder({ "nmftaCode", "identifyingCodes" })
 public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, String>, SetId<String> {
 
+    private String nmftaCode;
+
     private Address address;
+
+    private List<IdentifyingCode> identifyingCodes;
 
     @Override
     public boolean isSolelyReferenceToModel() {
@@ -32,5 +44,43 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
             party.setAddressID(address.getId());
         }
         return party;
+    }
+
+    public void adjustIdentifyingCodesIfNmftaIsPresent(){
+          if (StringUtils.isNotEmpty(this.getNmftaCode())) {
+              if (null != identifyingCodes
+                      && !identifyingCodes.isEmpty()
+                      && identifyingCodes.stream()
+                      .anyMatch(
+                              idc ->
+                                      CodeListResponsibleAgency.SCAC
+                                              .getCode()
+                                              .equals(idc.getCodeListResponsibleAgencyCode()))) {
+
+                  for (IdentifyingCode idc : this.identifyingCodes) {
+                      if(CodeListResponsibleAgency.SCAC
+                              .getCode()
+                              .equals(idc.getCodeListResponsibleAgencyCode())){
+                            idc.setPartyCode(this.getNmftaCode());
+                      }
+                  }
+
+              } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
+                  this.identifyingCodes =
+                          Collections.singletonList(
+                                  new IdentifyingCode(CodeListResponsibleAgency.SCAC.getCode(), this.getNmftaCode()));
+              } else {
+                  identifyingCodes.add(
+                          new IdentifyingCode(CodeListResponsibleAgency.SCAC.getCode(), this.getNmftaCode()));
+              }
+          }
+      }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class IdentifyingCode {
+        private String codeListResponsibleAgencyCode;
+        private String partyCode;
     }
 }
