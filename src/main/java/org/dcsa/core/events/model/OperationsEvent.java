@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.enums.FacilityTypeCode;
-import org.dcsa.core.events.model.enums.OperationsEventTypeCode;
-import org.dcsa.core.events.model.enums.PortCallServiceTypeCode;
-import org.dcsa.core.events.model.enums.PublisherRole;
+import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
@@ -70,4 +67,48 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @Transient
     private PartyTO publisher;
+
+    /**
+     * @return A name like "ETA-Berth" or "RTC Cargo Ops".  Unsupported variants will cause "Unknown" to be
+     *  included in the return value.
+     */
+    @JsonIgnore
+    @Transient
+    public String getTimestampTypeName() {
+        OperationsEventTypeCode eventTypeCode = getOperationsEventTypeCode();
+        EventClassifierCode classifierCode = getEventClassifierCode();
+        if (eventTypeCode == null || classifierCode == null) {
+            return "<Unknown timestamp>";
+        }
+        StringBuilder timestampType = new StringBuilder(25);
+        char separator = '-';
+        // Create the "ETA_" (etc.) prefix
+        timestampType.append(classifierCode.name().charAt(0)).append('T').append(eventTypeCode.name().charAt(0));
+        String suffix = "(Unknown)";
+
+        if (getPortCallServiceTypeCode() != null) {
+            // For some reason, Cargo Ops and Pilot timestamps uses ' ' instead of '-' as separator. Mirror that
+            separator = ' ';
+            // Strictly speaking, we should ensure that facilityTypeCode is BRTH for these, but it is probably
+            // not worth it
+            switch (getPortCallServiceTypeCode()) {
+                case CRGO:
+                    suffix = "Cargo Ops";
+                    break;
+                case PILO:
+                    suffix = "Pilot";
+                    break;
+            }
+        } else if (getFacilityTypeCode() != null) {
+            switch (getFacilityTypeCode()) {
+                case BRTH:
+                    suffix = "Berth";
+                    break;
+                case PBPL:
+                    suffix = "PBP";
+                    break;
+            }
+        }
+        return timestampType.append(separator).append(suffix).toString();
+    }
 }
