@@ -34,7 +34,7 @@ public class AbstractFacility {
 
     @Size(max = 4)
     @Column("facility_smdg_code")
-    private String facilitySMGDCode;
+    private String facilitySMDGCode;
 
     @JsonIgnore
     @Column("location_id")
