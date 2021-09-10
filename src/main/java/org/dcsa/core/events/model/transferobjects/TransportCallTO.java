@@ -6,14 +6,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.ModeOfTransport;
-import org.dcsa.core.events.model.Transport;
 import org.dcsa.core.events.model.Vessel;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.model.ForeignKey;
-import org.dcsa.core.model.JoinedWithModel;
-import org.dcsa.core.model.MapEntity;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.sql.Join;
 
@@ -105,8 +102,8 @@ public class TransportCallTO extends AbstractTransportCall {
     public void setFacility(FacilityTO facility) {
         if (facility != null && !facility.isNullFacility()) {
             UNLocationCode = facility.getUnLocationCode();
-            if (facility.getFacilitySMGDCode() != null) {
-                facilityCode = facility.getFacilitySMGDCode();
+            if (facility.getFacilitySMDGCode() != null) {
+                facilityCode = facility.getFacilitySMDGCode();
                 facilityCodeListProvider = FacilityCodeListProvider.SMDG;
             } else if (facility.getFacilityBICCode() != null) {
                 facilityCode = facility.getFacilityBICCode();
