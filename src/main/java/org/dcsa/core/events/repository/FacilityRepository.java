@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface FacilityRepository extends ExtendedRepository<Facility, UUID> {
 
-  Mono<Facility> findByUnLocationCodeAndFacilitySMGDCode(
+  Mono<Facility> findByUnLocationCodeAndFacilitySMDGCode(
       String uNLocationCode, String facilitySMDGCode);
 
   Mono<Facility> findByUnLocationCodeAndFacilityBICCode(
