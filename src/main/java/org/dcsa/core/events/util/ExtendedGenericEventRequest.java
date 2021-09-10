@@ -1,11 +1,9 @@
 package org.dcsa.core.events.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
-import jdk.dynalink.Operation;
 import lombok.SneakyThrows;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
@@ -174,7 +172,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             Class<?> currentClass = clazz;
             if (ShipmentEvent.class.isAssignableFrom(currentClass)) {
                 includesShipmentEvents = true;
-            } else if (TransportCall.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass) || OperationsEvent.class.isAssignableFrom(currentClass)) {
+            } else if (TransportEvent.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass) || OperationsEvent.class.isAssignableFrom(currentClass)) {
                 needsTransportCall = true;
             } else {
                 throw new IllegalStateException("Unsupported event subclass: " + currentClass.getSimpleName());
