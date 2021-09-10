@@ -30,7 +30,7 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
         BiFunction<String, String, Mono<Facility>> method;
         switch (Objects.requireNonNull(facilityCodeListProvider, "facilityCodeListProvider")) {
             case SMDG:
-                method = facilityRepository::findByUnLocationCodeAndFacilitySMGDCode;
+                method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
                 break;
             case BIC:
                 method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
