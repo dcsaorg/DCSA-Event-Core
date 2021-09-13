@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @JsonTypeName("OPERATIONS")
 public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
-    @JsonIgnore
     @Column("transport_call_id")
     private String transportCallID;
 
@@ -110,5 +109,10 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
             }
         }
         return timestampType.append(separator).append(suffix).toString();
+    }
+
+    @JsonIgnore
+    public String getTransportCallID() {
+        return transportCallID;
     }
 }
