@@ -112,7 +112,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     }
 
     @JsonIgnore
-    public void setTransportCallID(String transportCallID) {
-        this.transportCallID = transportCallID;
+    public String getTransportCallID() {
+        return transportCallID;
     }
 }
