@@ -43,13 +43,22 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
     @Query("SELECT transport_call.* FROM transport_call"
             + " JOIN facility ON (facility.id = transport_call.facility_id)"
             + " JOIN mode_of_transport ON (mode_of_transport.mode_of_transport_code = transport_call.mode_of_transport)"
+            + " LEFT JOIN transport_call_voyage ON (transport_call_voyage.transport_call_id = transport_call.id)"
+            + " LEFT JOIN voyage ON (transport_call_voyage.voyage_id = voyage.id)"
+            + " LEFT JOIN service ON (service.id = voyage.service_id)"
             + " WHERE transport_call.vessel_imo_number = :vesselIMONumber"
             + " AND mode_of_transport.dcsa_transport_type = :modeOfTransport"
             + " AND facility.facility_smdg_code = :facilitySMDGCode"
-            + " AND facility.un_location_code = :UNLocationCode")
-    Mono<TransportCall> getTransportCall(String UNLocationCode, String facilitySMDGCode, String modeOfTransport, String vesselIMONumber);
+            + " AND facility.un_location_code = :UNLocationCode"
+            + " AND (:carrierVoyageNumber IS NULL OR voyage.carrier_voyage_number = :carrierVoyageNumber)"
+            + " AND (:carrierServiceCode IS NULL OR service.carrier_service_code = :carrierServiceCode)"
+            + " AND (:transportCallSequenceNumber IS NULL OR transport_call.transport_call_sequence_number = :transportCallSequenceNumber)"
+    )
+    Flux<TransportCall> getTransportCall(String UNLocationCode, String facilitySMDGCode, String modeOfTransport,
+                                         String vesselIMONumber, String carrierServiceCode,
+                                         String carrierVoyageNumber, Integer transportCallSequenceNumber);
 
-  @Query(
+    @Query(
       "SELECT shipping_instruction.transport_document_type FROM shipping_instruction"
           + " JOIN transport_document transport_document ON transport_document.shipping_instruction_id = shipping_instruction.id"
           + " WHERE transport_document.transport_document_reference = :transportDocumentReference")
