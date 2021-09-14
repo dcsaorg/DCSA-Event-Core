@@ -2,7 +2,9 @@ package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.TransportEvent;
+import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.TransportEventRepository;
+import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.events.service.TransportEventService;
@@ -19,6 +21,7 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     private final TransportEventRepository transportEventRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
+    private final UnmappedEventRepository unmappedEventRepository;
 
     @Value("${dcsa.events.transport-event-map-references-and-document-references:true}")
     private boolean mapReferences;
@@ -55,5 +58,17 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
                 .findById(transportEvent.getTransportCallID())
                 .doOnNext(transportEvent::setTransportCall)
                 .thenReturn(transportEvent);
+    }
+
+    @Override
+    public Mono<TransportEvent> create(TransportEvent transportEvent) {
+        return super.create(transportEvent).flatMap(
+                te -> {
+                    UnmappedEvent unmappedEvent = new UnmappedEvent();
+                    unmappedEvent.setNewRecord(true);
+                    unmappedEvent.setEventID(te.getEventID());
+                    unmappedEvent.setEnqueuedAtDateTime(te.getEventCreatedDateTime());
+                    return unmappedEventRepository.save(unmappedEvent);
+                }).thenReturn(transportEvent);
     }
 }

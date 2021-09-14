@@ -1,7 +1,6 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.repository.EventRepository;
@@ -161,10 +160,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
             default:
                 return Mono.error(new IllegalStateException("Unexpected value: " + event.getEventType()));
         }
-        return eventMono.flatMap(
-                savedEvent -> pendingEventRepository.enqueueUnmappedEventID(event.getEventID())
-                .thenReturn(savedEvent)
-        ).doOnNext(e -> {
+        return eventMono.doOnNext(e -> {
             e.setEventType(eventType);
             e.setCarrierBookingReference(carrierBookingReference);
         }).cast(Event.class);

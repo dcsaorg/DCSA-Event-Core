@@ -3,8 +3,10 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Equipment;
 import org.dcsa.core.events.model.EquipmentEvent;
+import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.EquipmentEventRepository;
 import org.dcsa.core.events.repository.EquipmentRepository;
+import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
@@ -21,6 +23,7 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
     private final EquipmentRepository equipmentRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
+    private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
     public EquipmentEventRepository getRepository() {
@@ -58,5 +61,17 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
                 .findById(equipmentEvent.getTransportCallID())
                 .doOnNext(equipmentEvent::setTransportCall)
                 .thenReturn(equipmentEvent);
+    }
+
+    @Override
+    public Mono<EquipmentEvent> create(EquipmentEvent equipmentEvent) {
+        return super.create(equipmentEvent).flatMap(
+                ee -> {
+                    UnmappedEvent unmappedEvent = new UnmappedEvent();
+                    unmappedEvent.setNewRecord(true);
+                    unmappedEvent.setEventID(ee.getEventID());
+                    unmappedEvent.setEnqueuedAtDateTime(ee.getEventCreatedDateTime());
+                    return unmappedEventRepository.save(unmappedEvent);
+                }).thenReturn(equipmentEvent);
     }
 }
