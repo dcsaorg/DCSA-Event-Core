@@ -95,6 +95,8 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                           unmappedEvent.setEventID(ope.getEventID());
                           unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
                           return unmappedEventRepository.save(unmappedEvent);
-                      }).thenReturn(operationsEvent);
+                      })
+
+              .thenReturn(operationsEvent);
   }
 }

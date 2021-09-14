@@ -3,8 +3,10 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.ShipmentEvent;
+import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
+import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.ShipmentEventService;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.function.BiFunction;
 public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
     private final ShipmentEventRepository shipmentEventRepository;
     private final ReferenceRepository referenceRepository;
+    private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
     public ShipmentEventRepository getRepository() {
@@ -67,5 +70,17 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
                                             rs.collectList()
                                                     .doOnNext(shipmentEvent::setReferences)
                                                     .thenReturn(shipmentEvent));
+
+    @Override
+    public Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent) {
+        return super.create(shipmentEvent).flatMap(
+                se -> {
+                    UnmappedEvent unmappedEvent = new UnmappedEvent();
+                    unmappedEvent.setNewRecord(true);
+                    unmappedEvent.setEventID(se.getEventID());
+                    unmappedEvent.setEnqueuedAtDateTime(se.getEventCreatedDateTime());
+                    return unmappedEventRepository.save(unmappedEvent);
+                }).thenReturn(shipmentEvent);
+    }
 
 }
