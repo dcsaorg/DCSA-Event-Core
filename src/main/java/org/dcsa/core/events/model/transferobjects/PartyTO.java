@@ -1,7 +1,6 @@
 package org.dcsa.core.events.model.transferobjects;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@JsonPropertyOrder({ "nmftaCode", "identifyingCodes" })
 public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, String>, SetId<String> {
 
     private String nmftaCode;
@@ -66,21 +64,27 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
                   }
 
               } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
-                  this.identifyingCodes =
-                          Collections.singletonList(
-                                  new IdentifyingCode(CodeListResponsibleAgency.SCAC.getCode(), this.getNmftaCode()));
+                this.identifyingCodes =
+                    Collections.singletonList(
+                        IdentifyingCode.builder()
+                            .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
+                            .partyCode(this.getNmftaCode())
+                            .build());
               } else {
-                  identifyingCodes.add(
-                          new IdentifyingCode(CodeListResponsibleAgency.SCAC.getCode(), this.getNmftaCode()));
+                identifyingCodes.add(
+                    IdentifyingCode.builder()
+                        .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
+                        .partyCode(this.getNmftaCode())
+                        .build());
               }
           }
       }
 
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
+    @Builder
     public static class IdentifyingCode {
         private String codeListResponsibleAgencyCode;
         private String partyCode;
+        private String codeListName;
     }
 }
