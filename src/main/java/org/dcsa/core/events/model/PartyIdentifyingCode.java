@@ -8,8 +8,8 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.UUID;
 
 @Data
-@Table("party_code_list_responsible_agency")
-public class PartyCodeListResponsibleAgency {
+@Table("party_identifying_code")
+public class PartyIdentifyingCode {
 
   @Id private UUID id;
 
@@ -21,4 +21,7 @@ public class PartyCodeListResponsibleAgency {
 
   @Column("party_code")
   private String partyCode;
+
+  @Column("code_list_name")
+  private String codeListName;
 }
