@@ -3,9 +3,9 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
-import org.dcsa.core.events.model.PartyCodeListResponsibleAgency;
+import org.dcsa.core.events.model.PartyIdentifyingCode;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
-import org.dcsa.core.events.repository.PartyCodeListResponsibleAgencyRepository;
+import org.dcsa.core.events.repository.PartyIdentifyingCodeRepository;
 import org.dcsa.core.events.repository.PartyRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.PartyService;
@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, Party, String> implements PartyService {
     private final AddressService addressService;
     private final PartyRepository partyRepository;
-    private final PartyCodeListResponsibleAgencyRepository partyCodeListResponsibleAgencyRepository;
+    private final PartyIdentifyingCodeRepository partyCodeListResponsibleAgencyRepository;
 
     @Override
     public PartyRepository getRepository() {
@@ -51,7 +51,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                 party ->
                     Flux.fromStream(
                             partyTO.getIdentifyingCodes().stream()
-                                .map(idc -> mapIdCodeToPartyCLRA.apply(party.getId(), idc))
+                                .map(idc -> mapIdcCodeToPartyIdc.apply(party.getId(), idc))
                                 )
                         .flatMap(partyCodeListResponsibleAgencyRepository::save)
                         .then()
@@ -62,11 +62,12 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                         partyTO.getNmftaCode(), partyTO.getAddress(), partyTO.getIdentifyingCodes()));
     }
 
-    private final BiFunction<String, PartyTO.IdentifyingCode, PartyCodeListResponsibleAgency> mapIdCodeToPartyCLRA = (partyId, idc) -> {
-        PartyCodeListResponsibleAgency partyCodeListResponsibleAgency = new PartyCodeListResponsibleAgency();
+    private final BiFunction<String, PartyTO.IdentifyingCode, PartyIdentifyingCode> mapIdcCodeToPartyIdc = (partyId, idc) -> {
+        PartyIdentifyingCode partyCodeListResponsibleAgency = new PartyIdentifyingCode();
         partyCodeListResponsibleAgency.setPartyID(partyId);
-        partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
         partyCodeListResponsibleAgency.setCodeListResponsibleAgencyCode(idc.getCodeListResponsibleAgencyCode());
+        partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
+        partyCodeListResponsibleAgency.setCodeListName(idc.getCodeListName());
         return partyCodeListResponsibleAgency;
     };
 }
