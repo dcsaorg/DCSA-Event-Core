@@ -51,7 +51,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                 party ->
                     Flux.fromStream(
                             partyTO.getIdentifyingCodes().stream()
-                                .map(idc -> mapIdCodeToPartyCLRA.apply(party.getId(), idc))
+                                .map(idc -> mapIdcCodeToPartyIdc.apply(party.getId(), idc))
                                 )
                         .flatMap(partyCodeListResponsibleAgencyRepository::save)
                         .then()
@@ -62,11 +62,12 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                         partyTO.getNmftaCode(), partyTO.getAddress(), partyTO.getIdentifyingCodes()));
     }
 
-    private final BiFunction<String, PartyTO.IdentifyingCode, PartyIdentifyingCode> mapIdCodeToPartyCLRA = (partyId, idc) -> {
+    private final BiFunction<String, PartyTO.IdentifyingCode, PartyIdentifyingCode> mapIdcCodeToPartyIdc = (partyId, idc) -> {
         PartyIdentifyingCode partyCodeListResponsibleAgency = new PartyIdentifyingCode();
         partyCodeListResponsibleAgency.setPartyID(partyId);
-        partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
         partyCodeListResponsibleAgency.setCodeListResponsibleAgencyCode(idc.getCodeListResponsibleAgencyCode());
+        partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
+        partyCodeListResponsibleAgency.setCodeListName(idc.getCodeListName());
         return partyCodeListResponsibleAgency;
     };
 }
