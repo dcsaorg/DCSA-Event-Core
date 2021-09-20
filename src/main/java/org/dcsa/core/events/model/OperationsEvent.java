@@ -95,7 +95,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
                     suffix = "Cargo Ops";
                     break;
                 case PILO:
-                    suffix = "Pilot";
+                    suffix = "Pilotage";
                     break;
             }
         } else if (getFacilityTypeCode() != null) {
