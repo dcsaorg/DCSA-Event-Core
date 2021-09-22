@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Getter
 public enum SignatureMethod {
-    HMAC_SHA256("sha256", "HmacSHA256", 64, 64),
+    HMAC_SHA256("sha256", "HmacSHA256", 32, 64),
     PLAINTEXT_PASSWORD("plain", "", 1, 1024),
     ;
 
