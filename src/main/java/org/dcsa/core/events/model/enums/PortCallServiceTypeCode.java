@@ -6,5 +6,9 @@ public enum PortCallServiceTypeCode {
     CRGO,
     TOWG,
     BUNK,
-    WSDP
+    WSDP,
+    FAST,
+    GWAY,
+    SAFE,
+    LASH,
 }

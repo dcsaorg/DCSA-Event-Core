@@ -21,6 +21,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @JsonTypeName("OPERATIONS")
 public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
+    private static final String UNKNOWN_TIMESTAMP = "<Unknown timestamp>";
+
     @Column("transport_call_id")
     private String transportCallID;
 
@@ -76,30 +78,98 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     public String getTimestampTypeName() {
         OperationsEventTypeCode eventTypeCode = getOperationsEventTypeCode();
         EventClassifierCode classifierCode = getEventClassifierCode();
+        PortCallServiceTypeCode portCallServiceTypeCode = getPortCallServiceTypeCode();
+        FacilityTypeCode facilityTypeCode = getFacilityTypeCode();
         if (eventTypeCode == null || classifierCode == null) {
-            return "<Unknown timestamp>";
+            return UNKNOWN_TIMESTAMP;
         }
-        StringBuilder timestampType = new StringBuilder(25);
-        char separator = '-';
-        // Create the "ETA_" (etc.) prefix
-        timestampType.append(classifierCode.name().charAt(0)).append('T').append(eventTypeCode.name().charAt(0));
-        String suffix = "(Unknown)";
+        // Special-cases
+        if (facilityTypeCode == null && portCallServiceTypeCode == null) {
+            // Special-case "Start/End of Seaway Passage"
+            if (classifierCode != EventClassifierCode.ACT) {
+                return UNKNOWN_TIMESTAMP;
+            }
+            switch (operationsEventTypeCode) {
+                case ARRI:
+                    return "EOSP";
+                case DEPA:
+                    return "SOSP";
+                default:
+                    return UNKNOWN_TIMESTAMP;
+            }
+        }
+        if (portCallServiceTypeCode != null) {
+            // Special-cases around FAST, Gangway and SAFE
+            switch (portCallServiceTypeCode) {
+                case FAST:
+                    if (classifierCode != EventClassifierCode.ACT || facilityTypeCode != FacilityTypeCode.BRTH
+                            || operationsEventTypeCode != OperationsEventTypeCode.ARRI) {
+                        return UNKNOWN_TIMESTAMP;
+                    }
+                    return "AT All fast";
+                case GWAY:
+                    if (classifierCode != EventClassifierCode.ACT || facilityTypeCode != FacilityTypeCode.BRTH
+                            || operationsEventTypeCode != OperationsEventTypeCode.ARRI) {
+                        return UNKNOWN_TIMESTAMP;
+                    }
+                    return "Gangway Down and Safe";
+                case SAFE:
+                    if (classifierCode != EventClassifierCode.ACT || facilityTypeCode != FacilityTypeCode.BRTH) {
+                        return UNKNOWN_TIMESTAMP;
+                    }
+                    switch (operationsEventTypeCode) {
+                        case ARRI:
+                            return "Vessel Readiness for cargo operations";
+                        case DEPA:
+                            return "Terminal ready for vessel departure";
+                        default:
+                            return UNKNOWN_TIMESTAMP;
+                    }
+            }
+        }
 
-        if (getPortCallServiceTypeCode() != null) {
-            // For some reason, Cargo Ops and Pilot timestamps uses ' ' instead of '-' as separator. Mirror that
+        // Generic cases that follows the pattern "<X>T<Y>[ -]<Z>"  such as "ETA Berth" or "ETC-Cargo Ops"
+        String suffix = null;
+        // For some reason, Cargo Ops and Pilot timestamps uses ' ' while Berth/PBP uses '-' as separator.
+        char separator;
+
+        if (portCallServiceTypeCode != null) {
             separator = ' ';
             // Strictly speaking, we should ensure that facilityTypeCode is BRTH for these, but it is probably
             // not worth it
-            switch (getPortCallServiceTypeCode()) {
+            switch (portCallServiceTypeCode) {
                 case CRGO:
-                    suffix = "Cargo Ops";
+                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
+                        suffix = "Cargo Ops";
+                    }
                     break;
                 case PILO:
-                    suffix = "Pilotage";
+                    if (facilityTypeCode == null) {
+                        suffix = "Pilotage";
+                    }
+                    break;
+                case TOWG:
+                    if (facilityTypeCode == null) {
+                        suffix = "Towage";
+                    }
+                    break;
+                case BUNK:
+                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
+                        suffix = "Bunkering";
+                    }
+                    break;
+                case LASH:
+                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
+                        suffix = "Lashing";
+                    }
                     break;
             }
-        } else if (getFacilityTypeCode() != null) {
-            switch (getFacilityTypeCode()) {
+        } else {
+            // Due to previous cases, facilityTypeCode is guaranteed to be non-null here.  The assert is here to
+            // catch if that changes in the future.
+            assert facilityTypeCode != null;
+            separator = '-';
+            switch (facilityTypeCode) {
                 case BRTH:
                     suffix = "Berth";
                     break;
@@ -108,7 +178,11 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
                     break;
             }
         }
-        return timestampType.append(separator).append(suffix).toString();
+        if (suffix == null) {
+            return UNKNOWN_TIMESTAMP;
+        }
+        return String.valueOf(classifierCode.name().charAt(0)) + 'T' + eventTypeCode.name().charAt(0) +
+                separator + suffix;
     }
 
     @JsonIgnore
