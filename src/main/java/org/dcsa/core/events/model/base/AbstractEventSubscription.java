@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +29,5 @@ public abstract class AbstractEventSubscription extends AuditBase {
   // Jackson encodes this in base64 by default
   protected byte[] secret;
 
-  public List<EventType> getEventType() {
-    return Collections.emptyList();
-  }
+  public abstract List<EventType> getEventType();
 }

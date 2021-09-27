@@ -3,11 +3,13 @@ package org.dcsa.core.events.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.base.AbstractEventSubscription;
+import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.model.enums.SignatureMethod;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Table("event_subscription")
 @Data
@@ -59,5 +61,10 @@ public class EventSubscription extends AbstractEventSubscription implements Even
     this.retryAfter = eventSubscription.retryAfter;
     this.accumulatedRetryDelay = eventSubscription.accumulatedRetryDelay;
     this.signatureMethod = eventSubscription.signatureMethod;
+  }
+
+  @Override
+  public List<EventType> getEventType() {
+    throw new UnsupportedOperationException("This operation is not supported.");
   }
 }
