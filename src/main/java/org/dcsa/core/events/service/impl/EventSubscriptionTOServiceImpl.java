@@ -42,8 +42,6 @@ public abstract class EventSubscriptionTOServiceImpl<
   public static final List<OperationsEventTypeCode> ALL_OPERATIONS_EVENT_TYPES =
       List.of(OperationsEventTypeCode.values());
 
-  protected abstract List<EventType> getAllowedEventTypes();
-
   protected abstract S getService();
 
   protected abstract R getRepository();

@@ -53,6 +53,8 @@ public abstract class AbstractEventSubscriptionController<
 
     return getService()
         .findAllExtended(extendedRequest)
+        .filter(e ->
+                (e.getEventType().stream().filter(et -> !getService().getAllowedEventTypes().contains(et)).count() == 0))
         .doOnComplete(
             () -> {
               // Add Link headers to the response
