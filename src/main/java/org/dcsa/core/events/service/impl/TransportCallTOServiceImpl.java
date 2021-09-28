@@ -96,6 +96,12 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
             }
             throw new IllegalArgumentException("Cannot create transport call where service code is present but voyage code is missing");
         }
+        if (transportCallTO.getFacilityCode() == null ^ transportCallTO.getFacilityCodeListProvider() == null) {
+            if (transportCallTO.getFacilityCode() == null) {
+                throw new IllegalArgumentException("Cannot create transport call where facility code list provider is present but facility code is missing");
+            }
+            throw new IllegalArgumentException("Cannot create transport call where facility code is present but facility code list provider is missing");
+        }
         return Mono.justOrEmpty(transportCallTO.getLocation())
                 .flatMap(locationService::ensureResolvable)
                 .doOnNext(loc -> transportCallTO.setLocationID(loc.getId()))
@@ -123,15 +129,18 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                                     });
                         }))
                 .doOnNext(transportCallTO::setVessel)
-                // Force a non-empty Mono
-                .thenReturn(transportCallTO)
+                // If there is a facility
+                .then(Mono.justOrEmpty(transportCallTO.getFacilityCode()))
                 .flatMap(ignored ->
                         facilityService.findByUNLocationCodeAndFacilityCode(
                                 transportCallTO.getUNLocationCode(),
                                 transportCallTO.getFacilityCodeListProvider(),
                                 transportCallTO.getFacilityCode()
                         ).doOnNext(facility -> transportCallTO.setFacilityID(facility.getFacilityID()))
-                ).map(ignored -> {
+                )
+                // Force a non-empty Mono
+                .thenReturn(transportCallTO)
+                .map(ignored -> {
                     TransportCall transportCall = MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class);
                     // When we receive an event via subscription, we need to preserve the original Transport ID.
                     if (transportCallTO.getTransportCallID() != null) {
