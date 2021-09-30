@@ -40,4 +40,8 @@ public class AbstractLocation {
     @JsonIgnore
     @Column("address_id")
     private UUID addressID;
+
+    @JsonIgnore
+    @Column("facility_id")
+    private UUID facilityID;
 }
