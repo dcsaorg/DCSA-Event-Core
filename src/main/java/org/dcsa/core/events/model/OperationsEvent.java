@@ -130,45 +130,16 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
         // Generic cases that follows the pattern "<X>T<Y>[ -]<Z>"  such as "ETA Berth" or "ETC-Cargo Ops"
         String suffix = null;
-        // For some reason, Cargo Ops and Pilot timestamps uses ' ' while Berth/PBP uses '-' as separator.
-        char separator;
 
         if (portCallServiceTypeCode != null) {
-            separator = ' ';
-            // Strictly speaking, we should ensure that facilityTypeCode is BRTH for these, but it is probably
-            // not worth it
-            switch (portCallServiceTypeCode) {
-                case CRGO:
-                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
-                        suffix = "Cargo Ops";
-                    }
-                    break;
-                case PILO:
-                    if (facilityTypeCode == null) {
-                        suffix = "Pilotage";
-                    }
-                    break;
-                case TOWG:
-                    if (facilityTypeCode == null) {
-                        suffix = "Towage";
-                    }
-                    break;
-                case BUNK:
-                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
-                        suffix = "Bunkering";
-                    }
-                    break;
-                case LASH:
-                    if (facilityTypeCode == FacilityTypeCode.BRTH) {
-                        suffix = "Lashing";
-                    }
-                    break;
+            if (facilityTypeCode != portCallServiceTypeCode.getExpectedFacilityTypeCode()) {
+                return UNKNOWN_TIMESTAMP;
             }
+            suffix = portCallServiceTypeCode.getTimestampTypeNameSuffix();
         } else {
             // Due to previous cases, facilityTypeCode is guaranteed to be non-null here.  The assert is here to
             // catch if that changes in the future.
             assert facilityTypeCode != null;
-            separator = '-';
             switch (facilityTypeCode) {
                 case BRTH:
                     suffix = "Berth";
@@ -182,7 +153,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
             return UNKNOWN_TIMESTAMP;
         }
         return String.valueOf(classifierCode.name().charAt(0)) + 'T' + eventTypeCode.name().charAt(0) +
-                separator + suffix;
+                ' ' + suffix;
     }
 
     @JsonIgnore
