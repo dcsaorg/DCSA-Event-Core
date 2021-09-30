@@ -1,6 +1,7 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Address;
+import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.repository.ExtendedRepository;
@@ -17,8 +18,9 @@ public interface LocationRepository extends ExtendedRepository<Location, String>
     )
     Mono<Location> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
 
-    Mono<Location> findByAddressIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
+    Mono<Location> findByAddressIDAndFacilityIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
             UUID addressID,
+            UUID facilityID,
             String locationName,
             String latitude,
             String longitude,
@@ -27,9 +29,12 @@ public interface LocationRepository extends ExtendedRepository<Location, String>
 
     default Mono<Location> findByContent(LocationTO locationTO) {
         Address address = locationTO.getAddress();
+        Facility facility = locationTO.getFacility();
         UUID addressID = address != null ? address.getId() : null;
-        return findByAddressIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
+        UUID facilityID = facility != null ? facility.getFacilityID() : null;
+        return findByAddressIDAndFacilityIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
                 addressID,
+                facilityID,
                 locationTO.getLocationName(),
                 locationTO.getLatitude(),
                 locationTO.getLongitude(),
