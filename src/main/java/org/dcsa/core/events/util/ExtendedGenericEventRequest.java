@@ -183,7 +183,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                      * However, we do need the transportCallID field to be known as we need it for looking up
                      * the TransportCall afterwards.
                      */
-                    if (field.isAnnotationPresent(Transient.class)) {
+                    if (field.isSynthetic() || Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(Transient.class)) {
                         continue;
                     }
                     QueryField queryField = QueryFields.queryFieldFromField(Event.class, field, clazz, eventTable, true);
