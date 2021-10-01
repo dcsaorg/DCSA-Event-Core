@@ -86,6 +86,9 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
               .then(Mono.justOrEmpty(operationsEvent.getVesselPosition()))
               .flatMap(locationService::ensureResolvable)
               .doOnNext(loc -> operationsEvent.setVesselPositionID(loc.getId()))
+              .then(Mono.justOrEmpty(operationsEvent.getPublisher()))
+              .flatMap(partyService::ensureResolvable)
+              .doOnNext(publisher -> operationsEvent.setPublisherID(publisher.getId()))
               .thenReturn(operationsEvent)
               .flatMap(super::create)
               .flatMap(
@@ -96,7 +99,6 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                           unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
                           return unmappedEventRepository.save(unmappedEvent);
                       })
-
               .thenReturn(operationsEvent);
   }
 }
