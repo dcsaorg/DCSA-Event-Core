@@ -63,7 +63,7 @@ jobs:
           path: DCSA-API-Validator
 
       - name: Run API validator
-        run: cd DCSA-API-Validator && mvn -Dtest.suite=TnTV2.xml test
+        run: cd DCSA-API-Validator && mvn -Dtest.suite=TnTV2.xml test || (echo "==== TNT logs ====" ; docker logs dcsa_tnt; exit 1)
         env:
           client_secret: ${{ secrets.AUTH0_DCSA_CLIENT_SECRET }}
           client_id: 1qEYXCbxWvjeYS8VVm1BfnfZrP3TY9n8

@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  TNTTests:
+  OVSTests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,7 +63,7 @@ jobs:
           path: DCSA-API-Validator
 
       - name: Run API validator
-        run: cd DCSA-API-Validator && mvn -Dtest.suite=OVSV2.xml test
+        run: cd DCSA-API-Validator && mvn -Dtest.suite=OVSV2.xml test || (echo "==== OVS logs ====" ; docker logs dcsa-ovs_dcsa-ovs_1; exit 1)
         env:
           client_secret: ${{ secrets.AUTH0_DCSA_CLIENT_SECRET }}
           client_id: 1qEYXCbxWvjeYS8VVm1BfnfZrP3TY9n8
