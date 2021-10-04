@@ -116,11 +116,14 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 .flatMap(vessel ->
                         vesselService.findById(vessel.getVesselIMONumber())
                         .onErrorResume(NotFoundException.class, (e) -> {
-                            if (vessel.getVesselOperatorCarrierCodeListProvider() == null) {
-                                throw new IllegalArgumentException("Cannot create vessel where operator carrier code list provider is missing");
+                            if (vessel.getVesselOperatorCarrierCodeListProvider() == null ^ vessel.getVesselOperatorCarrierCode() == null) {
+                                if (vessel.getVesselOperatorCarrierCodeListProvider() == null) {
+                                    throw new IllegalArgumentException("Cannot create vessel where operator carrier code list provider is missing but vessel operator carrier code is present");
+                                }
+                                throw new IllegalArgumentException("Cannot create vessel where vessel operator carrier code is missing but operator carrier code list provider is present");
                             }
                             if (vessel.getVesselOperatorCarrierCode() == null) {
-                                throw new IllegalArgumentException("Cannot create vessel where operator carrier code is missing");
+                                return vesselService.create(vessel);
                             }
                             return carrierService.findByCode(vessel.getVesselOperatorCarrierCodeListProvider(), vessel.getVesselOperatorCarrierCode())
                                     .flatMap(carrier -> {
@@ -172,15 +175,18 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     }
 
     private Mono<Service> createService(String carrierServiceCode, Vessel vessel) {
-        return carrierService.findByCode(
-                vessel.getVesselOperatorCarrierCodeListProvider(),
-                vessel.getVesselOperatorCarrierCode()
-        ).flatMap(carrier -> {
-            Service service = new Service();
-            service.setCarrierServiceCode(carrierServiceCode);
-            service.setCarrierID(carrier.getId());
-            return serviceService.create(service);
-        });
+        Service service = new Service();
+        service.setCarrierServiceCode(carrierServiceCode);
+        Mono<Service> carrierMono = Mono.just(service);
+        if (vessel.getVesselOperatorCarrierCode() != null ||vessel.getVesselOperatorCarrierCodeListProvider() != null) {
+            carrierMono = carrierService.findByCode(
+                    vessel.getVesselOperatorCarrierCodeListProvider(),
+                    vessel.getVesselOperatorCarrierCode()
+            ).map(Carrier::getId)
+             .doOnNext(service::setCarrierID)
+            .thenReturn(service);
+        }
+        return carrierMono.flatMap(serviceService::create);
     }
 
     @Override
