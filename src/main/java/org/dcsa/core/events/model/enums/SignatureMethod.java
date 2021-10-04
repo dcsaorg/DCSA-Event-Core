@@ -43,7 +43,7 @@ public enum SignatureMethod {
         if (this.getMinKeyLength() == this.getMaxKeyLength()) {
             length = this.getMaxKeyLength();
         } else {
-            int diff = this.getMaxKeyLength() + this.getMinKeyLength();
+            int diff = this.getMaxKeyLength() - this.getMinKeyLength();
             length = this.getMinKeyLength() + random.nextInt(diff);
             assert length >= this.getMinKeyLength();
             assert length <= this.getMaxKeyLength();
