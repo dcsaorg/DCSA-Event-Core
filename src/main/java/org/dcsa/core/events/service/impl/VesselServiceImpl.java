@@ -83,25 +83,25 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
                 });
     }
 
-    private Mono<Carrier> mapEntity(Vessel vessel) {
+    private Mono<Carrier> findCarrierIfPresent(Vessel vessel) {
         CarrierCodeListProvider carrierCodeListProvider = vessel.getVesselOperatorCarrierCodeListProvider();
         String carrierCode = vessel.getVesselOperatorCarrierCode();
         if (carrierCodeListProvider == null) {
-            throw new CreateException("Vessel Operator code list provider is required");
+            return Mono.empty();
         }
         return carrierService.findByCode(carrierCodeListProvider, carrierCode);
     }
 
     @Override
     public Mono<Vessel> preCreateHook(Vessel vessel) {
-        return mapEntity(vessel)
+        return findCarrierIfPresent(vessel)
                 .doOnNext(carrier -> vessel.setVesselOperatorCarrierID(carrier.getId()))
                 .doOnNext(vessel::setCarrier)
                 .thenReturn(vessel);
     }
     @Override
     public Mono<Vessel> preUpdateHook(Vessel current, Vessel update) {
-        return mapEntity(update)
+        return findCarrierIfPresent(update)
                 .doOnNext(carrier -> update.setVesselOperatorCarrierID(carrier.getId()))
                 .doOnNext(update::setCarrier)
                 .thenReturn(update);
