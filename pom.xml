@@ -20,7 +20,7 @@
 		<dcsa.version>0.8.19</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
-		<revision>0.0.29</revision>
+		<revision>0.0.30</revision>
 		<sha1/>
 		<changelist/>
 	</properties>
