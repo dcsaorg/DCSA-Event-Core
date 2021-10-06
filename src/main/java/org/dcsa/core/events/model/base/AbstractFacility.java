@@ -32,7 +32,7 @@ public class AbstractFacility {
     @Column("facility_bic_code")
     private String facilityBICCode;
 
-    @Size(max = 4)
+    @Size(max = 6)
     @Column("facility_smdg_code")
     private String facilitySMDGCode;
 
