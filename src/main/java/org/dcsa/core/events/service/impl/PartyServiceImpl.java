@@ -49,13 +49,12 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                 pTo -> this.create(pTo.toParty()))
             .flatMap(
                 party ->
-                    Flux.fromStream(
-                            partyTO.getIdentifyingCodes().stream()
-                                .map(idc -> mapIdcCodeToPartyIdc.apply(party.getId(), idc))
-                                )
-                        .flatMap(partyCodeListResponsibleAgencyRepository::save)
-                        .then()
-                        .thenReturn(party))
+                        Mono.justOrEmpty(partyTO.getIdentifyingCodes())
+                            .flatMapMany(Flux::fromIterable)
+                            .map(idc -> mapIdcCodeToPartyIdc.apply(party.getId(), idc))
+                            .flatMap(partyCodeListResponsibleAgencyRepository::save)
+                            .then()
+                            .thenReturn(party))
             .map(
                 party ->
                     party.toPartyTO(
