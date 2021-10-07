@@ -1,6 +1,6 @@
 package org.dcsa.core.events.model.base;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.dcsa.core.model.GetId;
 import org.springframework.data.annotation.Id;
@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class AbstractParty implements GetId<String> {
 
     @Id
-    @JsonProperty("partyID")
+    @JsonIgnore
     private String id;
 
     @Column("party_name")
