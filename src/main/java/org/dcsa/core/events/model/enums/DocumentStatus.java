@@ -1,5 +1,10 @@
 package org.dcsa.core.events.model.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum DocumentStatus {
   RECE("Received"),
   DRFT("Drafted"),
@@ -13,12 +18,4 @@ public enum DocumentStatus {
   VOID("Void");
 
   private final String value;
-
-  DocumentStatus(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
 }
