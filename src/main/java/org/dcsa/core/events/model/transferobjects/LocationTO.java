@@ -65,7 +65,6 @@ public class LocationTO extends AbstractLocation {
         } else {
             facilityCode = null;
             facilityCodeListProvider = null;
-            this.setUnLocationCode(null);
         }
         this.facility = facility;
     }
