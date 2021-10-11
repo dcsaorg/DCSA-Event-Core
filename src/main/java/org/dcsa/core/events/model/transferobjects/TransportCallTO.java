@@ -32,6 +32,13 @@ public class TransportCallTO extends AbstractTransportCall {
     @JsonProperty("UNLocationCode")
     private String UNLocationCode;
 
+    public String getUNLocationCode() {
+        if (UNLocationCode == null && location != null) {
+            return location.getUnLocationCode();
+        }
+        return UNLocationCode;
+    }
+
     @Size(max = 6)
     @Transient
     private String facilityCode;
