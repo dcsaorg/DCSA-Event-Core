@@ -52,18 +52,20 @@ public class LocationTO extends AbstractLocation {
     public void setFacility(Facility facility) {
         if (facility != null && !NULL_FACILITY.equals(facility)) {
             this.setFacilityID(facility.getFacilityID());
-            if (facility.getFacilitySMDGCode() != null) {
+            if (this.getUnLocationCode() != null) {
                 this.setUnLocationCode(facility.getUnLocationCode());
+            }
+            if (facility.getFacilitySMDGCode() != null) {
                 facilityCode = facility.getFacilitySMDGCode();
                 facilityCodeListProvider = FacilityCodeListProvider.SMDG;
             } else if (facility.getFacilityBICCode() != null) {
-                this.setUnLocationCode(facility.getUnLocationCode());
                 facilityCode = facility.getFacilityBICCode();
                 facilityCodeListProvider = FacilityCodeListProvider.BIC;
             } else {
                 throw new IllegalArgumentException("Unsupported facility code list provider.");
             }
         } else {
+            // Preserve UNLocationCode as it is - in many cases we have a UN Location Code without a facility
             facilityCode = null;
             facilityCodeListProvider = null;
         }
