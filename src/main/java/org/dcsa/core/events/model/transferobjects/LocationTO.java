@@ -37,6 +37,7 @@ public class LocationTO extends AbstractLocation {
 
     @ForeignKey(fromFieldName = "facilityID", foreignFieldName = "facilityID", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     @Transient
+    @JsonIgnore
     // Use Facility (and not FacilityTO) to avoid infinite recursion with FacilityTO and because we do not need a
     // full FacilityTO object.
     private Facility facility;
