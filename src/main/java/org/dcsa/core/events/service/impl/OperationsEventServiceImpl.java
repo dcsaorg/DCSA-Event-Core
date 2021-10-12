@@ -65,16 +65,16 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private Mono<OperationsEvent> getAndSetEventLocation(OperationsEvent operationsEvent) {
         if (operationsEvent.getEventLocationID() == null) return Mono.just(operationsEvent);
         return locationService
-                .findById(operationsEvent.getEventLocationID())
-                .doOnNext(location -> operationsEvent.setEventLocation(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
+                .findTOById(operationsEvent.getEventLocationID())
+                .doOnNext(operationsEvent::setEventLocation)
                 .thenReturn(operationsEvent);
     }
 
     private Mono<OperationsEvent> getAndSetVesselPosition(OperationsEvent operationsEvent) {
         if (operationsEvent.getVesselPositionID() == null) return Mono.just(operationsEvent);
         return locationService
-                .findById(operationsEvent.getVesselPositionID())
-                .doOnNext(location -> operationsEvent.setVesselPosition(MappingUtils.instanceFrom(location, LocationTO::new, AbstractLocation.class)))
+                .findTOById(operationsEvent.getVesselPositionID())
+                .doOnNext(operationsEvent::setVesselPosition)
                 .thenReturn(operationsEvent);
     }
 
