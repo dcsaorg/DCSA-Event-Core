@@ -3,8 +3,7 @@
 The repository contains event functionality shared among different applications, i.e. the DCSA Event API functionality.
 It is packaged as a jar, and uploaded to GitHub packages, to be downloaded via Maven
 
-To build manually, run:
------------------------------------------
+### To build manually, run:
 ```
 mvn clean install -nsu
 ```
@@ -22,8 +21,9 @@ following definition should work:
 If you need more control over it, then all the repositories from the
 DCSA Event Core are isolated in `org.dcsa.core.events.repositories`.
 
+---------------------------------------------------------------------------------------------------------------------
 
-# DEVELOPMENT FLOW
+### DEVELOPMENT FLOW
 
 We have development branches for each project, branching from **master**. \
 _ex. dev-bkg, dev-ovs, etc_
