@@ -49,6 +49,14 @@ public class LocationTO extends AbstractLocation {
     @Transient
     private FacilityCodeListProvider facilityCodeListProvider;
 
+    public void setAddress(Address address) {
+        if (address == null || NULL_ADDRESS.equals(address)) {
+            this.address = null;
+        } else {
+            this.address = address;
+        }
+    }
+
     public void setFacility(Facility facility) {
         if (facility != null && !NULL_FACILITY.equals(facility)) {
             this.setFacilityID(facility.getFacilityID());
