@@ -27,7 +27,6 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     private final TransportCallTORepository transportCallTORepository;
     private final TransportCallVoyageService transportCallVoyageService;
     private final ModeOfTransportRepository modeOfTransportRepository;
-    private final VesselRepository vesselRepository;
     private final VesselService vesselService;
     private final VoyageRepository voyageRepository;
     private final VoyageService voyageService;
@@ -44,15 +43,7 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     @Override
     public Flux<TransportCallTO> findAllExtended(ExtendedRequest<TransportCallTO> extendedRequest) {
         return transportCallTORepository.findAllExtended(extendedRequest)
-                .concatMap(transportCallTO ->
-                        voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID())
-                                .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
-                                .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
-                                .flatMap(serviceRepository::findById)
-                                .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
-                                .doOnNext(transportCallTO::setCarrierServiceCode)
-                                .thenReturn(transportCallTO)
-                );
+                .concatMap(this::loadRelatedEntities);
     }
 
     @Override
@@ -70,22 +61,25 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                         return Mono.empty();
                     }
                     TransportCallTO transportCallTO = transportCallTOs.get(0);
-
-                    return modeOfTransportRepository
-                            .findByTransportCallID(transportCallTO.getTransportCallID())
-                            .map(ModeOfTransport::getDcsaTransportType)
-                            .doOnNext(transportCallTO::setModeOfTransport)
-                            // Ensure non-empty (ModeOfTransport can be null)
-                            .thenReturn(transportCallTO)
-                            .flatMap(
-                                    ignored -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
-                            .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
-                            .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
-                            .flatMap(serviceRepository::findById)
-                            .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
-                            .doOnNext(transportCallTO::setCarrierServiceCode)
-                            .thenReturn(transportCallTO);
+                    return loadRelatedEntities(transportCallTO);
                 });
+    }
+
+    private Mono<TransportCallTO> loadRelatedEntities(TransportCallTO transportCallTO) {
+        return modeOfTransportRepository
+                .findByTransportCallID(transportCallTO.getTransportCallID())
+                .map(ModeOfTransport::getDcsaTransportType)
+                .doOnNext(transportCallTO::setModeOfTransport)
+                // Ensure non-empty (ModeOfTransport can be null)
+                .thenReturn(transportCallTO)
+                .flatMap(
+                        ignored -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
+                .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
+                .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
+                .flatMap(serviceRepository::findById)
+                .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
+                .doOnNext(transportCallTO::setCarrierServiceCode)
+                .thenReturn(transportCallTO);
     }
 
     @Override
