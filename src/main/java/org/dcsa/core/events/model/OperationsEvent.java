@@ -21,7 +21,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @JsonTypeName("OPERATIONS")
 public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
-    private static final String UNKNOWN_TIMESTAMP = "<Unknown timestamp>";
+    public static final String UNKNOWN_TIMESTAMP = "<Unknown timestamp>";
 
     @Column("transport_call_id")
     private String transportCallID;
