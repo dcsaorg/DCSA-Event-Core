@@ -30,9 +30,8 @@ public class TimestampDefinition {
     @Column("operations_event_type_code")
     private OperationsEventTypeCode operationsEventTypeCode;
 
-    // TODO: Create a PortCallPhaseTypeCode class
     @Column("port_call_phase_type_code")
-    private String portCallPhaseTypeCode;
+    private PortCallPhaseTypeCode portCallPhaseTypeCode;
 
     @Column("port_call_service_type_code")
     private PortCallServiceTypeCode portCallServiceTypeCode;
@@ -58,4 +57,10 @@ public class TimestampDefinition {
 
     @Column("provided_in_standard")
     private String providedInStandard;
+
+    @Column("accept_timestamp_definition")
+    private String acceptTimestampDefinition;
+
+    @Column("reject_timestamp_definition")
+    private String rejectTimestampDefinition;
 }
