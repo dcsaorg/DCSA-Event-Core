@@ -57,8 +57,8 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private Mono<OperationsEvent> getAndSetPublisher(OperationsEvent operationsEvent) {
         if (operationsEvent.getPublisherID() == null) return Mono.just(operationsEvent);
         return partyService
-                .findById(operationsEvent.getPublisherID())
-                .doOnNext(party -> operationsEvent.setPublisher(MappingUtils.instanceFrom(party, PartyTO::new, AbstractParty.class)))
+                .findTOById(operationsEvent.getPublisherID())
+                .doOnNext(operationsEvent::setPublisher)
                 .thenReturn(operationsEvent);
     }
 
