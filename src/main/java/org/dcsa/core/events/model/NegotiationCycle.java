@@ -12,6 +12,6 @@ public class NegotiationCycle {
     @Column("cycle_key")
     private String cycleKey;
 
-    @Column("name")
+    @Column("cycle_name")
     private String cycleName;
 }
