@@ -6,5 +6,9 @@ public enum PublisherRole {
     VSL,
     ATH,
     PLT,
-    TR
+    TR,
+    TWG,
+    BUK,
+    LSH,
+    ;
 }
