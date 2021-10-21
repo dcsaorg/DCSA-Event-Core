@@ -41,16 +41,16 @@ public class TimestampDefinition {
     private FacilityTypeCode facilityTypeCode;
 
     @Column("is_berth_location_needed")
-    private boolean isBerthLocationNeeded;
+    private Boolean isBerthLocationNeeded;
 
     @Column("is_pbp_location_needed")
-    private boolean isPBPLocationNeeded;
+    private Boolean isPBPLocationNeeded;
 
     @Column("is_terminal_needed")
-    private boolean isTerminalNeeded;
+    private Boolean isTerminalNeeded;
 
     @Column("is_vessel_position_needed")
-    private boolean isVesselPositionNeeded;
+    private Boolean isVesselPositionNeeded;
 
     @Column("negotiation_cycle")
     private String negotiationCycle;
