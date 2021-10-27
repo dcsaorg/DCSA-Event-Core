@@ -9,7 +9,7 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
 import org.dcsa.core.events.model.SetId;
 import org.dcsa.core.events.model.base.AbstractParty;
-import org.dcsa.core.events.model.enums.CodeListResponsibleAgency;
+import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
@@ -51,13 +51,13 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
                       && identifyingCodes.stream()
                       .anyMatch(
                               idc ->
-                                      CodeListResponsibleAgency.SCAC
-                                              .getCode()
+                                      DCSAResponsibleAgencyCode.SCAC
+                                              .getLegacyAgencyCode()
                                               .equals(idc.getCodeListResponsibleAgencyCode()))) {
 
                   for (IdentifyingCode idc : this.identifyingCodes) {
-                      if(CodeListResponsibleAgency.SCAC
-                              .getCode()
+                      if(DCSAResponsibleAgencyCode.SCAC
+                              .getLegacyAgencyCode()
                               .equals(idc.getCodeListResponsibleAgencyCode())){
                             idc.setPartyCode(this.getNmftaCode());
                       }
@@ -67,13 +67,13 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
                 this.identifyingCodes =
                     Collections.singletonList(
                         IdentifyingCode.builder()
-                            .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
+                            .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
                             .partyCode(this.getNmftaCode())
                             .build());
               } else {
                 identifyingCodes.add(
                     IdentifyingCode.builder()
-                        .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
+                        .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
                         .partyCode(this.getNmftaCode())
                         .build());
               }
@@ -83,6 +83,7 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
     @Data
     @Builder
     public static class IdentifyingCode {
+        private DCSAResponsibleAgencyCode DCSAResponsibleAgencyCode;
         private String codeListResponsibleAgencyCode;
         private String partyCode;
         private String codeListName;

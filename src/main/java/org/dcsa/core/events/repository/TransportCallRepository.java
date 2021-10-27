@@ -42,22 +42,25 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
 
     @Query("SELECT transport_call.* FROM transport_call"
             + " JOIN mode_of_transport ON (mode_of_transport.mode_of_transport_code = transport_call.mode_of_transport)"
+            + " JOIN voyage import_voyage ON (transport_call.import_voyage_id = import_voyage.id)"
+            + " JOIN voyage export_voyage ON (transport_call.export_voyage_id = export_voyage.id)"
+            + " JOIN service ON (service.id = export_voyage.service_id)"
+            + " JOIN vessel ON (vessel.id = transport_call.vessel_id)"
             + " LEFT JOIN facility ON (facility.id = transport_call.facility_id)"
             + " LEFT JOIN location ON (location.id = transport_call.location_id)"
-            + " LEFT JOIN transport_call_voyage ON (transport_call_voyage.transport_call_id = transport_call.id)"
-            + " LEFT JOIN voyage ON (transport_call_voyage.voyage_id = voyage.id)"
-            + " LEFT JOIN service ON (service.id = voyage.service_id)"
-            + " WHERE transport_call.vessel_imo_number = :vesselIMONumber"
+            + " WHERE vessel.vessel_imo_number = :vesselIMONumber"
             + " AND mode_of_transport.dcsa_transport_type = :modeOfTransport"
             + " AND (facility.un_location_code = :UNLocationCode"
             + "      OR location.un_location_code = :UNLocationCode)"
-            + " AND (:carrierVoyageNumber IS NULL OR voyage.carrier_voyage_number = :carrierVoyageNumber)"
-            + " AND (:carrierServiceCode IS NULL OR service.carrier_service_code = :carrierServiceCode)"
+            + " AND import_voyage.carrier_voyage_number = :importVoyageNumber"
+            + " AND export_voyage.carrier_voyage_number = :exportVoyageNumber"
+            + " AND service.carrier_service_code = :carrierServiceCode"
             + " AND (:transportCallSequenceNumber IS NULL OR transport_call.transport_call_sequence_number = :transportCallSequenceNumber)"
     )
     Flux<TransportCall> getTransportCall(String UNLocationCode, String modeOfTransport,
                                          String vesselIMONumber, String carrierServiceCode,
-                                         String carrierVoyageNumber, Integer transportCallSequenceNumber);
+                                         String importVoyageNumber, String exportVoyageNumber,
+                                         Integer transportCallSequenceNumber);
 
     @Query(
       "SELECT shipping_instruction.transport_document_type FROM shipping_instruction"

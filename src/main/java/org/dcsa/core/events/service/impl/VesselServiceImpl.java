@@ -19,10 +19,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, String> implements VesselService {
+public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, UUID> implements VesselService {
 
     private final VesselRepository vesselRepository;
     private final CarrierService carrierService;
@@ -48,7 +49,7 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
         // One should check first using findById before creating, return error if key(VesselIMONumber) exists.
         return preCreateHook(vessel)
                 .flatMap(this::preSaveHook)
-                .flatMap(vesselRepository::insert);
+                .flatMap(vesselRepository::save);
     }
 
     @Override
@@ -59,25 +60,31 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
     }
 
     @Override
-    public Mono<Vessel> findById(final String vesselIMONumber) {
-        try {
-            ValidationUtils.validateVesselIMONumber(vesselIMONumber);
-        } catch (IllegalArgumentException e) {
-            return Mono.error(new CreateException(e.getLocalizedMessage()));
-        }
+    public Mono<Vessel> findByVesselIMONumber(final String vesselIMONumber) {
         ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
-        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(vesselIMONumber)));
+        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(String.valueOf(vesselIMONumber))));
+        return findSingle(extendedRequest, "vesselIMONumber", vesselIMONumber);
+    }
+
+    @Override
+    public Mono<Vessel> findById(final UUID vesselID) {
+        ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
+        extendedRequest.parseParameter(Map.of("id", List.of(String.valueOf(vesselID))));
+        return findSingle(extendedRequest, "vesselID", vesselID);
+    }
+
+    private Mono<Vessel> findSingle(ExtendedRequest<Vessel> extendedRequest, String valueType, Object value) {
         return vesselRepository.findAllExtended(extendedRequest)
                 .take(2)
                 .collectList()
                 .flatMap(vessels -> {
                     if (vessels.size() > 1) {
-                        throw new AssertionError("vesselIMONumber should be unique but " + vesselIMONumber
+                        throw new AssertionError(valueType + " should be unique but " + value
                                 + " matched more than one entity");
                     }
                     if (vessels.isEmpty()){
-                        return Mono.error(new NotFoundException("Cannot find any vessel operator with provided VesselIMONumber: "
-                                + vesselIMONumber ));
+                        return Mono.error(new NotFoundException("Cannot find any vessel operator with provided "
+                                  + valueType + ": " + value));
                     }
                     return Mono.just(vessels.get(0));
                 });
@@ -106,6 +113,7 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
                 .doOnNext(update::setCarrier)
                 .thenReturn(update);
     }
+
     public ExtendedRequest<Vessel> newExtendedRequest() {
         return new ExtendedRequest<>(extendedParameters, r2dbcDialect, Vessel.class);
     }

@@ -19,10 +19,12 @@ public class TimestampDefinition {
     private String timestampTypeName;
 
     @Column("publisher_role")
-    private PublisherRole publisherRole;
+    @EnumSubset(anyOf = {"CA", "AG", "VSL", "ATH", "PLT", "TR", "TWG", "BUK", "LSH"})
+    private PartyFunction publisherRole;
 
     @Column("primary_receiver")
-    private PublisherRole primaryReceiver;
+    @EnumSubset(anyOf = {"CA", "AG", "VSL", "ATH", "PLT", "TR", "TWG", "BUK", "LSH"})
+    private PartyFunction primaryReceiver;
 
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;

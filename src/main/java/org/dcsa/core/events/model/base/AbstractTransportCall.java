@@ -51,7 +51,14 @@ public class AbstractTransportCall extends AuditBase {
     private String modeOfTransportID;
 
     @JsonIgnore
-    @Column("vessel_imo_number")
-    private String vesselIMONumber;
+    @Column("vessel_id")
+    private UUID vesselID;
 
+    @JsonIgnore
+    @Column("import_voyage_id")
+    private UUID importVoyageID;
+
+    @JsonIgnore
+    @Column("export_voyage_id")
+    private UUID exportVoyageID;
 }

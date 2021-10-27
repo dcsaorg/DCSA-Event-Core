@@ -31,9 +31,12 @@ public class Vessel extends AuditBase {
         NULL_VESSEL_WITH_NULL_CARRIER.setCarrier(NULL_CARRIER);
     }
 
+    @Id
+    @Column("id")
+    private UUID id;
+
     @Column("vessel_imo_number")
     @ValidVesselIMONumber
-    @Id
     private String vesselIMONumber;
 
     @Size(max = 35)

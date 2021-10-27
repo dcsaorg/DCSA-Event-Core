@@ -16,7 +16,7 @@ public interface TimestampDefinitionRepository extends ExtendedRepository<Timest
     Mono<Void> markOperationsEventAsTimestamp(UUID eventID, String timestampDefinitionID);
 
     Mono<TimestampDefinition> findByPublisherRoleAndEventClassifierCodeAndOperationsEventTypeCodeAndPortCallPhaseTypeCodeAndPortCallServiceTypeCodeAndFacilityTypeCode(
-            PublisherRole publisherRole,
+            PartyFunction publisherRole,
             EventClassifierCode eventClassifierCode,
             OperationsEventTypeCode operationsEventTypeCode,
             PortCallPhaseTypeCode portCallPhaseTypeCode,

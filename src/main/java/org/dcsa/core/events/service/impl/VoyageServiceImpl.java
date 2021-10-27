@@ -21,11 +21,7 @@ public class VoyageServiceImpl extends ExtendedBaseServiceImpl<VoyageRepository,
         return voyageRepository;
     }
 
-    public Mono<Voyage> findByTransportCallID(String transportCallID) {
-        return voyageRepository.findByTransportCallID(transportCallID);
-    }
-
-    public Mono<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber) {
-        return voyageRepository.findByCarrierVoyageNumber(carrierVoyageNumber);
+    public Mono<Voyage> findByCarrierVoyageNumberAndServiceID(String carrierVoyageNumber, UUID serviceID) {
+        return voyageRepository.findByCarrierVoyageNumberAndServiceID(carrierVoyageNumber, serviceID);
     }
 }

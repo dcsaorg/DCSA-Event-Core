@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
 import org.dcsa.core.events.model.PartyIdentifyingCode;
-import org.dcsa.core.events.model.enums.CodeListResponsibleAgency;
+import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.PartyIdentifyingCodeRepository;
 import org.dcsa.core.events.repository.PartyRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.PartyService;
+import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -68,7 +69,23 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
     private final BiFunction<String, PartyTO.IdentifyingCode, PartyIdentifyingCode> mapIdcCodeToPartyIdc = (partyId, idc) -> {
         PartyIdentifyingCode partyCodeListResponsibleAgency = new PartyIdentifyingCode();
         partyCodeListResponsibleAgency.setPartyID(partyId);
-        partyCodeListResponsibleAgency.setCodeListResponsibleAgencyCode(idc.getCodeListResponsibleAgencyCode());
+        DCSAResponsibleAgencyCode dcsaCode = idc.getDCSAResponsibleAgencyCode();
+        if (dcsaCode == null) {
+            if (idc.getCodeListResponsibleAgencyCode() == null) {
+                throw new CreateException("Either DCSAResponsibleAgencyCode or codeListResponsibleAgencyCode must be provided");
+            }
+            try {
+                dcsaCode = DCSAResponsibleAgencyCode.legacyCode2DCSACode(idc.getCodeListResponsibleAgencyCode());
+            } catch (IllegalArgumentException e) {
+                throw new CreateException("Unknown codeListResponsibleAgencyCode!");
+            }
+        } else if (idc.getCodeListResponsibleAgencyCode() != null) {
+            if (!dcsaCode.getLegacyAgencyCode().equals(idc.getCodeListResponsibleAgencyCode())) {
+                throw new CreateException("DCSAResponsibleAgencyCode and codeListResponsibleAgencyCode do not match. "
+                        + dcsaCode + " (" + dcsaCode.getLegacyAgencyCode() + ") vs. " + idc.getCodeListResponsibleAgencyCode());
+            }
+        }
+        partyCodeListResponsibleAgency.setDCSAResponsibleAgencyCode(dcsaCode);
         partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
         partyCodeListResponsibleAgency.setCodeListName(idc.getCodeListName());
         return partyCodeListResponsibleAgency;
@@ -103,7 +120,8 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
     private PartyTO.IdentifyingCode partyIdentifyingCodeToIdentifyingCode(PartyIdentifyingCode partyIdentifyingCode){
         return PartyTO.IdentifyingCode.builder()
                 .partyCode(partyIdentifyingCode.getPartyCode())
-                .codeListResponsibleAgencyCode(partyIdentifyingCode.getCodeListResponsibleAgencyCode())
+                .DCSAResponsibleAgencyCode(partyIdentifyingCode.getDCSAResponsibleAgencyCode())
+                .codeListResponsibleAgencyCode(partyIdentifyingCode.getDCSAResponsibleAgencyCode().getLegacyAgencyCode())
                 .codeListName(partyIdentifyingCode.getCodeListName())
                 .build();
     }
@@ -112,8 +130,8 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
         if(null == identifyingCodes || identifyingCodes.isEmpty()){return null;}
 
         for (PartyTO.IdentifyingCode idc : identifyingCodes) {
-            if(CodeListResponsibleAgency.SCAC
-                    .getCode()
+            if(DCSAResponsibleAgencyCode.SCAC
+                    .getLegacyAgencyCode()
                     .equals(idc.getCodeListResponsibleAgencyCode())){
                 return idc.getPartyCode();
             }

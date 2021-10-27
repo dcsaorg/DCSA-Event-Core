@@ -28,7 +28,8 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     private OperationsEventTypeCode operationsEventTypeCode;
 
     @Column("publisher_role")
-    private PublisherRole publisherRole;
+    @EnumSubset(anyOf = {"CA", "AG", "VSL", "ATH", "PLT", "TR", "TWG", "BUK", "LSH"})
+    private PartyFunction publisherRole;
 
     @JsonIgnore
     @Column("event_location")

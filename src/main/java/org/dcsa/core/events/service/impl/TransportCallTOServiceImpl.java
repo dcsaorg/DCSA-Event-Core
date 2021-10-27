@@ -3,9 +3,11 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
+import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.*;
+import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
@@ -25,12 +27,9 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     private final FacilityService facilityService;
     private final LocationService locationService;
     private final TransportCallTORepository transportCallTORepository;
-    private final TransportCallVoyageService transportCallVoyageService;
     private final ModeOfTransportRepository modeOfTransportRepository;
     private final VesselService vesselService;
-    private final VoyageRepository voyageRepository;
     private final VoyageService voyageService;
-    private final ServiceRepository serviceRepository;
     private final ServiceService serviceService;
     private final TransportCallService transportCallService;
     private final ExtendedParameters extendedParameters;
@@ -42,8 +41,7 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
     }
     @Override
     public Flux<TransportCallTO> findAllExtended(ExtendedRequest<TransportCallTO> extendedRequest) {
-        return transportCallTORepository.findAllExtended(extendedRequest)
-                .concatMap(this::loadRelatedEntities);
+        return transportCallTORepository.findAllExtended(extendedRequest);
     }
 
     @Override
@@ -61,40 +59,38 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                         return Mono.empty();
                     }
                     TransportCallTO transportCallTO = transportCallTOs.get(0);
-                    return loadRelatedEntities(transportCallTO);
+                    return Mono.just(transportCallTO);
                 });
-    }
-
-    private Mono<TransportCallTO> loadRelatedEntities(TransportCallTO transportCallTO) {
-        return modeOfTransportRepository
-                .findByTransportCallID(transportCallTO.getTransportCallID())
-                .map(ModeOfTransport::getDcsaTransportType)
-                .doOnNext(transportCallTO::setModeOfTransport)
-                // Ensure non-empty (ModeOfTransport can be null)
-                .thenReturn(transportCallTO)
-                .flatMap(
-                        ignored -> voyageRepository.findByTransportCallID(transportCallTO.getTransportCallID()))
-                .doOnNext(voyage -> transportCallTO.setCarrierVoyageNumber(voyage.getCarrierVoyageNumber()))
-                .flatMap(voyage -> Mono.justOrEmpty(voyage.getServiceID()))
-                .flatMap(serviceRepository::findById)
-                .map(org.dcsa.core.events.model.Service::getCarrierServiceCode)
-                .doOnNext(transportCallTO::setCarrierServiceCode)
-                .thenReturn(transportCallTO);
     }
 
     @Override
     public Mono<TransportCallTO> create(TransportCallTO transportCallTO) {
-        if (transportCallTO.getCarrierVoyageNumber() == null ^ transportCallTO.getCarrierServiceCode() == null) {
-            if (transportCallTO.getCarrierServiceCode() == null) {
-                throw new IllegalArgumentException("Cannot create transport call where voyage code is present but service code is missing");
-            }
-            throw new IllegalArgumentException("Cannot create transport call where service code is present but voyage code is missing");
+        if (transportCallTO.getExportVoyage() == null) {
+            throw new CreateException("Cannot create transport call where export voyage number is missing");
         }
+        if (transportCallTO.getImportVoyage() == null) {
+            throw new CreateException("Cannot create transport call where export voyage number is missing");
+        }
+        if (transportCallTO.getCarrierServiceCode() == null) {
+                throw new CreateException("Cannot create transport call where service code is missing");
+        }
+        // FIXME: Assert that import and export carrier service code is the same
         if (transportCallTO.getFacilityCode() == null ^ transportCallTO.getFacilityCodeListProvider() == null) {
             if (transportCallTO.getFacilityCode() == null) {
-                throw new IllegalArgumentException("Cannot create transport call where facility code list provider is present but facility code is missing");
+                throw new CreateException("Cannot create transport call where facility code list provider is present but facility code is missing");
             }
-            throw new IllegalArgumentException("Cannot create transport call where facility code is present but facility code list provider is missing");
+            throw new CreateException("Cannot create transport call where facility code is present but facility code list provider is missing");
+        }
+        if (transportCallTO.getFacilityCode() == null && transportCallTO.getUNLocationCode() != null) {
+            LocationTO location = transportCallTO.getLocation();
+            if (location == null) {
+                location = new LocationTO();
+                transportCallTO.setLocation(location);
+            }
+            if (location.getUnLocationCode() != null && !location.getUnLocationCode().equals(transportCallTO.getUNLocationCode())) {
+                throw new CreateException("Cannot create transport call where UN Location Code (on TC) does not match the UN Location Code in the location (and there is no facility code)");
+            }
+            location.setUnLocationCode(transportCallTO.getUNLocationCode());
         }
         return Mono.justOrEmpty(transportCallTO.getLocation())
                 .flatMap(locationService::ensureResolvable)
@@ -108,7 +104,7 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 .doOnNext(modeOfTransport -> transportCallTO.setModeOfTransportID(modeOfTransport.getId()))
                 .then(Mono.justOrEmpty(transportCallTO.getVessel()))
                 .flatMap(vessel ->
-                        vesselService.findById(vessel.getVesselIMONumber())
+                        vesselService.findByVesselIMONumber(vessel.getVesselIMONumber())
                         .onErrorResume(NotFoundException.class, (e) -> {
                             if (vessel.getVesselOperatorCarrierCodeListProvider() == null ^ vessel.getVesselOperatorCarrierCode() == null) {
                                 if (vessel.getVesselOperatorCarrierCodeListProvider() == null) {
@@ -137,6 +133,24 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 )
                 // Force a non-empty Mono
                 .thenReturn(transportCallTO)
+                .flatMap(ignored -> Mono.justOrEmpty(transportCallTO.getCarrierServiceCode()))
+                .flatMap(carrierServiceCode ->
+                        serviceService.findByCarrierServiceCode(carrierServiceCode)
+                                .switchIfEmpty(Mono.defer(() -> createService(carrierServiceCode, transportCallTO.getVessel())))
+                                .doOnNext(service -> {
+                                    transportCallTO.getExportVoyage().getService().setId(service.getId());
+                                    transportCallTO.getImportVoyage().getService().setId(service.getId());
+                                    transportCallTO.getExportVoyage().setServiceID(service.getId());
+                                    transportCallTO.getImportVoyage().setServiceID(service.getId());
+                                })
+                ).flatMap(service -> voyageService.findByCarrierVoyageNumberAndServiceID(transportCallTO.getImportVoyageNumber(), service.getId())
+                        .switchIfEmpty(Mono.defer(() -> voyageService.create(transportCallTO.getImportVoyage())))
+                        .doOnNext(voyage -> transportCallTO.setImportVoyageID(voyage.getId()))
+                        .then(voyageService.findByCarrierVoyageNumberAndServiceID(transportCallTO.getExportVoyageNumber(), service.getId()))
+                        .switchIfEmpty(Mono.defer(() -> voyageService.create(transportCallTO.getExportVoyage())))
+                        .doOnNext(voyage -> transportCallTO.setExportVoyageID(voyage.getId()))
+                )
+                .switchIfEmpty(Mono.error(new AssertionError("Internal error: Voyage creation should have been non-empty")))
                 .map(ignored -> {
                     TransportCall transportCall = MappingUtils.instanceFrom(transportCallTO, TransportCall::new, AbstractTransportCall.class);
                     // When we receive an event via subscription, we need to preserve the original Transport ID.
@@ -145,26 +159,10 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                     }
                     return transportCall;
                 })
+                .switchIfEmpty(Mono.error(new AssertionError("Internal error: TransportCallTO was empty")))
                 .flatMap(transportCallService::create)
                 .doOnNext(transportCall -> transportCallTO.setTransportCallID(transportCall.getTransportCallID()))
-                .flatMap(ignored -> Mono.justOrEmpty(transportCallTO.getCarrierServiceCode()))
-                .flatMap(carrierServiceCode ->
-                    serviceService.findByCarrierServiceCode(carrierServiceCode)
-                            .switchIfEmpty(Mono.defer(() -> createService(carrierServiceCode, transportCallTO.getVessel()))
-                )).flatMap(service -> voyageService.findByCarrierVoyageNumber(transportCallTO.getCarrierVoyageNumber())
-                        .switchIfEmpty(Mono.defer(() -> {
-                            Voyage voyage = new Voyage();
-                            voyage.setCarrierVoyageNumber(transportCallTO.getCarrierVoyageNumber());
-                            voyage.setServiceID(service.getId());
-                            return voyageService.create(voyage);
-                })))
-                .flatMap(voyage -> transportCallVoyageService.findByTransportCallIDAndVoyageID(transportCallTO.getTransportCallID(), voyage.getId())
-                        .switchIfEmpty(Mono.defer(() -> {
-                            TransportCallVoyage transportCallVoyage = new TransportCallVoyage();
-                            transportCallVoyage.setTransportCallID(transportCallTO.getTransportCallID());
-                            transportCallVoyage.setVoyageID(voyage.getId());
-                            return transportCallVoyageService.create(transportCallVoyage);
-                })))
+                .switchIfEmpty(Mono.error(new AssertionError("Internal error: Post create transport call was empty but should not be")))
                 .thenReturn(transportCallTO);
     }
 
