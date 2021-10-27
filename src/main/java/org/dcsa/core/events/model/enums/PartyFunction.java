@@ -20,5 +20,7 @@ public enum PartyFunction {
     TWG,
     BUK,
     LSH,
-    ;
+    HE,
+    SCO,
+    BA
 }
