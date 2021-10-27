@@ -1,7 +1,9 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
+import org.dcsa.core.model.ForeignKey;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -19,4 +21,8 @@ public class Voyage {
 
     @Column("service_id")
     private UUID serviceID;
+
+    @Transient
+    @ForeignKey(fromFieldName = "serviceID", foreignFieldName = "id")
+    private Service service;
 }

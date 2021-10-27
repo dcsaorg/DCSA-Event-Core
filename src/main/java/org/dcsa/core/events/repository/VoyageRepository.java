@@ -11,20 +11,11 @@ import java.util.UUID;
 @Repository
 public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
 
-  @Query(
-      "SELECT v.* FROM voyage v "
-          + "JOIN transport_call_voyage tcv "
-          + "ON v.id = tcv.voyage_id "
-          + "WHERE tcv.transport_call_id = :transportCallID "
-          + "ORDER BY carrier_voyage_number DESC "
-          + "LIMIT 1")
-  Mono<Voyage> findByTransportCallID(String transportCallID);
-
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
-          "JOIN transport_call_voyage tcv " +
-          " ON tcv.voyage_id = v.id " +
+          "JOIN transport_call tc " +
+          " ON tc.import_voyage_id = v.id OR tc.export_voyage_id = v.id " +
           "JOIN transport t " +
-          " ON t.load_transport_call_id = tcv.transport_call_id " +
+          " ON t.load_transport_call_id = tc.id " +
           "JOIN shipment_transport st " +
           " ON st.transport_id = t.id " +
           "JOIN shipment s " +
@@ -33,10 +24,10 @@ public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
   Flux<String> findCarrierVoyageNumbersByCarrierBookingRef(String carrierBookingRef);
 
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
-          "JOIN transport_call_voyage tcv " +
-          " ON tcv.voyage_id = v.id " +
+          "JOIN transport_call tc " +
+          " ON tc.import_voyage_id = v.id OR tc.export_voyage_id = v.id " +
           "JOIN transport t " +
-          " ON t.load_transport_call_id = tcv.transport_call_id " +
+          " ON t.load_transport_call_id = tc.id " +
           "JOIN shipment_transport st " +
           " ON st.transport_id = t.id " +
           "JOIN cargo_item ci " +
@@ -47,10 +38,10 @@ public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
   Flux<String> findCarrierVoyageNumbersByShippingInstructionID(String shippingInstructionID);
 
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
-          "JOIN transport_call_voyage tcv " +
-          " ON tcv.voyage_id = v.id " +
+          "JOIN transport_call tc " +
+          " ON tc.import_voyage_id = v.id OR tc.export_voyage_id = v.id " +
           "JOIN transport t " +
-          " ON t.load_transport_call_id = tcv.transport_call_id " +
+          " ON t.load_transport_call_id = tc.id " +
           "JOIN shipment_transport st " +
           " ON st.transport_id = t.id " +
           "JOIN cargo_item ci " +
@@ -60,5 +51,5 @@ public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
           "WHERE td.transport_document_reference = :transportDocumentRef")
   Flux<String> findCarrierVoyageNumbersByTransportDocumentRef(String transportDocumentRef);
 
-  Mono<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber);
+  Mono<Voyage> findByCarrierVoyageNumberAndServiceID(String carrierVoyageNumber, UUID serviceID);
 }
