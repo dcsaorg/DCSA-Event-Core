@@ -10,5 +10,8 @@ public enum PartyFunction {
     NI,
     SFA,
     DDR,
-    DDS;
+    DDS,
+    HE,
+    SCO,
+    BA
 }
