@@ -5,5 +5,10 @@ public enum ReferenceTypeCode {
   SI,
   PO,
   CR,
-  AAO
+  AAO,
+  ECR,
+  CSI,
+  BPR,
+  BID,
+  EQ
 }
