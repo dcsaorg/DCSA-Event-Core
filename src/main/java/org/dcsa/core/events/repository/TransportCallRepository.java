@@ -71,15 +71,15 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
 
   @Query(
       "SELECT DISTINCT voyage.carrier_voyage_number FROM voyage"
-          + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
-          + " WHERE transport_call_voyage.transport_call_id = :transportCallID")
+          + " JOIN transport_call ON transport_call.import_voyage_id = voyage.id OR transport_call.export_voyage_id = voyage.id"
+          + " WHERE transport_call.id = :transportCallID")
   Flux<String> findCarrierVoyageNumbersByTransportCallID(String transportCallID);
 
   @Query(
       "SELECT DISTINCT service.carrier_service_code FROM service"
           + " JOIN voyage voyage ON voyage.service_id = service.id"
-          + " JOIN transport_call_voyage transport_call_voyage ON transport_call_voyage.voyage_id = voyage.id"
-          + " WHERE transport_call_voyage.transport_call_id = :transportCallID")
+          + " JOIN transport_call ON transport_call.import_voyage_id = voyage.id OR transport_call.export_voyage_id = voyage.id"
+          + " WHERE transport_call.id = :transportCallID")
   Flux<String> findCarrierServiceCodesByTransportCallID(String transportCallID);
 
   @Query(
