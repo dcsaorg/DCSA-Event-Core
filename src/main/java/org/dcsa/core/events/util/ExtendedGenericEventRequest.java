@@ -201,7 +201,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
 
                 .chainJoin(Service.class)
-                .onEqualsThen("serviceID", "id")
+                .onFieldEqualsThen("serviceID", "id")
                 .registerQueryFieldFromField("carrierServiceCode");
     }
 
