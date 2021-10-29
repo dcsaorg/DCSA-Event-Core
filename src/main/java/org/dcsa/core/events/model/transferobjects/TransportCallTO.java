@@ -122,10 +122,12 @@ public class TransportCallTO extends AbstractTransportCall {
         this.facility = facility;
     }
 
+    @JsonIgnore
     @Transient
     @ForeignKey(fromFieldName = "importVoyageID", foreignFieldName = "id", viaJoinAlias = "im_voyage", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     private Voyage importVoyage;
 
+    @JsonIgnore
     @Transient
     @ForeignKey(fromFieldName = "exportVoyageID", foreignFieldName = "id", viaJoinAlias = "ex_voyage", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     private Voyage exportVoyage;
