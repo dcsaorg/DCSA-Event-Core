@@ -14,6 +14,8 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Set;
+
 @Table("operations_event")
 @NoArgsConstructor
 @Data
@@ -74,5 +76,42 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     @JsonIgnore
     public String getTransportCallID() {
         return transportCallID;
+    }
+
+    public void ensurePhaseTypeIsDefined() {
+        if (portCallPhaseTypeCode != null) {
+            return;
+        }
+        if (portCallServiceTypeCode != null) {
+            Set<PortCallPhaseTypeCode> validPhases = portCallServiceTypeCode.getValidPhases();
+            if (validPhases.size() == 1) {
+                portCallPhaseTypeCode = validPhases.iterator().next();
+            }
+        } else if (facilityTypeCode != null) {
+            switch (facilityTypeCode) {
+                case BRTH:
+                    if (operationsEventTypeCode == OperationsEventTypeCode.ARRI) {
+                        if (getEventClassifierCode() == EventClassifierCode.ACT) {
+                            portCallPhaseTypeCode = PortCallPhaseTypeCode.ALGS;
+                        } else {
+                            portCallPhaseTypeCode = PortCallPhaseTypeCode.INBD;
+                        }
+                    }
+                    if (operationsEventTypeCode == OperationsEventTypeCode.DEPA) {
+                        if (getEventClassifierCode() == EventClassifierCode.ACT) {
+                            portCallPhaseTypeCode = PortCallPhaseTypeCode.OUTB;
+                        } else {
+                            portCallPhaseTypeCode = PortCallPhaseTypeCode.ALGS;
+                        }
+                    }
+                    break;
+                case PBPL:
+                    portCallPhaseTypeCode = PortCallPhaseTypeCode.INBD;
+                    break;
+            }
+        }
+        if (portCallPhaseTypeCode == null) {
+            throw new IllegalStateException("Ambiguous timestamp");
+        }
     }
 }
