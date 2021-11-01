@@ -56,7 +56,7 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                         throw new AssertionError("transportID is not unique");
                     }
                     if (transportCallTOs.isEmpty()) {
-                        return Mono.empty();
+                        return Mono.error(new NotFoundException("Not transport call with ID " + id + " was found"));
                     }
                     TransportCallTO transportCallTO = transportCallTOs.get(0);
                     return Mono.just(transportCallTO);
