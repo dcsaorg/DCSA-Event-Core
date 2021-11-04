@@ -23,4 +23,10 @@ public interface TimestampDefinitionRepository extends ExtendedRepository<Timest
             PortCallServiceTypeCode portCallServiceTypeCode,
             FacilityTypeCode facilityTypeCode
     );
+
+    @Query("SELECT timestamp_definition.* FROM timestamp_definition"
+                + " JOIN ops_event_timestamp_definition ON (timestamp_definition.id = ops_event_timestamp_definition.timestamp_definition)"
+                + " WHERE ops_event_timestamp_definition.event_id = :eventID"
+            )
+    Mono<TimestampDefinition> findTimestampDefinitionById(UUID eventID);
 }
