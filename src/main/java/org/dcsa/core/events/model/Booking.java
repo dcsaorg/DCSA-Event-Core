@@ -21,9 +21,12 @@ import java.util.UUID;
 public class Booking extends AuditBase {
 
   @Id
+  @Column("id")
+  private UUID id;
+
   @Column("carrier_booking_request_reference")
   @Size(max = 100)
-  private String id;
+  private String carrierBookingRequestReference;
 
   @Column("document_status")
   private DocumentStatus documentStatus;
@@ -35,17 +38,17 @@ public class Booking extends AuditBase {
   private ReceiptDeliveryType receiptDeliveryTypeAtDestination;
 
   @Column("cargo_movement_type_at_origin")
-  private CargoMovementType cargo_movement_type_at_origin;
+  private CargoMovementType cargoMovementTypeAtOrigin;
 
   @Column("cargo_movement_type_at_destination")
-  private CargoMovementType cargo_movement_type_at_destination;
+  private CargoMovementType cargoMovementTypeAtDestination;
 
   @Column("booking_request_datetime")
   private OffsetDateTime bookingRequestDateTime;
 
   @Column("service_contract_reference")
   @Size(max = 30)
-  private String serviceContract;
+  private String serviceContractReference;
 
   @Column("payment_term_code")
   private PaymentTerm paymentTermCode;
@@ -96,10 +99,6 @@ public class Booking extends AuditBase {
   @Column("transport_document_reference")
   private String transportDocumentReference;
 
-  @Column("booking_document_reference")
-  @Size(max = 20)
-  private String bookingDocumentReference;
-
   @Column("booking_channel_reference")
   @Size(max = 20)
   private String bookingChannelReference;
@@ -108,7 +107,7 @@ public class Booking extends AuditBase {
   private CommunicationChannel communicationChannelCode;
 
   @Column("is_equipment_substitution_allowed")
-  private Boolean isEquipment_SubstitutionAllowed;
+  private Boolean isEquipmentSubstitutionAllowed;
 
   @Column("vessel_id")
   private UUID vesselId;
