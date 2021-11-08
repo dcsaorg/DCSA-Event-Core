@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
@@ -41,4 +40,9 @@ public class Shipment {
   @Column("confirmation_datetime")
   @NotNull(message = "ConfirmedDateTime is required.")
   private OffsetDateTime confirmationDateTime;
+
+  @JsonIgnore
+  @Column("place_of_issue")
+  @Size(max = 100)
+  private String placeOfIssueID;
 }
