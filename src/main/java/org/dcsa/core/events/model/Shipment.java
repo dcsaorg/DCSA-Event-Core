@@ -1,7 +1,5 @@
 package org.dcsa.core.events.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -14,11 +12,9 @@ import java.util.UUID;
 @Table("shipment")
 public class Shipment {
 
-  @JsonIgnore
   @Column("booking_id")
   private UUID bookingID;
 
-  @JsonIgnore
   @Column("carrier_id")
   private UUID carrierID;
 
@@ -30,10 +26,8 @@ public class Shipment {
   private String termsAndConditions;
 
   @Column("confirmation_datetime")
-  @JsonFormat(shape = JsonFormat.Shape.STRING)
   private OffsetDateTime confirmationDateTime;
 
-  @JsonIgnore
   @Column("place_of_issue")
   @Size(max = 100)
   private String placeOfIssueID;
