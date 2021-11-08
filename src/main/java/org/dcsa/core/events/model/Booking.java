@@ -3,16 +3,16 @@ package org.dcsa.core.events.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.enums.CargoMovementType;
-import org.dcsa.core.events.model.enums.ReceiptDeliveryType;
-import org.dcsa.core.events.model.enums.WeightUnit;
+import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.model.AuditBase;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Table("booking")
 @NoArgsConstructor
@@ -21,37 +21,99 @@ import java.time.OffsetDateTime;
 public class Booking extends AuditBase {
 
   @Id
-  @Column("carrier_booking_reference")
-  @Size(max = 35)
-  private String id;
+  @Column("id")
+  private UUID id;
 
-  @Column("receipt_delivery_type_at_origin")
+  @Column("carrier_booking_request_reference")
+  @Size(max = 100)
+  private String carrierBookingRequestReference;
+
+  @Column("document_status")
+  private DocumentStatus documentStatus;
+
+  @Column("receipt_type_at_origin")
   private ReceiptDeliveryType receiptDeliveryTypeAtOrigin;
 
-  @Column("receipt_delivery_type_at_destination")
+  @Column("delivery_type_at_destination")
   private ReceiptDeliveryType receiptDeliveryTypeAtDestination;
 
   @Column("cargo_movement_type_at_origin")
-  private CargoMovementType cargo_movement_type_at_origin;
+  private CargoMovementType cargoMovementTypeAtOrigin;
 
   @Column("cargo_movement_type_at_destination")
-  private CargoMovementType cargo_movement_type_at_destination;
+  private CargoMovementType cargoMovementTypeAtDestination;
 
   @Column("booking_request_datetime")
-  private OffsetDateTime bookingDateTime;
+  private OffsetDateTime bookingRequestDateTime;
 
-  @Column("service_contract")
+  @Column("service_contract_reference")
   @Size(max = 30)
-  private String serviceContract;
+  private String serviceContractReference;
 
-  @Column("cargo_gross_weight")
-  private Float cargoGrossWeight;
+  @Column("payment_term_code")
+  private PaymentTerm paymentTermCode;
 
-  @Column("cargo_gross_weight_unit")
-  @Size(max = 3)
-  private WeightUnit cargoGrossWeightUnit;
+  @Column("is_partial_load_allowed")
+  private Boolean isPartialLoadAllowed;
 
-  @Column("commodity_type")
+  @Column("is_export_declaration_required")
+  private Boolean isExportDeclarationRequired;
+
+  @Column("export_declaration_reference")
+  @Size(max = 35)
+  private String exportDeclarationReference;
+
+  @Column("is_import_license_required")
+  private Boolean isImportLicenseRequired;
+
+  @Column("import_license_reference")
+  @Size(max = 35)
+  private String importLicenseReference;
+
+  @Column("submission_datetime")
+  private OffsetDateTime submissionDateTime;
+
+  @Column("is_ams_aci_filing_required")
+  private Boolean isAMSACIFilingRequired;
+
+  @Column("is_destination_filing_required")
+  private Boolean isDestinationFilingRequired;
+
+  @Column("contract_quotation_reference")
+  @Size(max = 35)
+  private String contractQuotationReference;
+
+  @Column("incoterms")
+  private IncoTerms incoTerms;
+
+  @Column("invoice_payable_at")
+  @Size(max = 100)
+  private String invoicePayableAt;
+
+  @Column("expected_departure_date")
+  private OffsetDateTime expectedDepartureDate;
+
+  @Column("transport_document_type_code")
+  private TransportDocumentTypeCode transportDocumentTypeCode;
+
+  @Column("transport_document_reference")
+  private String transportDocumentReference;
+
+  @Column("booking_channel_reference")
   @Size(max = 20)
-  private String commodityType;
+  private String bookingChannelReference;
+
+  @Column("communication_channel_code")
+  private CommunicationChannel communicationChannelCode;
+
+  @Column("is_equipment_substitution_allowed")
+  private Boolean isEquipmentSubstitutionAllowed;
+
+  @Column("vessel_id")
+  private UUID vesselId;
+
+  @Column("carrier_voyage_number")
+  @Size(max = 50)
+  private String carrierVoyageNumber;
+
 }
