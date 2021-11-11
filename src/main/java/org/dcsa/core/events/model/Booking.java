@@ -115,4 +115,8 @@ public class Booking extends AuditBase {
   @Column("carrier_voyage_number")
   @Size(max = 50)
   private String carrierVoyageNumber;
+
+  @Column("place_of_issue")
+  @Size(max = 100)
+  private String placeOfIssueID;
 }
