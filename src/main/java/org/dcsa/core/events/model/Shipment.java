@@ -41,7 +41,4 @@ public class Shipment {
   @NotNull(message = "ConfirmedDateTime is required.")
   private OffsetDateTime confirmationDateTime;
 
-  @Column("place_of_issue")
-  @Size(max = 100)
-  private String placeOfIssueID;
 }
