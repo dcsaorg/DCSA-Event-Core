@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -91,7 +91,7 @@ public class Booking extends AuditBase {
   private String invoicePayableAt;
 
   @Column("expected_departure_date")
-  private OffsetDateTime expectedDepartureDate;
+  private LocalDate expectedDepartureDate;
 
   @Column("transport_document_type_code")
   private TransportDocumentTypeCode transportDocumentTypeCode;
@@ -115,5 +115,4 @@ public class Booking extends AuditBase {
   @Column("carrier_voyage_number")
   @Size(max = 50)
   private String carrierVoyageNumber;
-
 }
