@@ -28,7 +28,4 @@ public class Shipment {
   @Column("confirmation_datetime")
   private OffsetDateTime confirmationDateTime;
 
-  @Column("place_of_issue")
-  @Size(max = 100)
-  private String placeOfIssueID;
 }
