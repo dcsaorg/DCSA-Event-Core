@@ -33,6 +33,12 @@ public class TimestampDefinitionServiceImpl extends ExtendedBaseServiceImpl<Time
                 operationsEvent.getPortCallServiceTypeCode(),
                 operationsEvent.getFacilityTypeCode()
         )
+                .flatMap(timestampDefinition -> {
+                    if (timestampDefinition.getCanonicalTimestampDefinition() != null) {
+                        return timestampDefinitionRepository.findById(timestampDefinition.getCanonicalTimestampDefinition());
+                    }
+                    return Mono.just(timestampDefinition);
+                })
                 .switchIfEmpty(Mono.error(new CreateException("Cannot determine timestamp type for provided timestamp - please verify publisherRole, eventClassifierCode, facilityTypeCode, portCallPhaseTypeCode, and portCallServiceTypeCode")))
                 .flatMap(timestampDefinition -> timestampDefinitionRepository.markOperationsEventAsTimestamp(operationsEvent.getEventID(), timestampDefinition.getId()))
                 .thenReturn(operationsEvent);
