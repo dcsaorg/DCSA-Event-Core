@@ -90,7 +90,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                   } catch (IllegalStateException e) {
                       return Mono.error(new CreateException("Cannot derive portCallPhaseTypeCode automatically from this timestamp. Please define it explicitly"));
                   }
-                  return timestampDefinitionService.markOperationsEventAsTimestamp(oe);
+                  return Mono.just(oe);
               })
               .flatMap(super::create)
               .flatMap(timestampDefinitionService::markOperationsEventAsTimestamp)
