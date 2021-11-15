@@ -78,8 +78,8 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
                 .collectList()
                 .flatMap(vessels -> {
                     if (vessels.size() > 1) {
-                        throw new AssertionError("vesselIMONumber should be unique but " + vesselIMONumber
-                                + " matched more than one entity");
+                        return Mono.error(new AssertionError("vesselIMONumber should be unique but " + vesselIMONumber
+                                + " matched more than one entity"));
                     }
                     if (vessels.isEmpty()){
                         return Mono.error(new NotFoundException("Cannot find any vessel operator with provided VesselIMONumber: "
