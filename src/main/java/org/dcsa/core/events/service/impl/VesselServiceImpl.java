@@ -72,7 +72,7 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
             return Mono.error(new CreateException(e.getLocalizedMessage()));
         }
         ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
-        extendedRequest.parseParameter(Map.of("vesselId", List.of(vesselIMONumber)));
+        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(vesselIMONumber)));
         return vesselRepository.findAllExtended(extendedRequest)
                 .take(2)
                 .collectList()
