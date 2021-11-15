@@ -40,5 +40,4 @@ public class Shipment {
   @Column("confirmation_datetime")
   @NotNull(message = "ConfirmedDateTime is required.")
   private OffsetDateTime confirmationDateTime;
-
 }

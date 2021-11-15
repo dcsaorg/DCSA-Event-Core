@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class Booking extends AuditBase {
 
   @Id
   @Column("id")
+  @JsonIgnore
   private UUID id;
 
   @Column("carrier_booking_request_reference")
