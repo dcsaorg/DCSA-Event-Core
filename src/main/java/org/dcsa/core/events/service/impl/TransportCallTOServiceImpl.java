@@ -108,7 +108,7 @@ public class TransportCallTOServiceImpl extends ExtendedBaseServiceImpl<Transpor
                 .doOnNext(modeOfTransport -> transportCallTO.setModeOfTransportID(modeOfTransport.getId()))
                 .then(Mono.justOrEmpty(transportCallTO.getVessel()))
                 .flatMap(vessel ->
-                        vesselService.findById(vessel.getVesselIMONumber())
+                        vesselService.findById(vessel.getId())
                         .onErrorResume(NotFoundException.class, (e) -> {
                             if (vessel.getVesselOperatorCarrierCodeListProvider() == null ^ vessel.getVesselOperatorCarrierCode() == null) {
                                 if (vessel.getVesselOperatorCarrierCodeListProvider() == null) {

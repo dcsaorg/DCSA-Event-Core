@@ -19,10 +19,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, String> implements VesselService {
+public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, UUID> implements VesselService {
 
     private final VesselRepository vesselRepository;
     private final CarrierService carrierService;
@@ -58,15 +59,20 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
                 .flatMap(this::save);
     }
 
+
     @Override
-    public Mono<Vessel> findById(final String vesselIMONumber) {
+    public Mono<Vessel> findById(final UUID vesselID) {
+        return vesselRepository.findById(vesselID);
+    }
+
+    public Mono<Vessel> findByVesselIMONumber(final String vesselIMONumber) {
         try {
             ValidationUtils.validateVesselIMONumber(vesselIMONumber);
         } catch (IllegalArgumentException e) {
             return Mono.error(new CreateException(e.getLocalizedMessage()));
         }
         ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
-        extendedRequest.parseParameter(Map.of("vesselIMONumber", List.of(vesselIMONumber)));
+        extendedRequest.parseParameter(Map.of("vesselId", List.of(vesselIMONumber)));
         return vesselRepository.findAllExtended(extendedRequest)
                 .take(2)
                 .collectList()
