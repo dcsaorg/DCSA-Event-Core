@@ -52,4 +52,6 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
           + "JOIN shipment s ON ci.shipment_id = s.id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference)")
   Flux<Reference> findByCarrierBookingReference(String carrierBookingReference);
+
+  Flux<Reference> findByBookingID(UUID bookingID);
 }

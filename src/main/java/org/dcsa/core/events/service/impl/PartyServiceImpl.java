@@ -69,7 +69,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
     private final BiFunction<String, PartyTO.IdentifyingCode, PartyIdentifyingCode> mapIdcCodeToPartyIdc = (partyId, idc) -> {
         PartyIdentifyingCode partyCodeListResponsibleAgency = new PartyIdentifyingCode();
         partyCodeListResponsibleAgency.setPartyID(partyId);
-        DCSAResponsibleAgencyCode dcsaCode = idc.getDCSAResponsibleAgencyCode();
+        DCSAResponsibleAgencyCode dcsaCode = idc.getDcsaResponsibleAgencyCode();
         if (dcsaCode == null) {
             if (idc.getCodeListResponsibleAgencyCode() == null) {
                 throw new CreateException("Either DCSAResponsibleAgencyCode or codeListResponsibleAgencyCode must be provided");
@@ -85,7 +85,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
                         + dcsaCode + " (" + dcsaCode.getLegacyAgencyCode() + ") vs. " + idc.getCodeListResponsibleAgencyCode());
             }
         }
-        partyCodeListResponsibleAgency.setDCSAResponsibleAgencyCode(dcsaCode);
+        partyCodeListResponsibleAgency.setDcsaResponsibleAgencyCode(dcsaCode);
         partyCodeListResponsibleAgency.setPartyCode(idc.getPartyCode());
         partyCodeListResponsibleAgency.setCodeListName(idc.getCodeListName());
         return partyCodeListResponsibleAgency;
@@ -120,8 +120,8 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
     private PartyTO.IdentifyingCode partyIdentifyingCodeToIdentifyingCode(PartyIdentifyingCode partyIdentifyingCode){
         return PartyTO.IdentifyingCode.builder()
                 .partyCode(partyIdentifyingCode.getPartyCode())
-                .DCSAResponsibleAgencyCode(partyIdentifyingCode.getDCSAResponsibleAgencyCode())
-                .codeListResponsibleAgencyCode(partyIdentifyingCode.getDCSAResponsibleAgencyCode().getLegacyAgencyCode())
+                .dcsaResponsibleAgencyCode(partyIdentifyingCode.getDcsaResponsibleAgencyCode())
+                .codeListResponsibleAgencyCode(partyIdentifyingCode.getDcsaResponsibleAgencyCode().getLegacyAgencyCode())
                 .codeListName(partyIdentifyingCode.getCodeListName())
                 .build();
     }

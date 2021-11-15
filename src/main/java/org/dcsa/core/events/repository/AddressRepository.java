@@ -4,6 +4,7 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.repository.ExtendedRepository;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public interface AddressRepository extends ExtendedRepository<Address, UUID> {
@@ -34,4 +35,12 @@ public interface AddressRepository extends ExtendedRepository<Address, UUID> {
                 address.getCountry()
         );
     }
+
+  default Mono<Address> findByIdOrEmpty(UUID id) {
+    if (Objects.isNull(id)) {
+      return Mono.empty();
+    } else {
+      return findById(id);
+    }
+  }
 }

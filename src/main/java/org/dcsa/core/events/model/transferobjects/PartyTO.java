@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,45 +46,46 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
     }
 
     public void adjustIdentifyingCodesIfNmftaIsPresent(){
-          if (StringUtils.isNotEmpty(this.getNmftaCode())) {
-              if (null != identifyingCodes
-                      && !identifyingCodes.isEmpty()
-                      && identifyingCodes.stream()
-                      .anyMatch(
-                              idc ->
-                                      DCSAResponsibleAgencyCode.SCAC
-                                              .getLegacyAgencyCode()
-                                              .equals(idc.getCodeListResponsibleAgencyCode()))) {
+        if (StringUtils.isNotEmpty(this.getNmftaCode())) {
+            if (null != identifyingCodes
+                    && !identifyingCodes.isEmpty()
+                    && identifyingCodes.stream()
+                    .anyMatch(
+                            idc ->
+                                    DCSAResponsibleAgencyCode.SCAC
+                                            .getLegacyAgencyCode()
+                                            .equals(idc.getCodeListResponsibleAgencyCode()))) {
 
-                  for (IdentifyingCode idc : this.identifyingCodes) {
-                      if(DCSAResponsibleAgencyCode.SCAC
-                              .getLegacyAgencyCode()
-                              .equals(idc.getCodeListResponsibleAgencyCode())){
-                            idc.setPartyCode(this.getNmftaCode());
-                      }
-                  }
+                for (IdentifyingCode idc : this.identifyingCodes) {
+                    if(DCSAResponsibleAgencyCode.SCAC
+                            .getLegacyAgencyCode()
+                            .equals(idc.getCodeListResponsibleAgencyCode())){
+                        idc.setPartyCode(this.getNmftaCode());
+                    }
+                }
 
-              } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
+            } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
                 this.identifyingCodes =
-                    Collections.singletonList(
-                        IdentifyingCode.builder()
-                            .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
-                            .partyCode(this.getNmftaCode())
-                            .build());
-              } else {
+                        Collections.singletonList(
+                                IdentifyingCode.builder()
+                                        .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
+                                        .partyCode(this.getNmftaCode())
+                                        .build());
+            } else {
                 identifyingCodes.add(
-                    IdentifyingCode.builder()
-                        .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
-                        .partyCode(this.getNmftaCode())
-                        .build());
-              }
-          }
-      }
+                        IdentifyingCode.builder()
+                                .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
+                                .partyCode(this.getNmftaCode())
+                                .build());
+            }
+        }
+    }
 
     @Data
     @Builder
     public static class IdentifyingCode {
-        private DCSAResponsibleAgencyCode DCSAResponsibleAgencyCode;
+        @JsonProperty("DCSAResponsibleAgencyCode")
+        private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
         private String codeListResponsibleAgencyCode;
         private String partyCode;
         private String codeListName;
