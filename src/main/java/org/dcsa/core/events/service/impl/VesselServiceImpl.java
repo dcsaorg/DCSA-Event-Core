@@ -62,7 +62,18 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
 
     @Override
     public Mono<Vessel> findById(final UUID vesselID) {
-        return vesselRepository.findById(vesselID);
+        ExtendedRequest<Vessel> extendedRequest = newExtendedRequest();
+        extendedRequest.parseParameter(Map.of("id", List.of(vesselID.toString())));
+        return vesselRepository.findAllExtended(extendedRequest)
+                .take(1)
+                .collectList()
+                .flatMap(vessels -> {
+                    if (vessels.isEmpty()){
+                        return Mono.error(new NotFoundException("Cannot find any vessel operator with provided id: "
+                                + vesselID ));
+                    }
+                    return Mono.just(vessels.get(0));
+                });
     }
 
     public Mono<Vessel> findByVesselIMONumber(final String vesselIMONumber) {
