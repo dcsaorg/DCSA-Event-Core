@@ -7,5 +7,5 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface ShipmentRepository extends ExtendedRepository<Shipment, UUID> {
-  Mono<Shipment> findByCarrierBookingReferenceID(String carrierBookingReference);
+  Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
 }
