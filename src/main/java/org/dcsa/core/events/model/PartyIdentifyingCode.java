@@ -16,7 +16,7 @@ public class PartyIdentifyingCode {
   private UUID id;
 
   @Column("dcsa_responsible_agency_code")
-  private DCSAResponsibleAgencyCode DCSAResponsibleAgencyCode;
+  private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
 
   @Column("party_id")
   private String partyID;

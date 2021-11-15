@@ -25,6 +25,7 @@ public class Reference extends AuditBase implements GetId<UUID> {
   @JsonIgnore
   private UUID referenceID;
 
+  @Column("reference_type_code")
   private ReferenceTypeCode referenceType;
 
   @Size(max = 100)
@@ -37,6 +38,10 @@ public class Reference extends AuditBase implements GetId<UUID> {
   @Column("shipment_id")
   @JsonIgnore
   private String shipmentID;
+
+  @Column("booking_id")
+  @JsonIgnore
+  private UUID bookingID;
 
   @JsonIgnore
   public UUID getId() {
