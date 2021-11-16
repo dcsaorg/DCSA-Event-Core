@@ -1,6 +1,6 @@
 package org.dcsa.core.events.repository;
 
-import org.dcsa.core.events.ShipmentLocation;
+import org.dcsa.core.events.model.ShipmentLocation;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
