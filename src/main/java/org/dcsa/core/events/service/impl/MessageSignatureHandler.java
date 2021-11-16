@@ -467,13 +467,17 @@ public class MessageSignatureHandler {
     private long computeNextDelay(EventSubscriptionState eventSubscriptionState) {
         Long delaySeconds = eventSubscriptionState.getAccumulatedRetryDelay();
         long limit = messageServiceConfig.getMaxRetryAfterDelay().toSeconds();
+        long minDelay = messageServiceConfig.getMinRetryAfterDelay().toSeconds();
         if (delaySeconds == null) {
-            delaySeconds = messageServiceConfig.getMinRetryAfterDelay().toSeconds();
+            delaySeconds = minDelay;
         } else {
             delaySeconds *= 2;
         }
         if (delaySeconds >= limit) {
             delaySeconds = limit;
+        } else if (delaySeconds < minDelay) {
+            // in case someone set it the delay to 0 or something else in the database directly.
+            delaySeconds = minDelay;
         }
         return delaySeconds;
     }
