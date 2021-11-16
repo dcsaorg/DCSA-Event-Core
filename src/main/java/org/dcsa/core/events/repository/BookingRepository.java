@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends ExtendedRepository<Booking, UUID>, ReactiveSortingRepository<Booking, UUID>, ReactiveQueryByExampleExecutor<Booking> {
+public interface BookingRepository extends ReactiveSortingRepository<Booking, UUID>, ReactiveQueryByExampleExecutor<Booking> {
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
