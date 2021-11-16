@@ -169,7 +169,7 @@ public abstract class EventSubscriptionTOServiceImpl<
 
   @Override
   public Flux<T> findAllExtended(ExtendedRequest<EventSubscription> extendedRequest) {
-    return mapManyD2TO(getService().findAll());
+    return mapManyD2TO(getService().findAllExtended(extendedRequest));
   }
 
   @Override
