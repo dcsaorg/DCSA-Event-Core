@@ -1,4 +1,4 @@
-package org.dcsa.core.events;
+package org.dcsa.core.events.model;
 
 import lombok.Data;
 import org.dcsa.core.events.model.enums.LocationType;
