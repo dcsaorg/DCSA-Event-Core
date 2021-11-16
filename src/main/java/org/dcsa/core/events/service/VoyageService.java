@@ -7,6 +7,5 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface VoyageService extends ExtendedBaseService<Voyage, UUID> {
-    Mono<Voyage> findByTransportCallID(String transportCallID);
-    Mono<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber);
+    Mono<Voyage> findByCarrierVoyageNumberAndServiceID(String carrierVoyageNumber, UUID serviceID);
 }

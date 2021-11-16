@@ -3,18 +3,11 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.UnmappedEvent;
-import org.dcsa.core.events.model.base.AbstractLocation;
-import org.dcsa.core.events.model.base.AbstractParty;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
-import org.dcsa.core.events.service.LocationService;
-import org.dcsa.core.events.service.OperationsEventService;
-import org.dcsa.core.events.service.PartyService;
-import org.dcsa.core.events.service.TransportCallTOService;
+import org.dcsa.core.events.service.*;
+import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.dcsa.core.util.MappingUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,6 +22,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private final TransportCallTOService transportCallTOService;
     private final PartyService partyService;
     private final LocationService locationService;
+    private final TimestampDefinitionService timestampDefinitionService;
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
@@ -90,15 +84,25 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
               .flatMap(partyService::ensureResolvable)
               .doOnNext(publisher -> operationsEvent.setPublisherID(publisher.getId()))
               .thenReturn(operationsEvent)
+              .flatMap(oe -> {
+                  try {
+                      oe.ensurePhaseTypeIsDefined();
+                  } catch (IllegalStateException e) {
+                      return Mono.error(new CreateException("Cannot derive portCallPhaseTypeCode automatically from this timestamp. Please define it explicitly"));
+                  }
+                  return Mono.just(oe);
+              })
               .flatMap(super::create)
+              .flatMap(timestampDefinitionService::markOperationsEventAsTimestamp)
               .flatMap(
                       ope -> {
                           UnmappedEvent unmappedEvent = new UnmappedEvent();
                           unmappedEvent.setNewRecord(true);
                           unmappedEvent.setEventID(ope.getEventID());
                           unmappedEvent.setEnqueuedAtDateTime(ope.getEventCreatedDateTime());
-                          return unmappedEventRepository.save(unmappedEvent);
+                          return unmappedEventRepository.save(unmappedEvent)
+                                  .thenReturn(ope);
                       })
-              .thenReturn(operationsEvent);
+              ;
   }
 }

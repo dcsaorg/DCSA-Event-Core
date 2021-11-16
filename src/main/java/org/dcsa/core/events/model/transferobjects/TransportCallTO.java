@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.ModeOfTransport;
+import org.dcsa.core.events.model.Service;
 import org.dcsa.core.events.model.Vessel;
+import org.dcsa.core.events.model.Voyage;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
@@ -20,12 +22,6 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class TransportCallTO extends AbstractTransportCall {
-
-    @Transient
-    private String carrierServiceCode;
-
-    @Transient
-    private String carrierVoyageNumber;
 
     @Size(max = 5)
     @Transient
@@ -62,13 +58,13 @@ public class TransportCallTO extends AbstractTransportCall {
     }
 
     @Transient
-    @ForeignKey(fromFieldName = "vesselIMONumber", foreignFieldName = "vesselIMONumber", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+    @ForeignKey(fromFieldName = "vesselID", foreignFieldName = "id", joinType = Join.JoinType.LEFT_OUTER_JOIN)
     private Vessel vessel;
 
     public void setVessel(Vessel vessel) {
         this.vessel = vesselOrNull(vessel);
         if (this.vessel != null) {
-            this.setVesselIMONumber(this.vessel.getVesselIMONumber());
+            this.setVesselID(this.vessel.getId());
         }
     }
 
@@ -124,5 +120,79 @@ public class TransportCallTO extends AbstractTransportCall {
             UNLocationCode = null;
         }
         this.facility = facility;
+    }
+
+    @JsonIgnore
+    @Transient
+    @ForeignKey(fromFieldName = "importVoyageID", foreignFieldName = "id", viaJoinAlias = "im_voyage", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+    private Voyage importVoyage;
+
+    @JsonIgnore
+    @Transient
+    @ForeignKey(fromFieldName = "exportVoyageID", foreignFieldName = "id", viaJoinAlias = "ex_voyage", joinType = Join.JoinType.LEFT_OUTER_JOIN)
+    private Voyage exportVoyage;
+
+    @Deprecated
+    public String getCarrierVoyageNumber() {
+        if (exportVoyage == null) {
+            return null;
+        }
+        return getExportVoyageNumber();
+    }
+
+    public String getCarrierServiceCode() {
+        if (exportVoyage == null) {
+            return null;
+        }
+        Service service = exportVoyage.getService();
+        if (service == null) {
+            return null;
+        }
+        return service.getCarrierServiceCode();
+    }
+
+    public String getExportVoyageNumber() {
+        if (exportVoyage == null) {
+            return null;
+        }
+        return exportVoyage.getCarrierVoyageNumber();
+    }
+
+    public String getImportVoyageNumber() {
+        if (importVoyage == null) {
+            return null;
+        }
+        return importVoyage.getCarrierVoyageNumber();
+    }
+
+    public void setExportVoyageNumber(String voyageNumber) {
+        if (exportVoyage == null) {
+            exportVoyage = new Voyage();
+        }
+        exportVoyage.setCarrierVoyageNumber(voyageNumber);
+    }
+
+    public void setImportVoyageNumber(String voyageNumber) {
+        if (importVoyage == null) {
+            importVoyage = new Voyage();
+        }
+        importVoyage.setCarrierVoyageNumber(voyageNumber);
+    }
+
+    public void setCarrierServiceCode(String carrierServiceCode) {
+        if (importVoyage == null) {
+            importVoyage = new Voyage();
+        }
+        if (importVoyage.getService() == null) {
+            importVoyage.setService(new Service());
+        }
+        if (exportVoyage == null) {
+            exportVoyage = new Voyage();
+        }
+        if (exportVoyage.getService() == null) {
+            exportVoyage.setService(new Service());
+        }
+        importVoyage.getService().setCarrierServiceCode(carrierServiceCode);
+        exportVoyage.getService().setCarrierServiceCode(carrierServiceCode);
     }
 }

@@ -35,4 +35,6 @@ public interface BookingRepository extends ExtendedRepository<Booking, UUID> {
           + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
   Flux<String> findCarrierBookingRefsByTransportCallID(String transportCallID);
+
+  Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 }

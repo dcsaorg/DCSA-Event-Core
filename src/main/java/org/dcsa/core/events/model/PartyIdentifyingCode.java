@@ -1,6 +1,7 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
+import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -11,10 +12,11 @@ import java.util.UUID;
 @Table("party_identifying_code")
 public class PartyIdentifyingCode {
 
-  @Id private UUID id;
+  @Id
+  private UUID id;
 
-  @Column("code_list_responsible_agency_code")
-  private String codeListResponsibleAgencyCode;
+  @Column("dcsa_responsible_agency_code")
+  private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
 
   @Column("party_id")
   private String partyID;

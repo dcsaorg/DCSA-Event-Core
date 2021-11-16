@@ -40,6 +40,4 @@ public interface TransportRepository extends ExtendedRepository<Transport, UUID>
           + "WHERE td.transport_document_reference = :transportDocumentRef")
   Flux<String> findVesselIMONumbersByTransportDocumentRef(String transportDocumentRef);
 
-  @Query("SELECT transport FROM transport WHERE transport.un_location_code =:modeOfTransport AND transport.vessel_imo_number = :vesselIMONumber")
-  Flux<Transport> getTransports(String modeOfTransport, String vesselIMONumber);
 }

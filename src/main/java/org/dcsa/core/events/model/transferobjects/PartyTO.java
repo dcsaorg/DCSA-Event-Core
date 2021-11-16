@@ -1,5 +1,7 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,7 +11,7 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
 import org.dcsa.core.events.model.SetId;
 import org.dcsa.core.events.model.base.AbstractParty;
-import org.dcsa.core.events.model.enums.CodeListResponsibleAgency;
+import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
@@ -45,44 +47,47 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
     }
 
     public void adjustIdentifyingCodesIfNmftaIsPresent(){
-          if (StringUtils.isNotEmpty(this.getNmftaCode())) {
-              if (null != identifyingCodes
-                      && !identifyingCodes.isEmpty()
-                      && identifyingCodes.stream()
-                      .anyMatch(
-                              idc ->
-                                      CodeListResponsibleAgency.SCAC
-                                              .getCode()
-                                              .equals(idc.getCodeListResponsibleAgencyCode()))) {
+        if (StringUtils.isNotEmpty(this.getNmftaCode())) {
+            if (null != identifyingCodes
+                    && !identifyingCodes.isEmpty()
+                    && identifyingCodes.stream()
+                    .anyMatch(
+                            idc ->
+                                    DCSAResponsibleAgencyCode.SCAC
+                                            .getLegacyAgencyCode()
+                                            .equals(idc.getCodeListResponsibleAgencyCode()))) {
 
-                  for (IdentifyingCode idc : this.identifyingCodes) {
-                      if(CodeListResponsibleAgency.SCAC
-                              .getCode()
-                              .equals(idc.getCodeListResponsibleAgencyCode())){
-                            idc.setPartyCode(this.getNmftaCode());
-                      }
-                  }
+                for (IdentifyingCode idc : this.identifyingCodes) {
+                    if(DCSAResponsibleAgencyCode.SCAC
+                            .getLegacyAgencyCode()
+                            .equals(idc.getCodeListResponsibleAgencyCode())){
+                        idc.setPartyCode(this.getNmftaCode());
+                    }
+                }
 
-              } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
+            } else if (null == identifyingCodes || identifyingCodes.isEmpty()) {
                 this.identifyingCodes =
-                    Collections.singletonList(
-                        IdentifyingCode.builder()
-                            .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
-                            .partyCode(this.getNmftaCode())
-                            .build());
-              } else {
+                        Collections.singletonList(
+                                IdentifyingCode.builder()
+                                        .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
+                                        .partyCode(this.getNmftaCode())
+                                        .build());
+            } else {
                 identifyingCodes.add(
-                    IdentifyingCode.builder()
-                        .codeListResponsibleAgencyCode(CodeListResponsibleAgency.SCAC.getCode())
-                        .partyCode(this.getNmftaCode())
-                        .build());
-              }
-          }
-      }
+                        IdentifyingCode.builder()
+                                .codeListResponsibleAgencyCode(DCSAResponsibleAgencyCode.SCAC.getLegacyAgencyCode())
+                                .partyCode(this.getNmftaCode())
+                                .build());
+            }
+        }
+    }
 
     @Data
     @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class IdentifyingCode {
+        @JsonProperty("DCSAResponsibleAgencyCode")
+        private DCSAResponsibleAgencyCode dcsaResponsibleAgencyCode;
         private String codeListResponsibleAgencyCode;
         private String partyCode;
         private String codeListName;
