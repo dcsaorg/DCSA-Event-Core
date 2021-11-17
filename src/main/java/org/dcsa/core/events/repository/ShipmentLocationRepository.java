@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ShipmentLocationRepository extends ExtendedRepository<ShipmentLocation, UUID> {
   Flux<ShipmentLocation> findByBookingID(UUID bookingID);
+  Flux<ShipmentLocation> findByShipmentID(UUID shipmentID);
 }
