@@ -1,9 +1,9 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Booking;
-import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
@@ -43,4 +43,15 @@ public interface BookingRepository extends ReactiveSortingRepository<Booking, UU
   Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 
   Flux<Booking> findAllOrderByBookingRequestDateTime(Example example, Pageable pageable);
+
+  @Modifying
+  @Query(
+          "UPDATE booking SET invoice_payable_at = :invoicePayableAt where carrier_booking_request_reference = :carrierBookingRequestReference")
+  Mono<Boolean> setInvoicePayableAtFor(
+          String invoicePayableAt, String carrierBookingRequestReference);
+
+  @Modifying
+  @Query(
+          "UPDATE booking SET place_of_issue = :placeOfIssue where carrier_booking_request_reference = :carrierBookingRequestReference")
+  Mono<Boolean> setPlaceOfIssueIDFor(String placeOfIssue, String carrierBookingRequestReference);
 }
