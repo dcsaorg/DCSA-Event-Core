@@ -15,41 +15,42 @@ import static org.springframework.data.relational.core.query.Query.query;
 @RequiredArgsConstructor
 public class BookingCustomRepositoryImpl implements BookingCustomRepository {
 
-	private final R2dbcEntityTemplate r2dbcEntityTemplate;
+  private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
-	@Override
-	public Flux<Booking> findAllByCarrierBookingReferenceAndDocumentStatus(String carrierBookingRequestReference, DocumentStatus documentStatus, Pageable pageable) {
+  @Override
+  public Flux<Booking> findAllByCarrierBookingReferenceAndDocumentStatus(
+      String carrierBookingRequestReference, DocumentStatus documentStatus, Pageable pageable) {
 
-		Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
-		Criteria carrierBookingRequestReferenceCriteria =
-			getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference);
+    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
+    Criteria carrierBookingRequestReferenceCriteria =
+        getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference);
 
-		Criteria criteria = Criteria.from(docStatusCriteria, carrierBookingRequestReferenceCriteria);
+    Criteria criteria = Criteria.from(docStatusCriteria, carrierBookingRequestReferenceCriteria);
 
-		return r2dbcEntityTemplate
-			.select(Booking.class)
-			.matching(
-				query(criteria)
-					.sort(pageable.getSort())
-					.limit(pageable.getPageSize())
-					.offset(pageable.getOffset()))
-			.all();
-	}
+    return r2dbcEntityTemplate
+        .select(Booking.class)
+        .matching(
+            query(criteria)
+                .sort(pageable.getSort())
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset()))
+        .all();
+  }
 
-	protected Criteria getCriteriaHasCarrierBookingRequestReference(
-		String carrierBookingRequestReference) {
-		Criteria criteria = Criteria.empty();
-		if (carrierBookingRequestReference != null) {
-			criteria = where("carrier_booking_request_reference").is(carrierBookingRequestReference);
-		}
-		return criteria;
-	}
+  protected Criteria getCriteriaHasCarrierBookingRequestReference(
+      String carrierBookingRequestReference) {
+    Criteria criteria = Criteria.empty();
+    if (carrierBookingRequestReference != null) {
+      criteria = where("carrier_booking_request_reference").is(carrierBookingRequestReference);
+    }
+    return criteria;
+  }
 
-	protected Criteria getCriteriaHasDocumentStatus(DocumentStatus documentStatus) {
-		Criteria criteria = Criteria.empty();
-		if (documentStatus != null) {
-			criteria = where("document_status").is(documentStatus);
-		}
-		return criteria;
-	}
+  protected Criteria getCriteriaHasDocumentStatus(DocumentStatus documentStatus) {
+    Criteria criteria = Criteria.empty();
+    if (documentStatus != null) {
+      criteria = where("document_status").is(documentStatus);
+    }
+    return criteria;
+  }
 }

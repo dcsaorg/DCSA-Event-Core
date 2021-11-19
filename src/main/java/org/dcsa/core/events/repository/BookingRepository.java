@@ -11,7 +11,8 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends ReactiveSortingRepository<Booking, UUID>, BookingCustomRepository {
+public interface BookingRepository
+    extends ReactiveSortingRepository<Booking, UUID>, BookingCustomRepository {
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -41,12 +42,12 @@ public interface BookingRepository extends ReactiveSortingRepository<Booking, UU
 
   @Modifying
   @Query(
-          "UPDATE booking SET invoice_payable_at = :invoicePayableAt where carrier_booking_request_reference = :carrierBookingRequestReference")
+      "UPDATE booking SET invoice_payable_at = :invoicePayableAt where carrier_booking_request_reference = :carrierBookingRequestReference")
   Mono<Boolean> setInvoicePayableAtFor(
-          String invoicePayableAt, String carrierBookingRequestReference);
+      String invoicePayableAt, String carrierBookingRequestReference);
 
   @Modifying
   @Query(
-          "UPDATE booking SET place_of_issue = :placeOfIssue where carrier_booking_request_reference = :carrierBookingRequestReference")
+      "UPDATE booking SET place_of_issue = :placeOfIssue where carrier_booking_request_reference = :carrierBookingRequestReference")
   Mono<Boolean> setPlaceOfIssueIDFor(String placeOfIssue, String carrierBookingRequestReference);
 }
