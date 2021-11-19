@@ -1,10 +1,13 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Booking;
+import org.dcsa.core.events.model.enums.DocumentStatus;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -14,7 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends ReactiveSortingRepository<Booking, UUID>, ReactiveQueryByExampleExecutor<Booking> {
+public interface BookingRepository extends ReactiveSortingRepository<Booking, UUID>, BookingCustomRepository {
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -42,5 +45,4 @@ public interface BookingRepository extends ReactiveSortingRepository<Booking, UU
 
   Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 
-  Flux<Booking> findAllOrderByBookingRequestDateTime(Example example, Pageable pageable);
 }
