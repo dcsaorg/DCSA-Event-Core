@@ -24,18 +24,18 @@ public class Booking extends AuditBase {
   @Column("id")
   private UUID id;
 
-  @Column("carrier_booking_request_reference")
   @Size(max = 100)
+  @Column("carrier_booking_request_reference")
   private String carrierBookingRequestReference;
 
   @Column("document_status")
   private DocumentStatus documentStatus;
 
   @Column("receipt_type_at_origin")
-  private ReceiptDeliveryType receiptDeliveryTypeAtOrigin;
+  private ReceiptDeliveryType receiptTypeAtOrigin;
 
   @Column("delivery_type_at_destination")
-  private ReceiptDeliveryType receiptDeliveryTypeAtDestination;
+  private ReceiptDeliveryType deliveryTypeAtDestination;
 
   @Column("cargo_movement_type_at_origin")
   private CargoMovementType cargoMovementTypeAtOrigin;
