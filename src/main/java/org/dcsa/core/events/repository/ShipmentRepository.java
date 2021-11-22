@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface ShipmentRepository extends ExtendedRepository<Shipment, UUID> {
 
   Flux<Shipment> findShipmentsByBookingIDNotNull(Pageable pageable);
-  Flux<Shipment> findAllByCarrierBookingReference(String carrierBookingReference);
+  Flux<Shipment> findAllByCarrierBookingReference(String carrierBookingReference, Pageable pageable);
   Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
 }
