@@ -20,15 +20,15 @@ public class RequestedEquipment {
   private UUID shipmentID;
 
   @Size(max = 4)
-  @Column("requested_equipment_type")
-  private String requestedEquipmentType;
+  @Column("requested_equipment_sizetype")
+  private String requestedEquipmentSizetype;
 
   @Column("requested_equipment_units")
   private Integer requestedEquipmentUnits;
 
   @Size(max = 4)
-  @Column("confirmed_equipment_type")
-  private String confirmedEquipmentType;
+  @Column("confirmed_equipment_sizetype")
+  private String confirmedEquipmentSizetype;
 
   @Column("confirmed_equipment_units")
   private Integer confirmedEquipmentUnits;
