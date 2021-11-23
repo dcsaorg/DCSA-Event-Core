@@ -15,7 +15,8 @@ public enum DocumentStatus {
   ISSU("Issued"),
   SURR("Surrendered"),
   SUBM("Submitted"),
-  VOID("Void");
+  VOID("Void"),
+  CANC("Cancelled");
 
   private final String value;
 }
