@@ -13,4 +13,5 @@ public enum ShipmentEventTypeCode {
     VOID,
     CONF,
     PENC,
+    CANC
 }
