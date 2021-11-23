@@ -9,5 +9,4 @@ import java.util.UUID;
 
 @Repository
 public interface CarrierClauseRepository extends ExtendedRepository<CarrierClause, UUID> {
-    Mono<CarrierClause> findByCarrierClauseID(UUID carrierClauseID);
 }

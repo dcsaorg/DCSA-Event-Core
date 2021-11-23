@@ -12,8 +12,7 @@ import java.util.UUID;
 public class CarrierClause {
 
   @Id
-  @Column("id")
-  private UUID carrierClauseID;
+  private UUID id;
 
   @Column("clause_content")
   private String clauseContent;
