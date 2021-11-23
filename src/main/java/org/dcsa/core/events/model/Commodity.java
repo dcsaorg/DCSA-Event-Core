@@ -19,6 +19,7 @@ public class Commodity {
   private UUID bookingID;
 
   @Column("commodity_type")
+  @Size(max = 550)
   private String commodityType;
 
   @Column("hs_code") // we need an enum for this
