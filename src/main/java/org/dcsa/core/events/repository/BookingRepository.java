@@ -1,6 +1,7 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Booking;
+import org.dcsa.core.events.model.enums.DocumentStatus;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
@@ -50,4 +51,10 @@ public interface BookingRepository
   @Query(
       "UPDATE booking SET place_of_issue = :placeOfIssue where carrier_booking_request_reference = :carrierBookingRequestReference")
   Mono<Boolean> setPlaceOfIssueIDFor(String placeOfIssue, String carrierBookingRequestReference);
+
+  @Modifying
+  @Query(
+      "UPDATE booking SET document_status = :documentStatus where carrier_booking_request_reference = :carrierBookingRequestReference")
+  Mono<Boolean> updateDocumentStatusForCarrierBookingRequestReference(
+      DocumentStatus documentStatus, String carrierBookingRequestReference);
 }
