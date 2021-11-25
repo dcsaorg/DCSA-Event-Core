@@ -16,6 +16,8 @@ public enum DocumentStatus {
   SURR("Surrendered"),
   SUBM("Submitted"),
   VOID("Void"),
+  CONF("Confirmed"),
+  PENC("Pending Confirmation"),
   CANC("Cancelled");
 
   private final String value;
