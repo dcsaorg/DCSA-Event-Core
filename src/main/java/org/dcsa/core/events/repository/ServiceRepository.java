@@ -39,7 +39,7 @@ public interface ServiceRepository extends ExtendedRepository<Service, UUID> {
           + " ON st.transport_id = t.id "
           + "JOIN cargo_item ci "
           + " ON ci.shipment_id = st.shipment_id "
-          + "LEFT JOIN \"references\" r"
+          + "LEFT JOIN \"reference\" r"
           + " ON r.shipment_id = st.shipment_id"
           + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR references.shipping_instruction_id = :shippingInstructionID)")
   Flux<String> findCarrierServiceCodesByShippingInstructionID(String shippingInstructionID);

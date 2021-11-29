@@ -31,7 +31,7 @@ public interface ShipmentEquipmentRepository extends ExtendedRepository<Shipment
           + "ON se.shipment_id = s.id "
           + "JOIN cargo_item ci "
           + "ON ci.shipment_id = s.id"
-          + "LEFT JOIN \"references\" r "
+          + "LEFT JOIN \"reference\" r "
           + "ON r.shipment_id = s.id "
           + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID")
   Flux<String> findEquipmentReferenceByShippingInstructionID(String shippingInstructionID);
@@ -42,7 +42,7 @@ public interface ShipmentEquipmentRepository extends ExtendedRepository<Shipment
           + "ON se.shipment_id = s.id "
           + "JOIN cargo_item ci "
           + "ON ci.shipment_id = s.id"
-          + "LEFT JOIN \"references\" r "
+          + "LEFT JOIN \"reference\" r "
           + "ON r.shipment_id = s.id "
           + "JOIN transport_document td "
           + "ON (td.shipping_instruction_id = ci.shipping_instruction_id OR td.shipping_instruction_id = r.shipping_instruction_id) "

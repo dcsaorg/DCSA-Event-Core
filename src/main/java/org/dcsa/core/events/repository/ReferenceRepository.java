@@ -10,8 +10,8 @@ import java.util.UUID;
 public interface ReferenceRepository extends ExtendedRepository<Reference, UUID> {
 
   @Query(
-      "SELECT \"references\".* "
-          + "FROM \"references\" "
+      "SELECT \"reference\".* "
+          + "FROM \"reference\" "
           + "WHERE shipping_instruction_id = :shippingInstructionID "
           + "OR shipment_id IN ( SELECT s.id from shipment s "
           + "JOIN shipment_equipment se ON s.id = se.shipment_id "
@@ -20,8 +20,8 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
   Flux<Reference> findByShippingInstructionID(String shippingInstructionID);
 
   @Query(
-      "SELECT \"references\".* "
-          + "FROM \"references\" "
+      "SELECT \"reference\".* "
+          + "FROM \"reference\" "
           + "WHERE shipment_id = :shipmentID "
           + "OR shipping_instruction_id IN ( SELECT si.id from shipping_instruction si "
           + "JOIN cargo_item ci ON ci.shipping_instruction_id = si.id "
@@ -30,8 +30,8 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
   Flux<Reference> findByShipmentID(UUID shipmentID);
 
   @Query(
-      "SELECT \"references\".* "
-          + "FROM \"references\" "
+      "SELECT \"reference\".* "
+          + "FROM \"reference\" "
           + "JOIN shipping_instruction si ON shipping_instruction_id = si.id "
           + "JOIN transport_document td ON td.shipping_instruction_id = si.id "
           + "WHERE  td.transport_document_reference = :transportDocumentReference "
@@ -44,7 +44,7 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
   Flux<Reference> findByTransportDocumentReference(String transportDocumentReference);
 
   @Query(
-      "SELECT \"references\".* FROM \"references\" "
+      "SELECT \"reference\".* FROM \"reference\" "
           + "LEFT JOIN shipment s ON shipment_id = s.id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference "
           + "OR shipping_instruction_id IN ( SELECT si.id from shipping_instruction si "
