@@ -15,6 +15,8 @@ import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +28,10 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
     private String nmftaCode;
 
     private Address address;
+
+    @NotNull(message = "PartyContactDetails is required.")
+    @NotEmpty(message = "PartyContactDetails is required.")
+    private List<PartyContactDetailsTO> partyContactDetails;
 
     private List<IdentifyingCode> identifyingCodes;
 
