@@ -39,5 +39,4 @@ public interface TransportRepository extends ExtendedRepository<Transport, UUID>
           + "ON (td.shipping_instruction_id = ci.shipping_instruction_id OR td.shipping_instruction_id = r.shipping_instruction_id) "
           + "WHERE td.transport_document_reference = :transportDocumentRef")
   Flux<String> findVesselIMONumbersByTransportDocumentRef(String transportDocumentRef);
-
 }
