@@ -32,7 +32,7 @@ public class ShipmentEvent extends Event {
     private String documentID;
 
     @Column("reason")
-    @Size(max = 100)
+    @Size(max = 250)
     private String reason;
 
     @JsonProperty("shipmentID")
