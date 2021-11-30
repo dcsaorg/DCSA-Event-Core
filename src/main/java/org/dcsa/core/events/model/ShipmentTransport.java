@@ -31,10 +31,10 @@ public class ShipmentTransport {
   private UUID transportID;
 
   @Column("transport_plan_stage_sequence_number")
-  private Integer carrierID;
+  private Integer transportPlanStageSequenceNumber;
 
   @Column("transport_plan_stage_code")
-  private TransportPlanStageCode carrierBookingReference;
+  private TransportPlanStageCode transportPlanStageCode;
 
   @JsonIgnore
   @Column("commercial_voyage_id")
