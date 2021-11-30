@@ -34,7 +34,7 @@ public interface VoyageRepository extends ExtendedRepository<Voyage, UUID> {
           " ON ci.shipment_id = st.shipment_id " +
           "LEFT JOIN \"reference\" r" +
           " ON r.shipment_id = st.shipment_id" +
-          "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR references.shipping_instruction_id = :shippingInstructionID)")
+          "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR reference.shipping_instruction_id = :shippingInstructionID)")
   Flux<String> findCarrierVoyageNumbersByShippingInstructionID(String shippingInstructionID);
 
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
