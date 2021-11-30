@@ -114,7 +114,7 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
           + "ON s.id = st.shipment_id "
           + "LEFT JOIN cargo_item ci "
           + "ON ci.shipment_id = s.id"
-          + "LEFT JOIN \"reference\" r "
+          + "LEFT JOIN reference r "
           + "ON r.shipment_id = s.id "
           + "JOIN transport_document td "
           + "ON (td.shipping_instruction_id = ci.shipping_instruction_id OR td.shipping_instruction_id = r.shipping_instruction_id)"
