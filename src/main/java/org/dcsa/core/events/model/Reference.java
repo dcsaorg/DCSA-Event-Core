@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
-@Table("\"references\"")
+@Table("reference")
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
