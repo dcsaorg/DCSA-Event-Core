@@ -13,4 +13,6 @@ public interface ShipmentTransportRepository extends ExtendedRepository<Shipment
   Flux<ShipmentTransport> findAllByBookingID(UUID bookingId);
 
   Flux<ShipmentTransport> findAllByShipmentID(UUID shipmentId);
+
+  Flux<ShipmentTransport> findAllByShipmentIDOrBookingID(UUID shipmentId, UUID bookingId);
 }
