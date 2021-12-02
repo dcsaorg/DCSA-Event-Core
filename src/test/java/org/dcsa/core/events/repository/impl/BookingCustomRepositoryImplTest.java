@@ -44,7 +44,7 @@ public class BookingCustomRepositoryImplTest {
 	@Test
 	@DisplayName("Get booking summaries with documentStatus Filter should return a query with an one criteria present")
 	void bookingSummaryRequestWithDocumentStatusFilterShouldReturnCarrierRequestBookingReferenceCriteria() {
-		DocumentStatus documentStatus = DocumentStatus.ISSU;
+		DocumentStatus documentStatus = DocumentStatus.RECE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasCarrierBookingRequestReference(null), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(Criteria.empty(), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
@@ -78,7 +78,7 @@ public class BookingCustomRepositoryImplTest {
 	@Test
 	@DisplayName("Get booking summaries with documentStatus Filter should return a query with an one criteria present")
 	void bookingSummaryRequestWithDocumentStatusFilterShouldReturnBookingIDCriteria() {
-		DocumentStatus documentStatus = DocumentStatus.ISSU;
+		DocumentStatus documentStatus = DocumentStatus.RECE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasBookingID(null), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(Criteria.empty(), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
