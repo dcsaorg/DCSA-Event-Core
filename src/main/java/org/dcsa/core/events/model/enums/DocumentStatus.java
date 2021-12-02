@@ -7,18 +7,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DocumentStatus {
   RECE("Received"),
-  DRFT("Drafted"),
-  PENA("Pending Approval"),
   PENU("Pending Update"),
   REJE("Rejected"),
-  APPR("Approved"),
-  ISSU("Issued"),
-  SURR("Surrendered"),
-  SUBM("Submitted"),
-  VOID("Void"),
   CONF("Confirmed"),
   PENC("Pending Confirmation"),
-  CANC("Cancelled");
+  CANC("Cancelled"),
+  DECL("Declined");
 
   private final String value;
 }
