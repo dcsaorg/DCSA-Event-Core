@@ -18,10 +18,6 @@ public class ShipmentTransport {
   @JsonIgnore
   private UUID id;
 
-  @Column("booking_id")
-  @JsonIgnore
-  private UUID bookingID;
-
   @JsonIgnore
   @Column("shipment_id")
   private UUID shipmentID;
