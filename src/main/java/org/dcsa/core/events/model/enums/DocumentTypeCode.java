@@ -8,5 +8,10 @@ public enum DocumentTypeCode {
     VGM,
     SRM,
     TRD,
-    ARN
+    ARN,
+    CBR,
+    CAS,
+    CUS,
+    DGD,
+    OOG
 }
