@@ -42,6 +42,10 @@ public interface BookingRepository
   Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 
   @Modifying
+  @Query("UPDATE booking SET vessel_id = :vesselId where id = :id")
+  Mono<Boolean> setVesselIDFor(UUID vesselId, UUID id);
+
+  @Modifying
   @Query(
       "UPDATE booking SET invoice_payable_at = :invoicePayableAt where carrier_booking_request_reference = :carrierBookingRequestReference")
   Mono<Boolean> setInvoicePayableAtFor(
