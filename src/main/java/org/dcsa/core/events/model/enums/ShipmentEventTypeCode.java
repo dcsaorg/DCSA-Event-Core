@@ -17,6 +17,5 @@ public enum ShipmentEventTypeCode {
     CMPL,
     RELS,
     REQS,
-    HOLD,
-    DECL
+    HOLD
 }
