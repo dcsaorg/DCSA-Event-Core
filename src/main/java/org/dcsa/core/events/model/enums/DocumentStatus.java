@@ -11,8 +11,7 @@ public enum DocumentStatus {
   REJE("Rejected"),
   CONF("Confirmed"),
   PENC("Pending Confirmation"),
-  CANC("Cancelled"),
-  DECL("Declined");
+  CANC("Cancelled");
 
   private final String value;
 }
