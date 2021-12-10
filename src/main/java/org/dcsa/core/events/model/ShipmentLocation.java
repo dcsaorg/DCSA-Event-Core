@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -22,6 +23,10 @@ public class ShipmentLocation {
 
   @Column("location_id")
   private String locationID;
+
+  @Size(max = 100)
+  @Column("shipping_instruction_id ")
+  private String shippingInstructionID;
 
   @Column("shipment_location_type_code")
   private LocationType shipmentLocationTypeCode;
