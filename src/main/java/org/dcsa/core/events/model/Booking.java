@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -118,4 +119,9 @@ public class Booking extends AuditBase {
   @Column("place_of_issue")
   @Size(max = 100)
   private String placeOfIssueID;
+
+  @JsonIgnore
+  @Column("pre_carriage_mode_of_transport_code")
+  @Size(max = 3)
+  protected String preCarriageModeOfTransportCode;
 }

@@ -43,6 +43,9 @@ public class Reference extends AuditBase implements GetId<UUID> {
   @JsonIgnore
   private UUID bookingID;
 
+  @Column("cargo_item_id")
+  private UUID cargoItemID;
+
   @JsonIgnore
   public UUID getId() {
     return getReferenceID();
