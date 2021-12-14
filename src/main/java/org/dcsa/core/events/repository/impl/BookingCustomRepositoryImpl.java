@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -32,6 +33,24 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset()))
         .all();
+  }
+
+  @Override
+  public Mono<Long> countAllByCarrierBookingReferenceAndDocumentStatus(
+    String carrierBookingRequestReference,DocumentStatus documentStatus){
+
+    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
+    Criteria carrierBookingRequestReferenceCriteria =
+      getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference);
+
+    Criteria criteria = Criteria.from(docStatusCriteria,carrierBookingRequestReferenceCriteria);
+
+    return r2dbcEntityTemplate
+      .select(Booking.class)
+      .matching(
+        query(criteria)
+      )
+      .count();
   }
 
   @Override
