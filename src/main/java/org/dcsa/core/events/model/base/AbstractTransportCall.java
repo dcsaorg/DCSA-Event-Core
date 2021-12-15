@@ -46,7 +46,7 @@ public class AbstractTransportCall extends AuditBase {
     private UUID facilityID;
 
     @JsonIgnore
-    @Column("mode_of_transport")
+    @Column("mode_of_transport_code")
     @Size(max = 3)
     private String modeOfTransportID;
 
