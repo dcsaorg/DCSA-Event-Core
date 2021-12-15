@@ -113,9 +113,9 @@ public class Booking extends AuditBase {
   @Column("vessel_id")
   private UUID vesselId;
 
-  @Column("carrier_voyage_number")
+  @Column("export_voyage_number")
   @Size(max = 50)
-  private String carrierVoyageNumber;
+  private String exportVoyageNumber;
 
   @Column("place_of_issue")
   @Size(max = 100)
