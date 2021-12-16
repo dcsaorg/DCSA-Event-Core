@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.model.AuditBase;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -20,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Booking extends AuditBase {
+public class Booking extends AuditBase implements Persistable<UUID> {
 
   @Id
   @Column("id")
@@ -126,6 +127,11 @@ public class Booking extends AuditBase {
   @Column("pre_carriage_mode_of_transport_code")
   @Size(max = 3)
   protected String preCarriageModeOfTransportCode;
+
+  @Override
+  public boolean isNew() {
+    return this.getId() == null;
+  }
 
   // Both eventCreatedDateTime and eventDateTime are considered metadata
   // and are not part of the official IM model. They are added in the sql only.
