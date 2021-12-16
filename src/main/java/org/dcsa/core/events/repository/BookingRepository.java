@@ -60,6 +60,6 @@ public interface BookingRepository
   @Modifying
   @Query(
       "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime where carrier_booking_request_reference = :carrierBookingRequestReference")
-  Mono<Boolean> updateDocumentStatusForCarrierBookingRequestReference(
+  Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
           DocumentStatus documentStatus, String carrierBookingRequestReference, OffsetDateTime updatedDateTime);
 }
