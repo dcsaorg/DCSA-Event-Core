@@ -4,6 +4,7 @@ import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -54,4 +55,6 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
   Flux<Reference> findByCarrierBookingReference(String carrierBookingReference);
 
   Flux<Reference> findByBookingID(UUID bookingID);
+
+  Mono<Void> deleteByBookingID(UUID bookingID);
 }
