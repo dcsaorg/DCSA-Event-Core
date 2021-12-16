@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -125,4 +126,13 @@ public class Booking extends AuditBase {
   @Column("pre_carriage_mode_of_transport_code")
   @Size(max = 3)
   protected String preCarriageModeOfTransportCode;
+
+  // Both eventCreatedDateTime and eventDateTime are considered metadata
+  // and are not part of the official IM model. They are added in the sql only.
+
+  @Column("created_date_time")
+  protected OffsetDateTime createdDateTime;
+
+  @Column("updated_date_time")
+  protected OffsetDateTime updatedDateTime;
 }
