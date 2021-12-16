@@ -18,8 +18,7 @@ import java.util.UUID;
 @Table("booking")
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class Booking extends AuditBase implements Persistable<UUID> {
+public class Booking implements Persistable<UUID> {
 
   @Id
   @Column("id")
