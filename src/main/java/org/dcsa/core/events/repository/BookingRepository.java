@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Repository
@@ -55,7 +56,7 @@ public interface BookingRepository
 
   @Modifying
   @Query(
-      "UPDATE booking SET document_status = :documentStatus where carrier_booking_request_reference = :carrierBookingRequestReference")
-  Mono<Boolean> updateDocumentStatusForCarrierBookingRequestReference(
-      DocumentStatus documentStatus, String carrierBookingRequestReference);
+      "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime where carrier_booking_request_reference = :carrierBookingRequestReference")
+  Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
+          DocumentStatus documentStatus, String carrierBookingRequestReference, OffsetDateTime updatedDateTime);
 }
