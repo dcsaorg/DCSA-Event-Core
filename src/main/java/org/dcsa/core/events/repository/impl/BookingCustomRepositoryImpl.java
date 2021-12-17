@@ -20,14 +20,9 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
   private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
   @Override
-  public Flux<Booking> findAllByCarrierBookingReferenceAndDocumentStatus(
-      String carrierBookingRequestReference, DocumentStatus documentStatus, Pageable pageable) {
+  public Flux<Booking> findAllByDocumentStatus(DocumentStatus documentStatus, Pageable pageable) {
 
-    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
-    Criteria carrierBookingRequestReferenceCriteria =
-        getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference);
-
-    Criteria criteria = Criteria.from(docStatusCriteria, carrierBookingRequestReferenceCriteria);
+    Criteria criteria = Criteria.from(getCriteriaHasDocumentStatus(documentStatus));
 
     return r2dbcEntityTemplate
         .select(Booking.class)
@@ -39,7 +34,7 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
         .all();
   }
 
-    @Override
+  @Override
   public Flux<Booking> findAllByBookingIDAndDocumentStatus(
       UUID bookingID, DocumentStatus documentStatus, Pageable pageable) {
 

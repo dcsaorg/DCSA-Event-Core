@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BookingCustomRepository {
 
-  Flux<Booking> findAllByCarrierBookingReferenceAndDocumentStatus(
-      String carrierBookingRequestReference, DocumentStatus documentStatus, Pageable pageable);
+  Flux<Booking> findAllByDocumentStatus(
+      DocumentStatus documentStatus, Pageable pageable);
   Flux<Booking> findAllByBookingIDAndDocumentStatus(UUID bookingID, DocumentStatus documentStatus, Pageable pageable);
 }
