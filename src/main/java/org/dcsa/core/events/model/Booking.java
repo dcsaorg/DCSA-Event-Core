@@ -2,10 +2,8 @@ package org.dcsa.core.events.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.*;
-import org.dcsa.core.model.AuditBase;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -125,12 +123,8 @@ public class Booking implements Persistable<UUID> {
   @Size(max = 3)
   protected String preCarriageModeOfTransportCode;
 
-  // Both eventCreatedDateTime and eventDateTime are considered metadata
-  // and are not part of the official IM model. They are added in the sql only.
-
-  @Column("created_date_time")
-  protected OffsetDateTime createdDateTime;
-
+  // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
+  // This is not part of the official IM model. They are added in the sql only.
   @Column("updated_date_time")
   protected OffsetDateTime updatedDateTime;
 
