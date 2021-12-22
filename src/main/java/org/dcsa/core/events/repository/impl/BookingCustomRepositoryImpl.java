@@ -36,40 +36,11 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
   }
 
   @Override
-  public Mono<Long> countAllByCarrierBookingReferenceAndDocumentStatus(
-    String carrierBookingRequestReference,DocumentStatus documentStatus){
+  public Mono<Long> countAllByDocumentStatus(DocumentStatus documentStatus) {
 
-    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
-    Criteria carrierBookingRequestReferenceCriteria =
-      getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference);
+    Criteria criteria = getCriteriaHasDocumentStatus(documentStatus);
 
-    Criteria criteria = Criteria.from(docStatusCriteria,carrierBookingRequestReferenceCriteria);
-
-    return r2dbcEntityTemplate
-      .select(Booking.class)
-      .matching(
-        query(criteria)
-      )
-      .count();
-  }
-
-  @Override
-  public Flux<Booking> findAllByBookingIDAndDocumentStatus(
-      UUID bookingID, DocumentStatus documentStatus, Pageable pageable) {
-
-    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
-    Criteria bookingIDCriteria = getCriteriaHasBookingID(bookingID);
-
-    Criteria criteria = Criteria.from(docStatusCriteria, bookingIDCriteria);
-
-    return r2dbcEntityTemplate
-        .select(Booking.class)
-        .matching(
-            query(criteria)
-                .sort(pageable.getSort())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset()))
-        .all();
+    return r2dbcEntityTemplate.select(Booking.class).matching(query(criteria)).count();
   }
 
   protected Criteria getCriteriaHasCarrierBookingRequestReference(
