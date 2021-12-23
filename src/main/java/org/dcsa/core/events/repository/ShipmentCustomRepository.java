@@ -22,6 +22,8 @@ public interface ShipmentCustomRepository {
 
 		private OffsetDateTime confirmationDateTime;
 
+		private OffsetDateTime updatedDateTime;
+
 		private String carrierBookingRequestReference;
 
 		private DocumentStatus documentStatus;

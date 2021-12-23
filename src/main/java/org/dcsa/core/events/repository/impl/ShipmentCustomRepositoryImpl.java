@@ -60,6 +60,7 @@ public class ShipmentCustomRepositoryImpl implements ShipmentCustomRepository {
         row.get("carrier_booking_reference").toString(),
         row.get("terms_and_conditions").toString(),
         OffsetDateTime.parse(row.get("confirmation_datetime").toString()),
+        OffsetDateTime.parse(row.get("updated_date_time").toString()),
         row.get("carrier_booking_request_reference").toString(),
         DocumentStatus.valueOf(row.get("document_status").toString())
       ))
@@ -98,6 +99,7 @@ public class ShipmentCustomRepositoryImpl implements ShipmentCustomRepository {
         "termsAndConditions", Column.create("terms_and_conditions", SHIPMENT_TABLE));
     selectedColumns.put(
         "confirmationDateTime", Column.create("confirmation_datetime", SHIPMENT_TABLE));
+    selectedColumns.put("updatedDateTime", Column.create("updated_date_time", SHIPMENT_TABLE));
     selectedColumns.put(
         "carrierBookingRequestReference",
         Column.create("carrier_booking_request_reference", BOOKING_TABLE));
