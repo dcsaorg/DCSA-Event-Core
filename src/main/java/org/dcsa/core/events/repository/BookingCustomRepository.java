@@ -4,12 +4,12 @@ import org.dcsa.core.events.model.Booking;
 import org.dcsa.core.events.model.enums.DocumentStatus;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
-
-import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface BookingCustomRepository {
 
   Flux<Booking> findAllByDocumentStatus(
       DocumentStatus documentStatus, Pageable pageable);
-  Flux<Booking> findAllByBookingIDAndDocumentStatus(UUID bookingID, DocumentStatus documentStatus, Pageable pageable);
+  Mono<Long> countAllByDocumentStatus(
+    DocumentStatus documentStatus);
 }

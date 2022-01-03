@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -35,22 +36,11 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
   }
 
   @Override
-  public Flux<Booking> findAllByBookingIDAndDocumentStatus(
-      UUID bookingID, DocumentStatus documentStatus, Pageable pageable) {
+  public Mono<Long> countAllByDocumentStatus(DocumentStatus documentStatus) {
 
-    Criteria docStatusCriteria = getCriteriaHasDocumentStatus(documentStatus);
-    Criteria bookingIDCriteria = getCriteriaHasBookingID(bookingID);
+    Criteria criteria = getCriteriaHasDocumentStatus(documentStatus);
 
-    Criteria criteria = Criteria.from(docStatusCriteria, bookingIDCriteria);
-
-    return r2dbcEntityTemplate
-        .select(Booking.class)
-        .matching(
-            query(criteria)
-                .sort(pageable.getSort())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset()))
-        .all();
+    return r2dbcEntityTemplate.select(Booking.class).matching(query(criteria)).count();
   }
 
   protected Criteria getCriteriaHasCarrierBookingRequestReference(

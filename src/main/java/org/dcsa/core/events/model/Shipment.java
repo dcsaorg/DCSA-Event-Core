@@ -2,6 +2,7 @@ package org.dcsa.core.events.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -12,6 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
 @Table("shipment")
 public class Shipment {
 
@@ -41,4 +43,10 @@ public class Shipment {
   @Column("confirmation_datetime")
   @NotNull(message = "ConfirmedDateTime is required.")
   private OffsetDateTime confirmationDateTime;
+
+  // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
+  // This is not part of the official IM model. They are added in the sql only.
+
+  @Column("updated_date_time")
+  protected OffsetDateTime updatedDateTime;
 }
