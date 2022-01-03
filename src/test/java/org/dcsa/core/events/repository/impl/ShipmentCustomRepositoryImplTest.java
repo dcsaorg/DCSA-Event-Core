@@ -38,7 +38,7 @@ public class ShipmentCustomRepositoryImplTest {
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
         "SELECT booking.carrier_booking_request_reference, shipment.confirmation_datetime, booking.id, booking.document_status, "
-            + "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions "
+            + "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions, shipment.updated_date_time "
             + "FROM shipment "
             + "JOIN booking ON shipment.booking_id = booking.id "
             + "WHERE booking.document_status = 'RECE' LIMIT 10 OFFSET 0";
@@ -57,7 +57,7 @@ public class ShipmentCustomRepositoryImplTest {
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
       "SELECT booking.carrier_booking_request_reference, shipment.confirmation_datetime, booking.id, booking.document_status, " +
-        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions " +
+        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions, shipment.updated_date_time " +
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE booking.document_status = 'PENU' " +
@@ -77,7 +77,7 @@ public class ShipmentCustomRepositoryImplTest {
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
       "SELECT booking.carrier_booking_request_reference, shipment.confirmation_datetime, booking.id, booking.document_status, " +
-        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions " +
+        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions, shipment.updated_date_time " +
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE booking.document_status = 'PENU' " +
@@ -97,7 +97,7 @@ public class ShipmentCustomRepositoryImplTest {
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
       "SELECT booking.carrier_booking_request_reference, shipment.confirmation_datetime, booking.id, booking.document_status, " +
-        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions " +
+        "shipment.id, shipment.booking_id, shipment.carrier_booking_reference, shipment.terms_and_conditions, shipment.updated_date_time " +
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE NULL IS NULL " +

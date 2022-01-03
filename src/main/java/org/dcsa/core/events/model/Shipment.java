@@ -43,4 +43,10 @@ public class Shipment {
   @Column("confirmation_datetime")
   @NotNull(message = "ConfirmedDateTime is required.")
   private OffsetDateTime confirmationDateTime;
+
+  // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
+  // This is not part of the official IM model. They are added in the sql only.
+
+  @Column("updated_date_time")
+  protected OffsetDateTime updatedDateTime;
 }
