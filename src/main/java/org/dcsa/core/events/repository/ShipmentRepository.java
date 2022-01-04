@@ -15,8 +15,6 @@ public interface ShipmentRepository
 
   Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
 
-  Mono<Shipment> findByCarrierBookingReferenceID(String carrierBookingReference);
-
   @Query(
       "SELECT COUNT(s.id) "
           + "FROM shipment s "
