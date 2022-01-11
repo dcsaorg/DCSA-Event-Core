@@ -31,8 +31,8 @@ jobs:
 
       - name: Set Dcsa-Core branch
         run: |
-        GITHUB_REF=${{ github.ref }}
-        echo "::set-output name=REF::${GITHUB_REF##*/}"
+          GITHUB_REF=${{ github.ref }}
+          echo "::set-output name=REF::${GITHUB_REF##*/}"
         id: dcsa-core-branch
 
       - name: Checkout dcsaorg/DCSA-Core
