@@ -27,7 +27,20 @@ jobs:
           repositories: '[{ "id": "github", "name": "DCSA Backend repo", "url": "https://maven.pkg.github.com/dcsaorg/DCSA-Core", "releases": { "enabled": "false" }, "snapshots": { "enabled": "true" } }]'
           servers: '[{ "id": "github", "username": "${{ secrets.DCSA_USER }}", "password": "${{ secrets.DCSA_PACKAGES_PAT }}" }]'
 
+      - name: Checkout dcsaorg/DCSA-Core
+        uses: actions/checkout@v2.3.1
+        with:
+          repository: dcsaorg/DCSA-Core
+          ref: ${GITHUB_REF##*/}
+          path: DCSA-Core
+          token: ${{ secrets.REPO_ACCESS_PAT }}
+
+      - name: Set dcsa-core mvn version variable
+        run: cd DCSA-Core && echo "DCSA_CORE_PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)- " >> $GITHUB_ENV
+
+      - run: echo $DCSA_CORE_PROJECT_VERSION
+
       - name: Publish package
         run: |
           GITHUB_REF=${{ github.ref }}
-          mvn -B deploy -Dsha1=-${GITHUB_REF##*/} -Dchangelist=-SNAPSHOT
+          mvn -B deploy -Dsha1=-${GITHUB_REF##*/} -Dchangelist=-SNAPSHOT -Ddcsa.version=$DCSA_CORE_PROJECT_VERSION -Ddcsa.core.tag=${GITHUB_REF##*/} -Ddcsa.artifacttype=-SNAPSHOT
