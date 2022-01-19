@@ -1,13 +1,22 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Booking;
-import org.dcsa.core.repository.ExtendedRepository;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Pageable;
+import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Repository
-public interface BookingRepository extends ExtendedRepository<Booking, String> {
+public interface BookingRepository
+    extends ReactiveSortingRepository<Booking, UUID>, BookingCustomRepository {
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -32,4 +41,26 @@ public interface BookingRepository extends ExtendedRepository<Booking, String> {
           + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
   Flux<String> findCarrierBookingRefsByTransportCallID(String transportCallID);
+
+  Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
+
+  Flux<Booking> findAllOrderByBookingRequestDateTime(Example example, Pageable pageable);
+
+  @Modifying
+  @Query("UPDATE booking SET vessel_id = :vesselId where id = :id")
+  Mono<Boolean> setVesselIDFor(UUID vesselId, UUID id);
+
+  @Modifying
+  @Query("UPDATE booking SET invoice_payable_at = :invoicePayableAt where id = :id")
+  Mono<Boolean> setInvoicePayableAtFor(String invoicePayableAt, UUID id);
+
+  @Modifying
+  @Query("UPDATE booking SET place_of_issue = :placeOfIssue where id = :id")
+  Mono<Boolean> setPlaceOfIssueIDFor(String placeOfIssue, UUID id);
+
+  @Modifying
+  @Query(
+      "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime where carrier_booking_request_reference = :carrierBookingRequestReference")
+  Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
+          DocumentStatus documentStatus, String carrierBookingRequestReference, OffsetDateTime updatedDateTime);
 }

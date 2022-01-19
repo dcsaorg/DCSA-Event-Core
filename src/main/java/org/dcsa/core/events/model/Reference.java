@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
-@Table("\"references\"")
+@Table("reference")
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -25,6 +25,7 @@ public class Reference extends AuditBase implements GetId<UUID> {
   @JsonIgnore
   private UUID referenceID;
 
+  @Column("reference_type_code")
   private ReferenceTypeCode referenceType;
 
   @Size(max = 100)
@@ -37,6 +38,13 @@ public class Reference extends AuditBase implements GetId<UUID> {
   @Column("shipment_id")
   @JsonIgnore
   private String shipmentID;
+
+  @Column("booking_id")
+  @JsonIgnore
+  private UUID bookingID;
+
+  @Column("cargo_item_id")
+  private UUID cargoItemID;
 
   @JsonIgnore
   public UUID getId() {
