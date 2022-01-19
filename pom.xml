@@ -17,10 +17,10 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<dcsa.version>0.8.25</dcsa.version>
+		<dcsa.version>0.8.26</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
-		<revision>0.0.51</revision>
+		<revision>0.0.52</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
 	</properties>
