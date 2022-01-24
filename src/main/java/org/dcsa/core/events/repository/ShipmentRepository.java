@@ -1,7 +1,7 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Shipment;
-import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,5 +20,5 @@ public interface ShipmentRepository
           + "FROM shipment s "
           + "JOIN booking b ON s.booking_id = b.id "
           + "WHERE (:documentStatus is null OR b.document_status = :documentStatus)")
-  Mono<Long> countShipmentsByDocumentStatus(DocumentStatus documentStatus);
+  Mono<Long> countShipmentsByDocumentStatus(ShipmentEventTypeCode documentStatus);
 }
