@@ -12,11 +12,12 @@ public enum ShipmentEventTypeCode {
 
     PENU("Pending Update"),
     REJE("Rejected"),
-    APPR(null),
-    ISSU(null),
-    SURR(null),
-    SUBM(null),
-    VOID(null),
+    APPR("Approved"),
+    ISSU("Issued"),
+    SURR("Surrenered"),
+    SUBM("Submitted"),
+    VOID("Void"),
+
     CONF("Confirmed"),
     PENC("Pending Confirmation"),
     CANC("Cancelled"),
