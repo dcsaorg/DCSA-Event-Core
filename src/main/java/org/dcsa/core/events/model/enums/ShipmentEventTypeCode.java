@@ -7,8 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ShipmentEventTypeCode {
     RECE("Received"),
-    DRFT(null),
-    PENA(null),
+    DRFT("Draft"),
+    PENA("Pending Approval"),
+
     PENU("Pending Update"),
     REJE("Rejected"),
     APPR(null),
