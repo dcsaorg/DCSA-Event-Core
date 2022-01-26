@@ -21,10 +21,11 @@ public enum ShipmentEventTypeCode {
     CONF("Confirmed"),
     PENC("Pending Confirmation"),
     CANC("Cancelled"),
-    CMPL(null),
-    RELS(null),
-    REQS(null),
-    HOLD(null);
+    CMPL("Completed"),
+    RELS("Released"),
+    REQS("Requested"),
+    HOLD("On hold");
+
 
     /**
      * The values allowed when used as a DocumentStatus
