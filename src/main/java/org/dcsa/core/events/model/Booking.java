@@ -91,6 +91,12 @@ public class Booking implements Persistable<UUID> {
   @Column("expected_departure_date")
   private LocalDate expectedDepartureDate;
 
+  @Column("expected_arrival_date_start")
+  private LocalDate expectedArrivalDateStart;
+
+  @Column("expected_arrival_date_end")
+  private LocalDate expectedArrivalDateEnd;
+
   @Column("transport_document_type_code")
   private TransportDocumentTypeCode transportDocumentTypeCode;
 
