@@ -1,7 +1,7 @@
 package org.dcsa.core.events.repository.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.repository.ShipmentCustomRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,7 @@ public class ShipmentCustomRepositoryImpl implements ShipmentCustomRepository {
 
   @Override
   public Flux<ShipmentSummary> findShipmentsAndBookingsByDocumentStatus(
-      DocumentStatus documentStatus, Pageable pageable) {
+      ShipmentEventTypeCode documentStatus, Pageable pageable) {
 
     //Creates the following query programatically, since order by is not supported in @Query
     //    select s.id, s.booking_id, s.carrier_id, s.carrier_booking_reference,
@@ -62,13 +62,13 @@ public class ShipmentCustomRepositoryImpl implements ShipmentCustomRepository {
         OffsetDateTime.parse(row.get("confirmation_datetime").toString()),
         OffsetDateTime.parse(row.get("updated_date_time").toString()),
         row.get("carrier_booking_request_reference").toString(),
-        DocumentStatus.valueOf(row.get("document_status").toString())
+        ShipmentEventTypeCode.valueOf(row.get("document_status").toString())
       ))
       .all();
 
   }
 
-  private Condition getDocumentStatusCondition(DocumentStatus documentStatus) {
+  private Condition getDocumentStatusCondition(ShipmentEventTypeCode documentStatus) {
     Condition condition;
     if (documentStatus == null) {
       condition = Conditions.isNull(SQL.nullLiteral());
