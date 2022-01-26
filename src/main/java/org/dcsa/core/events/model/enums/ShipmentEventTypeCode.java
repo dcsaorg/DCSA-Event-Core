@@ -14,7 +14,7 @@ public enum ShipmentEventTypeCode {
     REJE("Rejected"),
     APPR("Approved"),
     ISSU("Issued"),
-    SURR("Surrenered"),
+    SURR("Surrendered"),
     SUBM("Submitted"),
     VOID("Void"),
 
@@ -30,6 +30,6 @@ public enum ShipmentEventTypeCode {
     /**
      * The values allowed when used as a DocumentStatus
      */
-    public static final String DOCUMENT_STATUSES = "RECE,PENU,REJE,CONF,PENC,CANC";
+    public static final String BOOKING_DOCUMENT_STATUSES = "RECE,PENU,REJE,CONF,PENC,CANC";
     private final String value;
 }

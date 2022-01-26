@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.DOCUMENT_STATUSES;
+import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.BOOKING_DOCUMENT_STATUSES;
 
 @Table("booking")
 @NoArgsConstructor
@@ -29,7 +29,7 @@ public class Booking implements Persistable<UUID> {
   private String carrierBookingRequestReference;
 
   @Column("document_status")
-  @EnumSubset(anyOf = DOCUMENT_STATUSES)
+  @EnumSubset(anyOf = BOOKING_DOCUMENT_STATUSES)
   private ShipmentEventTypeCode documentStatus;
 
   @Column("receipt_type_at_origin")
