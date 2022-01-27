@@ -1,6 +1,7 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
+import org.dcsa.core.events.model.transferobjects.PartyContactDetailsTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -27,4 +28,13 @@ public class PartyContactDetails {
   @Size(max = 30)
   @Column("phone")
   private String phone;
+
+  public PartyContactDetailsTO toPartyTO() {
+    PartyContactDetailsTO partyContactDetailsTO = new PartyContactDetailsTO();
+    partyContactDetailsTO.setEmail(this.getEmail());
+    partyContactDetailsTO.setPhone(this.getPhone());
+    partyContactDetailsTO.setName(this.getName());
+
+    return partyContactDetailsTO;
+  }
 }

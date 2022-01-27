@@ -8,6 +8,8 @@ import reactor.core.publisher.Mono;
 
 public interface PartyService extends ExtendedBaseService<Party, String> {
     Flux<Party> findAllById(Iterable<String> ids);
+
+    @Deprecated
     Mono<PartyTO> ensureResolvable(PartyTO partyTO);
     Mono<PartyTO> findTOById(String publisherID);
 }
