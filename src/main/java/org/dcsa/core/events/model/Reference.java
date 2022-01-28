@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.ReferenceTypeCode;
+import org.dcsa.core.events.model.transferobjects.ReferenceTO;
 import org.dcsa.core.model.AuditBase;
 import org.dcsa.core.model.GetId;
 import org.springframework.data.annotation.Id;
@@ -50,4 +51,11 @@ public class Reference extends AuditBase implements GetId<UUID> {
   public UUID getId() {
     return getReferenceID();
   }
+
+	public ReferenceTO toReferenceTO() {
+    ReferenceTO referenceTO = new ReferenceTO();
+    referenceTO.setReferenceType(this.getReferenceType());
+    referenceTO.setReferenceValue(this.referenceValue);
+    return referenceTO;
+	}
 }
