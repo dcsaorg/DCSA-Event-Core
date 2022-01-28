@@ -41,7 +41,7 @@ public class ReferenceServiceImpl
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(
+  public Mono<Optional<List<ReferenceTO>>> createReferencesAndTOs(
       UUID bookingID, String shippingInstructionID, List<ReferenceTO> references) {
 
     if (Objects.isNull(references) || references.isEmpty()) {

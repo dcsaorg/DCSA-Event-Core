@@ -18,5 +18,5 @@ public interface ReferenceService extends ExtendedBaseService<Reference, UUID> {
 
   Flux<Reference> findByTransportDocumentReference(String transportDocumentReference);
 
-  Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(UUID bookingID, String shippingInstructionID, List<ReferenceTO> references);
+  Mono<Optional<List<ReferenceTO>>> createReferencesAndTOs(UUID bookingID, String shippingInstructionID, List<ReferenceTO> references);
 }
