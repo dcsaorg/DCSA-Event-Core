@@ -5,6 +5,7 @@ import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.transferobjects.ReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.service.ReferenceService;
+import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -41,7 +42,21 @@ public class ReferenceServiceImpl
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> createReferencesAndTOs(
+  public Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(
+      UUID bookingID, List<ReferenceTO> references) {
+    if (bookingID == null) return Mono.error(new CreateException("BookingID cannot be null"));
+    return createReferencesAndTOs(bookingID, null, references);
+  }
+
+  @Override
+  public Mono<Optional<List<ReferenceTO>>> createReferencesByShippingInstructionIDAndTOs(
+      String shippingInstructionID, List<ReferenceTO> references) {
+    if (shippingInstructionID == null)
+      return Mono.error(new CreateException("ShippingInstructionID cannot be null"));
+    return createReferencesAndTOs(null, shippingInstructionID, references);
+  }
+
+  private Mono<Optional<List<ReferenceTO>>> createReferencesAndTOs(
       UUID bookingID, String shippingInstructionID, List<ReferenceTO> references) {
 
     if (Objects.isNull(references) || references.isEmpty()) {
@@ -75,5 +90,21 @@ public class ReferenceServiceImpl
             })
         .collectList()
         .map(Optional::of);
+  }
+
+  public Mono<Optional<List<ReferenceTO>>> resolveReferencesForShippingInstructionID(
+      List<ReferenceTO> references, String shippingInstructionID) {
+
+    return referenceRepository
+        .deleteByShippingInstructionID(shippingInstructionID)
+        .then(createReferencesAndTOs(null, shippingInstructionID, references));
+  }
+
+  public Mono<Optional<List<ReferenceTO>>> resolveReferencesForBookingID(
+      List<ReferenceTO> references, UUID bookingID) {
+
+    return referenceRepository
+        .deleteByBookingID(bookingID)
+        .then(createReferencesAndTOs(bookingID, null, references));
   }
 }
