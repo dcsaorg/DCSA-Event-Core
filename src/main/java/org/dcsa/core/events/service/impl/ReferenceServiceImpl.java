@@ -92,6 +92,7 @@ public class ReferenceServiceImpl
         .map(Optional::of);
   }
 
+  @Override
   public Mono<Optional<List<ReferenceTO>>> resolveReferencesForShippingInstructionID(
       List<ReferenceTO> references, String shippingInstructionID) {
 
@@ -100,6 +101,7 @@ public class ReferenceServiceImpl
         .then(createReferencesAndTOs(null, shippingInstructionID, references));
   }
 
+  @Override
   public Mono<Optional<List<ReferenceTO>>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID) {
 
