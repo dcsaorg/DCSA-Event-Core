@@ -116,7 +116,7 @@ public class ReferenceServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test create reference with shippingInstructionID")
+  @DisplayName("Test create reference without shippingInstructionID")
   void testWithoutShippingInstructionID() {
     StepVerifier.create(
             referenceService.createReferencesByShippingInstructionIDAndTOs(null, Collections.singletonList(referenceTO)))
