@@ -1,9 +1,13 @@
 package org.dcsa.core.events.service;
 
 import org.dcsa.core.events.model.Reference;
+import org.dcsa.core.events.model.transferobjects.ReferenceTO;
 import org.dcsa.core.service.ExtendedBaseService;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ReferenceService extends ExtendedBaseService<Reference, UUID> {
@@ -13,4 +17,16 @@ public interface ReferenceService extends ExtendedBaseService<Reference, UUID> {
   Flux<Reference> findByShipmentID(UUID shipmentID);
 
   Flux<Reference> findByTransportDocumentReference(String transportDocumentReference);
+
+  Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(
+      UUID bookingID, List<ReferenceTO> references);
+
+  Mono<Optional<List<ReferenceTO>>> createReferencesByShippingInstructionIDAndTOs(
+      String shippingInstructionID, List<ReferenceTO> references);
+
+  Mono<Optional<List<ReferenceTO>>> resolveReferencesForShippingInstructionID(
+      List<ReferenceTO> references, String shippingInstructionID);
+
+  Mono<Optional<List<ReferenceTO>>> resolveReferencesForBookingID(
+      List<ReferenceTO> references, UUID bookingID);
 }
