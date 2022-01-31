@@ -42,8 +42,7 @@ public class ReferenceServiceImpl
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(
-      UUID bookingID, List<ReferenceTO> references) {
+  public Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(UUID bookingID, List<ReferenceTO> references) {
     if (bookingID == null) return Mono.error(new CreateException("BookingID cannot be null"));
     return createReferencesAndTOs(bookingID, null, references);
   }
