@@ -36,8 +36,7 @@ public class LocationServiceImplTest {
   @Mock AddressRepository addressRepository;
   @Mock FacilityRepository facilityRepository;
 
-  @Mock
-    AddressService addressService;
+  @Mock AddressService addressService;
 
   @InjectMocks LocationServiceImpl locationService;
 
@@ -101,7 +100,7 @@ public class LocationServiceImplTest {
             l -> {
               assertTrue(l.isPresent());
 
-              verify(addressService,times(0)).ensureResolvable(any());
+              verify(addressService, times(0)).ensureResolvable(any());
 
               assertEquals(facility.getFacilityID(), l.get().getFacilityID());
               assertEquals(address.getId(), l.get().getAddressID());
@@ -175,18 +174,6 @@ public class LocationServiceImplTest {
 
               assertNull(l.get().getFacility());
               assertNull(l.get().getAddress());
-            })
-        .verifyComplete();
-  }
-
-  @Test
-  @DisplayName("Test fetch optional locationTO by ID without facility and address")
-  void testFetchLocationWithNullID() {
-
-    StepVerifier.create(locationService.fetchLocationByID(null))
-        .assertNext(
-            l -> {
-              assertFalse(l.isPresent());
             })
         .verifyComplete();
   }

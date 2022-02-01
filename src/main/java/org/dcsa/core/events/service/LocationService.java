@@ -10,15 +10,19 @@ import java.util.function.Function;
 
 public interface LocationService extends ExtendedBaseService<Location, String> {
 
-    Mono<LocationTO> ensureResolvable(LocationTO locationTO);
+  Mono<LocationTO> ensureResolvable(LocationTO locationTO);
 
-    Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
+  Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
 
-    Mono<LocationTO> findTOById(String locationID);
+  Mono<LocationTO> findTOById(String locationID);
 
-    Mono<Optional<LocationTO>> fetchLocationByID(String id);
+  Mono<Optional<LocationTO>> fetchLocationByID(String id);
 
-    Mono<Optional<LocationTO>> createLocationByTO(LocationTO locationTO, Function<String, Mono<Boolean>> updateBookingCallback);
+  Mono<Optional<LocationTO>> createLocationByTO(
+      LocationTO locationTO, Function<String, Mono<Boolean>> updateBookingCallback);
 
-    Mono<Optional<LocationTO>> resolveLocationByTO(String currentLocationIDInBooking, LocationTO locationTO, Function<String, Mono<Boolean>> updateBookingCallback);
+  Mono<Optional<LocationTO>> resolveLocationByTO(
+      String currentLocationIDInBooking,
+      LocationTO locationTO,
+      Function<String, Mono<Boolean>> updateBookingCallback);
 }
