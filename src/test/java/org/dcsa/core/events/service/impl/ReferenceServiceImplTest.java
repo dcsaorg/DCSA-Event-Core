@@ -65,23 +65,20 @@ class ReferenceServiceImplTest {
     UUID bookingID = UUID.randomUUID();
     reference.setBookingID(bookingID);
 
-    when(referenceRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(reference));
+    when(referenceRepository.saveAll(any(Iterable.class))).thenReturn(Flux.just(reference));
 
-    ArgumentCaptor<Flux<Reference>> argumentCaptor = ArgumentCaptor.forClass(Flux.class);
+    ArgumentCaptor<Iterable<Reference>> argumentCaptor = ArgumentCaptor.forClass(Iterable.class);
 
     StepVerifier.create(
             referenceService.createReferencesByBookingIDAndTOs(
                 bookingID, Collections.singletonList(referenceTO)))
         .assertNext(
             referenceTOS -> {
-              verify(referenceRepository).saveAll(any(Flux.class));
-              assertTrue(referenceTOS.isPresent());
-              assertNotNull(referenceTOS.get().get(0).getReferenceValue());
-              assertNotNull(referenceTOS.get().get(0).getReferenceValue());
+              assertNotNull(referenceTOS.get(0).getReferenceValue());
+              assertNotNull(referenceTOS.get(0).getReferenceValue());
               verify(referenceRepository).saveAll(argumentCaptor.capture());
-
               Reference capturedArgument =
-                  Objects.requireNonNull(argumentCaptor.getValue().blockFirst());
+                  Objects.requireNonNull(argumentCaptor.getValue().iterator().next());
               assertEquals(bookingID, capturedArgument.getBookingID());
               assertNull(capturedArgument.getShippingInstructionID());
             })
@@ -95,23 +92,20 @@ class ReferenceServiceImplTest {
     String shippingInstructionID = UUID.randomUUID().toString();
     reference.setShippingInstructionID(shippingInstructionID);
 
-    when(referenceRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(reference));
+    when(referenceRepository.saveAll(any(Iterable.class))).thenReturn(Flux.just(reference));
 
-    ArgumentCaptor<Flux<Reference>> argumentCaptor = ArgumentCaptor.forClass(Flux.class);
+    ArgumentCaptor<Iterable<Reference>> argumentCaptor = ArgumentCaptor.forClass(Iterable.class);
 
     StepVerifier.create(
             referenceService.createReferencesByShippingInstructionIDAndTOs(
                 shippingInstructionID, Collections.singletonList(referenceTO)))
         .assertNext(
             referenceTOS -> {
-              verify(referenceRepository).saveAll(any(Flux.class));
-              assertTrue(referenceTOS.isPresent());
-              assertNotNull(referenceTOS.get().get(0).getReferenceValue());
-              assertNotNull(referenceTOS.get().get(0).getReferenceValue());
+              assertNotNull(referenceTOS.get(0).getReferenceValue());
+              assertNotNull(referenceTOS.get(0).getReferenceValue());
               verify(referenceRepository).saveAll(argumentCaptor.capture());
-
               Reference capturedArgument =
-                  Objects.requireNonNull(argumentCaptor.getValue().blockFirst());
+                  Objects.requireNonNull(argumentCaptor.getValue().iterator().next());
               assertEquals(shippingInstructionID, capturedArgument.getShippingInstructionID());
               assertNull(capturedArgument.getBookingID());
             })
@@ -159,9 +153,8 @@ class ReferenceServiceImplTest {
         .assertNext(
             rs -> {
               verify(referenceRepository).findByBookingID(bookingID);
-              assertTrue(rs.isPresent());
-              assertEquals(ReferenceTypeCode.FF, rs.get().get(0).getReferenceType());
-              assertEquals("test", rs.get().get(0).getReferenceValue());
+              assertEquals(ReferenceTypeCode.FF, rs.get(0).getReferenceType());
+              assertEquals("test", rs.get(0).getReferenceValue());
             })
         .verifyComplete();
   }
@@ -179,9 +172,8 @@ class ReferenceServiceImplTest {
         .assertNext(
             rs -> {
               verify(referenceRepository).findByShippingInstructionID(shippingInstructionID);
-              assertTrue(rs.isPresent());
-              assertEquals(ReferenceTypeCode.FF, rs.get().get(0).getReferenceType());
-              assertEquals("test", rs.get().get(0).getReferenceValue());
+              assertEquals(ReferenceTypeCode.FF, rs.get(0).getReferenceType());
+              assertEquals("test", rs.get(0).getReferenceValue());
             })
         .verifyComplete();
   }
