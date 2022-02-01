@@ -144,13 +144,10 @@ public class DocumentPartyServiceImplTest {
     documentParty.setBookingID(bookingID);
 
     when(partyRepository.save(any())).thenReturn(Mono.just(party));
-    when(partyContactDetailsRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(partyContactDetails));
-    when(partyIdentifyingCodeRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(partyIdentifyingCode));
+    when(partyContactDetailsRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(partyContactDetails));
+    when(partyIdentifyingCodeRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(partyIdentifyingCode));
     when(documentPartyRepository.save(any())).thenReturn(Mono.just(documentParty));
-    when(displayedAddressRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(displayedAddress));
+    when(displayedAddressRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(displayedAddress));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
