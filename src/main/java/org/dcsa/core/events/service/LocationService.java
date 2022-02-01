@@ -16,13 +16,13 @@ public interface LocationService extends ExtendedBaseService<Location, String> {
 
   Mono<LocationTO> findTOById(String locationID);
 
-  Mono<Optional<LocationTO>> fetchLocationByID(String id);
+  Mono<LocationTO> fetchLocationByID(String id);
 
-  Mono<Optional<LocationTO>> createLocationByTO(
-      LocationTO locationTO, Function<String, Mono<Boolean>> updateBookingCallback);
+  Mono<LocationTO> createLocationByTO(
+      LocationTO locationTO, Function<String, Mono<Boolean>> updateEDocumentationCallback);
 
-  Mono<Optional<LocationTO>> resolveLocationByTO(
-      String currentLocationIDInBooking,
+  Mono<LocationTO> resolveLocationByTO(
+      String currentLocationIDInEDocumentation,
       LocationTO locationTO,
-      Function<String, Mono<Boolean>> updateBookingCallback);
+      Function<String, Mono<Boolean>> updateEDocumentationCallback);
 }

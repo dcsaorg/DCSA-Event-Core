@@ -51,9 +51,7 @@ public class LocationServiceImplTest {
 
   @BeforeEach
   void init() {
-
     initEntities();
-
     initTO();
   }
 
@@ -98,12 +96,10 @@ public class LocationServiceImplTest {
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothing))
         .assertNext(
             l -> {
-              assertTrue(l.isPresent());
-
               verify(addressService, times(0)).ensureResolvable(any());
 
-              assertEquals(facility.getFacilityID(), l.get().getFacilityID());
-              assertEquals(address.getId(), l.get().getAddressID());
+              assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(address.getId(), l.getAddressID());
             })
         .verifyComplete();
   }
@@ -118,10 +114,8 @@ public class LocationServiceImplTest {
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothing))
         .assertNext(
             l -> {
-              assertTrue(l.isPresent());
-
-              assertEquals(facility.getFacilityID(), l.get().getFacilityID());
-              assertEquals(address.getId(), l.get().getAddressID());
+              assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(address.getId(), l.getAddressID());
             })
         .verifyComplete();
   }
@@ -140,15 +134,13 @@ public class LocationServiceImplTest {
     StepVerifier.create(locationService.fetchLocationByID(location.getId()))
         .assertNext(
             l -> {
-              assertTrue(l.isPresent());
-
               verify(addressRepository).findByIdOrEmpty(any());
               verify(facilityRepository).findByIdOrEmpty(any());
 
-              assertEquals(facility.getFacilityID(), l.get().getFacilityID());
-              assertEquals(address.getId(), l.get().getAddressID());
-              assertNotNull(l.get().getAddress());
-              assertNotNull(l.get().getFacility());
+              assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(address.getId(), l.getAddressID());
+              assertNotNull(l.getAddress());
+              assertNotNull(l.getFacility());
             })
         .verifyComplete();
   }
@@ -167,13 +159,11 @@ public class LocationServiceImplTest {
     StepVerifier.create(locationService.fetchLocationByID(location.getId()))
         .assertNext(
             l -> {
-              assertTrue(l.isPresent());
+              assertNull(l.getFacilityID());
+              assertNull(l.getAddressID());
 
-              assertNull(l.get().getFacilityID());
-              assertNull(l.get().getAddressID());
-
-              assertNull(l.get().getFacility());
-              assertNull(l.get().getAddress());
+              assertNull(l.getFacility());
+              assertNull(l.getAddress());
             })
         .verifyComplete();
   }

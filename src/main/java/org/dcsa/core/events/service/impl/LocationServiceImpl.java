@@ -88,21 +88,20 @@ public class LocationServiceImpl
   }
 
   @Override
-  public Mono<Optional<LocationTO>> fetchLocationByID(String id) {
-    if (id == null) return Mono.just(Optional.empty());
+  public Mono<LocationTO> fetchLocationByID(String id) {
+    if (id == null) return Mono.empty();
     return locationRepository
         .findById(id)
         .flatMap(this::getLocationTO)
-        .onErrorReturn(new LocationTO())
-        .map(Optional::of);
+        .onErrorReturn(new LocationTO());
   }
 
   @Override
-  public Mono<Optional<LocationTO>> createLocationByTO(
-      LocationTO locationTO, Function<String, Mono<Boolean>> updateeDocumentation) {
+  public Mono<LocationTO> createLocationByTO(
+      LocationTO locationTO, Function<String, Mono<Boolean>> updateEDocumentation) {
 
     if (Objects.isNull(locationTO)) {
-      return Mono.just(Optional.empty());
+      return Mono.empty();
     }
 
     Location location = locationMapper.dtoToLocation(locationTO);
@@ -110,9 +109,8 @@ public class LocationServiceImpl
     if (Objects.isNull(locationTO.getAddress())) {
       return locationRepository
           .save(location)
-          .flatMap(l -> updateeDocumentation.apply(l.getId()).thenReturn(l))
-          .map(locationMapper::locationToDTO)
-          .map(Optional::of);
+          .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
+          .map(locationMapper::locationToDTO);
     } else {
       return addressService
           .ensureResolvable(locationTO.getAddress())
@@ -121,38 +119,34 @@ public class LocationServiceImpl
                 location.setAddressID(a.getId());
                 return locationRepository
                     .save(location)
-                    .flatMap(l -> updateeDocumentation.apply(l.getId()).thenReturn(l))
+                    .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
                     .map(
                         l -> {
                           LocationTO lTO = locationMapper.locationToDTO(l);
                           lTO.setAddress(a);
                           return lTO;
-                        })
-                    .map(Optional::of);
+                        });
               });
     }
   }
 
   @Override
-  public Mono<Optional<LocationTO>> resolveLocationByTO(
-      String currentLocationIDIneDocumentation,
+  public Mono<LocationTO> resolveLocationByTO(
+      String currentLocationIDInEDocumentation,
       LocationTO locationTO,
-      Function<String, Mono<Boolean>> updateeDocumentationCallback) {
+      Function<String, Mono<Boolean>> updateEDocumentationCallback) {
 
     // locationTO is the location received from the update eDocumentation request
     if (Objects.isNull(locationTO)) {
-      if (StringUtils.isEmpty(currentLocationIDIneDocumentation)) {
+      if (StringUtils.isEmpty(currentLocationIDInEDocumentation)) {
         // it's possible that there may be no location linked to eDocumentation
-        return Mono.just(Optional.empty());
+        return Mono.empty();
       } else {
-        return locationRepository
-            .deleteById(currentLocationIDIneDocumentation)
-            .then(Mono.just(Optional.empty()));
+        return locationRepository.deleteById(currentLocationIDInEDocumentation).then(Mono.empty());
       }
     } else {
       return this.ensureResolvable(locationTO)
-          .flatMap(lTO -> updateeDocumentationCallback.apply(lTO.getId()).thenReturn(lTO))
-          .map(Optional::of);
+          .flatMap(lTO -> updateEDocumentationCallback.apply(lTO.getId()).thenReturn(lTO));
     }
   }
 
