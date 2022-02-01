@@ -47,7 +47,7 @@ public class LocationServiceImplTest {
   Address address;
   Facility facility;
 
-  private final Mono<Boolean> doNothing = Mono.just(true);
+  private final Mono<Boolean> doNothingCallback = Mono.just(true);
 
   @BeforeEach
   void init() {
@@ -93,7 +93,7 @@ public class LocationServiceImplTest {
 
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
 
-    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothing))
+    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
         .assertNext(
             l -> {
               verify(addressService, times(0)).ensureResolvable(any());
@@ -111,7 +111,7 @@ public class LocationServiceImplTest {
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
-    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothing))
+    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
         .assertNext(
             l -> {
               assertEquals(facility.getFacilityID(), l.getFacilityID());
