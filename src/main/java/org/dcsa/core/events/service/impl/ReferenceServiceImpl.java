@@ -7,105 +7,114 @@ import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.util.MappingUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
 public class ReferenceServiceImpl
     extends ExtendedBaseServiceImpl<ReferenceRepository, Reference, UUID>
     implements ReferenceService {
+
+  enum ImplementationType {
+    BOOKING,
+    SHIPPING_INSTRUCTION
+  }
+
   private final ReferenceRepository referenceRepository;
 
   @Override
   public ReferenceRepository getRepository() {
-    return referenceRepository;
+    return this.referenceRepository;
   }
 
   @Override
-  public Flux<Reference> findByShippingInstructionID(String shippingInstructionID) {
-    return referenceRepository.findByShippingInstructionID(shippingInstructionID);
-  }
-
-  @Override
-  public Flux<Reference> findByShipmentID(UUID shipmentID) {
-    return referenceRepository.findByShipmentID(shipmentID);
-  }
-
-  @Override
-  public Flux<Reference> findByTransportDocumentReference(String transportDocumentReference) {
-    return referenceRepository.findByTransportDocumentReference(transportDocumentReference);
-  }
-
-  @Override
-  public Mono<Optional<List<ReferenceTO>>> createReferencesByBookingIDAndTOs(UUID bookingID, List<ReferenceTO> references) {
+  public Mono<List<ReferenceTO>> createReferencesByBookingIDAndTOs(
+      UUID bookingID, List<ReferenceTO> references) {
     if (bookingID == null) return Mono.error(new CreateException("BookingID cannot be null"));
-    return createReferencesAndTOs(bookingID, null, references);
+    return this.createReferencesByIDAndRefTOs(bookingID, references, ImplementationType.BOOKING);
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> createReferencesByShippingInstructionIDAndTOs(
+  public Mono<List<ReferenceTO>> createReferencesByShippingInstructionIDAndTOs(
       String shippingInstructionID, List<ReferenceTO> references) {
     if (shippingInstructionID == null)
       return Mono.error(new CreateException("ShippingInstructionID cannot be null"));
-    return createReferencesAndTOs(null, shippingInstructionID, references);
-  }
-
-  private Mono<Optional<List<ReferenceTO>>> createReferencesAndTOs(
-      UUID bookingID, String shippingInstructionID, List<ReferenceTO> references) {
-
-    if (Objects.isNull(references) || references.isEmpty()) {
-      return Mono.just(Optional.of(Collections.emptyList()));
-    }
-
-    Stream<Reference> referenceStream =
-        references.stream()
-            .map(
-                r -> {
-                  Reference reference = new Reference();
-                  if (bookingID != null) {
-                    reference.setBookingID(bookingID);
-                  }
-                  if (shippingInstructionID != null) {
-                    reference.setShippingInstructionID(shippingInstructionID);
-                  }
-                  reference.setReferenceType(r.getReferenceType());
-                  reference.setReferenceValue(r.getReferenceValue());
-                  return reference;
-                });
-
-    return referenceRepository
-        .saveAll(Flux.fromStream(referenceStream))
-        .map(
-            r -> {
-              ReferenceTO referenceTO = new ReferenceTO();
-              referenceTO.setReferenceType(r.getReferenceType());
-              referenceTO.setReferenceValue(r.getReferenceValue());
-              return referenceTO;
-            })
-        .collectList()
-        .map(Optional::of);
+    return this.createReferencesByIDAndRefTOs(
+        shippingInstructionID, references, ImplementationType.SHIPPING_INSTRUCTION);
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> resolveReferencesForShippingInstructionID(
+  public Mono<List<ReferenceTO>> findByBookingID(UUID bookingID) {
+    return referenceRepository.findByBookingID(bookingID).map(transformRefToRefTO).collectList();
+  }
+
+  @Override
+  public Mono<List<ReferenceTO>> findByShippingInstructionID(String shippingInstructionID) {
+    return referenceRepository
+        .findByShippingInstructionID(shippingInstructionID)
+        .map(transformRefToRefTO)
+        .collectList();
+  }
+
+  @Override
+  public Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionID(
       List<ReferenceTO> references, String shippingInstructionID) {
 
     return referenceRepository
         .deleteByShippingInstructionID(shippingInstructionID)
-        .then(createReferencesAndTOs(null, shippingInstructionID, references));
+        .then(
+            createReferencesByIDAndRefTOs(
+                shippingInstructionID, references, ImplementationType.SHIPPING_INSTRUCTION));
   }
 
   @Override
-  public Mono<Optional<List<ReferenceTO>>> resolveReferencesForBookingID(
+  public Mono<List<ReferenceTO>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID) {
 
     return referenceRepository
         .deleteByBookingID(bookingID)
-        .then(createReferencesAndTOs(bookingID, null, references));
+        .then(createReferencesByIDAndRefTOs(bookingID, references, ImplementationType.BOOKING));
   }
+
+  private Mono<List<ReferenceTO>> createReferencesByIDAndRefTOs(
+      Object id, List<ReferenceTO> references, ImplementationType impType) {
+
+    if (Objects.isNull(references) || references.isEmpty()) {
+      return Mono.empty();
+    }
+
+    return Flux.fromIterable(references)
+        .map(
+            r -> {
+              Reference reference = new Reference();
+              if (impType == ImplementationType.BOOKING) {
+                reference.setBookingID((UUID) id);
+              } else if (impType == ImplementationType.SHIPPING_INSTRUCTION) {
+                reference.setShippingInstructionID((String) id);
+              }
+              reference.setReferenceType(r.getReferenceType());
+              reference.setReferenceValue(r.getReferenceValue());
+              return reference;
+            })
+        .buffer(MappingUtils.SQL_LIST_BUFFER_SIZE) // process in smaller batches
+        .concatMap(referenceRepository::saveAll)
+        .map(transformRefToRefTO)
+        .collectList();
+  }
+
+  private final Function<Reference, ReferenceTO> transformRefToRefTO =
+      ref -> {
+        ReferenceTO referenceTO = new ReferenceTO();
+        referenceTO.setReferenceType(ref.getReferenceType());
+        referenceTO.setReferenceValue(ref.getReferenceValue());
+        return referenceTO;
+      };
 }
