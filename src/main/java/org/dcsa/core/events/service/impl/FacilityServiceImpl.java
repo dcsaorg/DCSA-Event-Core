@@ -5,6 +5,7 @@ import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.service.FacilityService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
       FacilityCodeListProvider facilityCodeListProvider,
       String facilityCode) {
     BiFunction<String, String, Mono<Facility>> method;
-    switch (Objects.requireNonNull(facilityCodeListProvider, "facilityCodeListProvider")) {
+    switch (Objects.requireNonNull(facilityCodeListProvider, "The attribute facilityCodeListProvider cannot be null.")) {
       case SMDG:
         method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
         break;
@@ -40,16 +41,14 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
         method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
         break;
       default:
-        throw new CreateException(
-            "Unsupported facility code list provider: " + facilityCodeListProvider);
+        throw ConcreteRequestErrorMessageException.invalidParameter("Unsupported facility code list provider: " + facilityCodeListProvider);
     }
     return method
         .apply(
-            Objects.requireNonNull(unLocationCode, "unLocationCode"),
-            Objects.requireNonNull(facilityCode, "facilityCode"))
+            Objects.requireNonNull(unLocationCode, "The attribute unLocationCode cannot be null."),
+            Objects.requireNonNull(facilityCode, "The attribute facilityCode be null."))
         .switchIfEmpty(
-            Mono.error(
-                new CreateException(
+            Mono.error(ConcreteRequestErrorMessageException.invalidParameter(
                     "Cannot find any facility with UNLocationCode + Facility code: "
                         + unLocationCode
                         + ", "

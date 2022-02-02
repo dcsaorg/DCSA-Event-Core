@@ -3,6 +3,7 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
+import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
@@ -173,6 +174,7 @@ public class LocationServiceImpl
     }
   }
 
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   private Mono<LocationTO> getLocationTO(Location location) {
     return Mono.zip(
             addressService
@@ -185,9 +187,8 @@ public class LocationServiceImpl
                 .defaultIfEmpty(Optional.empty()))
         .flatMap(
             t2 -> {
-              LocationTO locTO = locationMapper.locationToDTO(location);
-              t2.getT1().ifPresent(locTO::setAddress);
-              t2.getT2().ifPresent(locTO::setFacility);
+              LocationTO locTO =
+                  locationMapper.locationToDTO(location, t2.getT1().get(), t2.getT2().get());
               return Mono.just(locTO);
             });
   }

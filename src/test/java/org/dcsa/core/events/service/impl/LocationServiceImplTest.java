@@ -64,6 +64,7 @@ class LocationServiceImplTest {
     facility.setFacilityID(UUID.randomUUID());
     facility.setFacilityName("Some facility");
     facility.setFacilityBICCode("x".repeat(4));
+    facility.setUnLocationCode("x".repeat(5));
 
     location = new Location();
     location.setId(UUID.randomUUID().toString());
@@ -133,7 +134,10 @@ class LocationServiceImplTest {
               verify(addressService).findByIdOrEmpty(any());
               verify(facilityService).findByIdOrEmpty(any());
 
+              assertEquals(location.getId(), l.getId());
               assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(facility.getFacilityID(), l.getFacility().getFacilityID());
+              assertEquals(facility.getUnLocationCode(), l.getFacility().getUnLocationCode());
               assertEquals(address.getId(), l.getAddressID());
               assertNotNull(l.getAddress());
               assertNotNull(l.getFacility());
