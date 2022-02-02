@@ -3,7 +3,6 @@ package org.dcsa.core.events.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.base.AbstractCargoLineItem;
-import org.dcsa.core.events.model.transferobjects.CargoLineItemTO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -19,10 +18,10 @@ public class CargoLineItem extends AbstractCargoLineItem {
     @Column("cargo_item_id")
     private UUID cargoItemID;
 
-	public CargoLineItemTO toCargoLineItemTO() {
-		CargoLineItemTO cargoLineItem = new CargoLineItemTO();
-		cargoLineItem.setCargoLineItemID(this.getCargoLineItemID());
-		cargoLineItem.setShippingMarks(this.getShippingMarks());
-		return cargoLineItem;
-	}
+//	public CargoLineItemTO toCargoLineItemTO() {
+//		CargoLineItemTO cargoLineItem = new CargoLineItemTO();
+//		cargoLineItem.setCargoLineItemID(this.getCargoLineItemID());
+//		cargoLineItem.setShippingMarks(this.getShippingMarks());
+//		return cargoLineItem;
+//	}
 }

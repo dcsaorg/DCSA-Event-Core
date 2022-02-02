@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.enums.SealSourceCode;
-import org.dcsa.core.events.model.enums.SealTypeCode;
-import org.dcsa.core.events.model.transferobjects.SealTO;
 import org.dcsa.core.model.AuditBase;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -41,11 +38,11 @@ public class Seal extends AuditBase {
     @Size(max = 5)
     private String sealType;
 
-    public SealTO toSealTO() {
-        SealTO sealTO = new SealTO();
-        sealTO.setSealNumber(this.getSealNumber());
-        sealTO.setSealSource(SealSourceCode.valueOf(this.getSealSource()));
-        sealTO.setSealType(SealTypeCode.valueOf(this.getSealType()));
-        return sealTO;
-    }
+//    public SealTO toSealTO() {
+//        SealTO sealTO = new SealTO();
+//        sealTO.setSealNumber(this.getSealNumber());
+//        sealTO.setSealSource(SealSourceCode.valueOf(this.getSealSource()));
+//        sealTO.setSealType(SealTypeCode.valueOf(this.getSealType()));
+//        return sealTO;
+//    }
 }

@@ -1,12 +1,9 @@
 package org.dcsa.core.events.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.TemperatureUnit;
-import org.dcsa.core.events.model.transferobjects.ActiveReeferSettingsTO;
 import org.dcsa.core.model.AuditBase;
-import org.dcsa.core.model.GetId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -15,11 +12,10 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @Data
-public class ActiveReeferSettings extends AuditBase implements GetId<UUID> {
+public class ActiveReeferSettings extends AuditBase {
 
     @Id
     /* We do not show this in JSON as it is an internal detail */
-    @JsonIgnore
     @Column("shipment_equipment_id")
     private UUID shipmentEquipmentID;
 
@@ -45,21 +41,4 @@ public class ActiveReeferSettings extends AuditBase implements GetId<UUID> {
     @Column("ventilation_max")
     private Float ventilationMax;
 
-    @Override
-    @JsonIgnore
-    public UUID getId() {
-        return getShipmentEquipmentID();
-    }
-
-    public ActiveReeferSettingsTO toActiveReeferSettingsTO() {
-        ActiveReeferSettingsTO activeReeferSettingsTO = new ActiveReeferSettingsTO();
-        activeReeferSettingsTO.setTemperatureMin(this.getTemperatureMin());
-        activeReeferSettingsTO.setTemperatureMax(this.getTemperatureMax());
-        activeReeferSettingsTO.setTemperatureUnit(this.getTemperatureUnit());
-        activeReeferSettingsTO.setHumidityMin(this.getHumidityMin());
-        activeReeferSettingsTO.setHumidityMax(this.getHumidityMax());
-        activeReeferSettingsTO.setVentilationMin(this.getVentilationMin());
-        activeReeferSettingsTO.setVentilationMax(this.getVentilationMax());
-        return activeReeferSettingsTO;
-    }
 }

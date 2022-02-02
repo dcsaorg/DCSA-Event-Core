@@ -2,6 +2,7 @@ package org.dcsa.core.events.service.impl;
 
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.*;
+import org.dcsa.core.events.model.mapper.*;
 import org.dcsa.core.events.model.transferobjects.*;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.ReferenceService;
@@ -9,9 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -36,6 +39,17 @@ public class ShipmentEquipmentServiceImplTest {
   @Mock CargoItemRepository cargoItemRepository;
   @Mock CargoLineItemRepository cargoLineItemRepository;
   @Mock ReferenceService referenceService;
+
+  @Spy SealMapper sealMapper = Mappers.getMapper(SealMapper.class);
+  @Spy CargoLineItemMapper cargoLineItemMapper = Mappers.getMapper(CargoLineItemMapper.class);
+  @Spy CargoItemMapper cargoItemMapper = Mappers.getMapper(CargoItemMapper.class);
+
+  @Spy
+  ActiveReeferSettingsMapper activeReeferSettingsMapper =
+      Mappers.getMapper(ActiveReeferSettingsMapper.class);
+
+  @Spy EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
+  @Spy ShipmentEquipmentMapper shipmentEquipmentMapper = Mappers.getMapper(ShipmentEquipmentMapper.class);
 
   @InjectMocks ShipmentEquipmentServiceImpl shipmentEquipmentService;
 
