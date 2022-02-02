@@ -6,8 +6,6 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.events.repository.AddressRepository;
-import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.FacilityService;
@@ -26,12 +24,11 @@ import java.util.function.Function;
 public class LocationServiceImpl
     extends ExtendedBaseServiceImpl<LocationRepository, Location, String>
     implements LocationService {
-  private final LocationRepository locationRepository;
-  private final FacilityRepository facilityRepository;
-  private final AddressRepository addressRepository;
 
   private final FacilityService facilityService;
   private final AddressService addressService;
+
+  private final LocationRepository locationRepository;
 
   private final LocationMapper locationMapper;
 
@@ -97,6 +94,32 @@ public class LocationServiceImpl
   }
 
   @Override
+  public Mono<LocationTO> fetchLocationDeepObjByID(String id) {
+    if (id == null) return Mono.empty();
+    return locationRepository
+        .findById(id)
+        .flatMap(
+            location ->
+                Mono.zip(
+                        addressService
+                            .findByIdOrEmpty(location.getAddressID())
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty()),
+                        facilityService
+                            .findByIdOrEmpty(location.getFacilityID())
+                            .map(Optional::of)
+                            .defaultIfEmpty(Optional.empty()))
+                    .flatMap(
+                        t2 -> {
+                          LocationTO locTO = locationMapper.locationToDTO(location);
+                          t2.getT1().ifPresent(locTO::setAddress);
+                          t2.getT2().ifPresent(locTO::setFacility);
+                          return Mono.just(locTO);
+                        }))
+        .onErrorReturn(new LocationTO());
+  }
+
+  @Override
   public Mono<LocationTO> createLocationByTO(
       LocationTO locationTO, Function<String, Mono<Boolean>> updateEDocumentation) {
 
@@ -152,11 +175,11 @@ public class LocationServiceImpl
 
   private Mono<LocationTO> getLocationTO(Location location) {
     return Mono.zip(
-            addressRepository
+            addressService
                 .findByIdOrEmpty(location.getAddressID())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty()),
-            facilityRepository
+            facilityService
                 .findByIdOrEmpty(location.getFacilityID())
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty()))

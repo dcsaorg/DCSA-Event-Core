@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface AddressService extends ExtendedBaseService<Address, UUID> {
     Mono<Address> ensureResolvable(Address address);
+    Mono<Address> findByIdOrEmpty(UUID id);
 }

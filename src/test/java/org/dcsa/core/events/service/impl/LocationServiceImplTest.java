@@ -5,10 +5,9 @@ import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.events.repository.AddressRepository;
-import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.service.AddressService;
+import org.dcsa.core.events.service.FacilityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,13 +28,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Test for LocationService implementation")
-public class LocationServiceImplTest {
+class LocationServiceImplTest {
 
   @Mock LocationRepository locationRepository;
-
-  @Mock AddressRepository addressRepository;
-  @Mock FacilityRepository facilityRepository;
-
+  @Mock FacilityService facilityService;
   @Mock AddressService addressService;
 
   @InjectMocks LocationServiceImpl locationService;
@@ -128,14 +124,14 @@ public class LocationServiceImplTest {
     location.setId(locationID);
 
     when(locationRepository.findById(any(String.class))).thenReturn(Mono.just(location));
-    when(addressRepository.findByIdOrEmpty(any())).thenReturn(Mono.just(address));
-    when(facilityRepository.findByIdOrEmpty(any())).thenReturn(Mono.just(facility));
+    when(addressService.findByIdOrEmpty(any())).thenReturn(Mono.just(address));
+    when(facilityService.findByIdOrEmpty(any())).thenReturn(Mono.just(facility));
 
     StepVerifier.create(locationService.fetchLocationByID(location.getId()))
         .assertNext(
             l -> {
-              verify(addressRepository).findByIdOrEmpty(any());
-              verify(facilityRepository).findByIdOrEmpty(any());
+              verify(addressService).findByIdOrEmpty(any());
+              verify(facilityService).findByIdOrEmpty(any());
 
               assertEquals(facility.getFacilityID(), l.getFacilityID());
               assertEquals(address.getId(), l.getAddressID());
@@ -164,6 +160,31 @@ public class LocationServiceImplTest {
 
               assertNull(l.getFacility());
               assertNull(l.getAddress());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch optional locationTO DeepObj by ID")
+  void testFetchLocationTODeepObjByID() {
+
+    String locationID = UUID.randomUUID().toString();
+    location.setId(locationID);
+    location.setAddressID(address.getId());
+    location.setFacilityID(facility.getFacilityID());
+
+    when(locationRepository.findById(any(String.class))).thenReturn(Mono.just(location));
+    when(addressService.findByIdOrEmpty(any(UUID.class))).thenReturn(Mono.just(address));
+    when(facilityService.findByIdOrEmpty(any(UUID.class))).thenReturn(Mono.just(facility));
+
+    StepVerifier.create(locationService.fetchLocationDeepObjByID(location.getId()))
+        .assertNext(
+            l -> {
+              assertNotNull(l.getFacilityID());
+              assertNotNull(l.getAddressID());
+              assertEquals(locationID, l.getId());
+              assertEquals(address.getId(), l.getAddress().getId());
+              assertEquals(facility.getFacilityID(), l.getFacility().getFacilityID());
             })
         .verifyComplete();
   }

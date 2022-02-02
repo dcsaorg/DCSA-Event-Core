@@ -16,32 +16,48 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityRepository, Facility, UUID> implements FacilityService {
+public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityRepository, Facility, UUID>
+    implements FacilityService {
 
-    private final FacilityRepository facilityRepository;
+  private final FacilityRepository facilityRepository;
 
-    @Override
-    public FacilityRepository getRepository() {
-        return facilityRepository;
+  @Override
+  public FacilityRepository getRepository() {
+    return facilityRepository;
+  }
+
+  @Override
+  public Mono<Facility> findByUNLocationCodeAndFacilityCode(
+      String unLocationCode,
+      FacilityCodeListProvider facilityCodeListProvider,
+      String facilityCode) {
+    BiFunction<String, String, Mono<Facility>> method;
+    switch (Objects.requireNonNull(facilityCodeListProvider, "facilityCodeListProvider")) {
+      case SMDG:
+        method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
+        break;
+      case BIC:
+        method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
+        break;
+      default:
+        throw new CreateException(
+            "Unsupported facility code list provider: " + facilityCodeListProvider);
     }
+    return method
+        .apply(
+            Objects.requireNonNull(unLocationCode, "unLocationCode"),
+            Objects.requireNonNull(facilityCode, "facilityCode"))
+        .switchIfEmpty(
+            Mono.error(
+                new CreateException(
+                    "Cannot find any facility with UNLocationCode + Facility code: "
+                        + unLocationCode
+                        + ", "
+                        + facilityCode)));
+  }
 
-    @Override
-    public Mono<Facility> findByUNLocationCodeAndFacilityCode(String unLocationCode, FacilityCodeListProvider facilityCodeListProvider, String facilityCode) {
-        BiFunction<String, String, Mono<Facility>> method;
-        switch (Objects.requireNonNull(facilityCodeListProvider, "facilityCodeListProvider")) {
-            case SMDG:
-                method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
-                break;
-            case BIC:
-                method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
-                break;
-            default:
-                throw new CreateException("Unsupported facility code list provider: " + facilityCodeListProvider);
-        }
-        return method.apply(
-                    Objects.requireNonNull(unLocationCode, "unLocationCode"),
-                    Objects.requireNonNull(facilityCode, "facilityCode")
-                ).switchIfEmpty(Mono.error(new CreateException("Cannot find any facility with UNLocationCode + Facility code: "
-                        + unLocationCode + ", " + facilityCode)));
-    }
+  @Override
+  public Mono<Facility> findByIdOrEmpty(UUID id) {
+    return facilityRepository.findByIdOrEmpty(id);
+  }
 }

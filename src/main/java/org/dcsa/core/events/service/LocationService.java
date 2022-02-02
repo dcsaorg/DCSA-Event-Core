@@ -5,7 +5,6 @@ import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.service.ExtendedBaseService;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 public interface LocationService extends ExtendedBaseService<Location, String> {
@@ -17,6 +16,8 @@ public interface LocationService extends ExtendedBaseService<Location, String> {
   Mono<LocationTO> findTOById(String locationID);
 
   Mono<LocationTO> fetchLocationByID(String id);
+
+  Mono<LocationTO> fetchLocationDeepObjByID(String id);
 
   Mono<LocationTO> createLocationByTO(
       LocationTO locationTO, Function<String, Mono<Boolean>> updateEDocumentationCallback);

@@ -13,16 +13,22 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class AddressServiceImpl extends ExtendedBaseServiceImpl<AddressRepository, Address, UUID> implements AddressService {
-    private final AddressRepository addressRepository;
+public class AddressServiceImpl extends ExtendedBaseServiceImpl<AddressRepository, Address, UUID>
+    implements AddressService {
+  private final AddressRepository addressRepository;
 
-    @Override
-    public AddressRepository getRepository() {
-        return addressRepository;
-    }
+  @Override
+  public AddressRepository getRepository() {
+    return addressRepository;
+  }
 
-    @Override
-    public Mono<Address> ensureResolvable(Address address) {
-        return Util.createOrFindByContent(address, addressRepository::findByContent, this::create);
-    }
+  @Override
+  public Mono<Address> ensureResolvable(Address address) {
+    return Util.createOrFindByContent(address, addressRepository::findByContent, this::create);
+  }
+
+  @Override
+  public Mono<Address> findByIdOrEmpty(UUID id) {
+    return addressRepository.findByIdOrEmpty(id);
+  }
 }
