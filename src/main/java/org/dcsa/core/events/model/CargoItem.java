@@ -18,17 +18,54 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CargoItem extends AbstractCargoItem implements GetId<UUID> {
 
-    @Id
-    private UUID id;
+  @Id private UUID id;
 
-    @Column("shipment_id")
-    @NotNull
-    private UUID shipmentID;
+  @Column("shipment_id")
+  @NotNull
+  private UUID shipmentID;
 
-    @Column("shipping_instruction_id")
-    private String shippingInstructionID;
+  @Column("shipping_instruction_id")
+  private String shippingInstructionID;
 
-    @Column("shipment_equipment_id")
-    @NotNull
-    protected UUID shipmentEquipmentID;
+  @Column("shipment_equipment_id")
+  @NotNull
+  protected UUID shipmentEquipmentID;
+
+//  public CargoItemTO toCargoItemTO() {
+//    CargoItemTO cargoItemTO = new CargoItemTO();
+//    cargoItemTO.setHsCode(this.getHsCode());
+//    cargoItemTO.setVolume(this.getVolume());
+//    cargoItemTO.setVolumeUnit(this.getVolumeUnit());
+//    cargoItemTO.setWeight(this.getWeight());
+//    cargoItemTO.setWeightUnit(this.getWeightUnit());
+//    cargoItemTO.setDescriptionOfGoods(this.getDescriptionOfGoods());
+//    cargoItemTO.setPackageCode(this.getPackageCode());
+//    cargoItemTO.setNumberOfPackages(this.getNumberOfPackages());
+//    return cargoItemTO;
+//  }
+
+//  public CargoItemTO toCargoItemTO(
+//      List<CargoLineItem> cargoLineItems,
+//      List<Reference> references,
+//      String carrierBookingRequestReference) {
+//    CargoItemTO cargoItemTO = new CargoItemTO();
+//    cargoItemTO.setCargoLineItems(
+//        cargoLineItems.stream()
+//            .map(cargoLineItem -> cargoLineItem.toCargoLineItemTO())
+//            .collect(Collectors.toList()));
+//    cargoItemTO.setReferences(
+//        references.stream()
+//            .map(reference -> reference.toReferenceTO())
+//            .collect(Collectors.toList()));
+//    cargoItemTO.setCarrierBookingReference(carrierBookingRequestReference);
+//    cargoItemTO.setHsCode(this.getHsCode());
+//    cargoItemTO.setVolume(this.getVolume());
+//    cargoItemTO.setVolumeUnit(this.getVolumeUnit());
+//    cargoItemTO.setWeight(this.getWeight());
+//    cargoItemTO.setWeightUnit(this.getWeightUnit());
+//    cargoItemTO.setDescriptionOfGoods(this.getDescriptionOfGoods());
+//    cargoItemTO.setPackageCode(this.getPackageCode());
+//    cargoItemTO.setNumberOfPackages(this.getNumberOfPackages());
+//    return cargoItemTO;
+//  }
 }

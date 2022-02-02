@@ -37,4 +37,12 @@ public class Seal extends AuditBase {
     @Column("seal_type")
     @Size(max = 5)
     private String sealType;
+
+//    public SealTO toSealTO() {
+//        SealTO sealTO = new SealTO();
+//        sealTO.setSealNumber(this.getSealNumber());
+//        sealTO.setSealSource(SealSourceCode.valueOf(this.getSealSource()));
+//        sealTO.setSealType(SealTypeCode.valueOf(this.getSealType()));
+//        return sealTO;
+//    }
 }
