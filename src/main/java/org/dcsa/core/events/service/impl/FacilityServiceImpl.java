@@ -32,8 +32,10 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
       String unLocationCode,
       FacilityCodeListProvider facilityCodeListProvider,
       String facilityCode) {
+
     BiFunction<String, String, Mono<Facility>> method;
-    switch (Objects.requireNonNull(facilityCodeListProvider, "The attribute facilityCodeListProvider cannot be null.")) {
+    switch (Objects.requireNonNull(
+        facilityCodeListProvider, "The attribute facilityCodeListProvider cannot be null.")) {
       case SMDG:
         method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
         break;
@@ -41,14 +43,16 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
         method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
         break;
       default:
-        throw ConcreteRequestErrorMessageException.invalidParameter("Unsupported facility code list provider: " + facilityCodeListProvider);
+        throw ConcreteRequestErrorMessageException.invalidParameter(
+            "Unsupported facility code list provider: " + facilityCodeListProvider);
     }
     return method
         .apply(
             Objects.requireNonNull(unLocationCode, "The attribute unLocationCode cannot be null."),
-            Objects.requireNonNull(facilityCode, "The attribute facilityCode be null."))
+            Objects.requireNonNull(facilityCode, "The attribute facilityCode cannot be null."))
         .switchIfEmpty(
-            Mono.error(ConcreteRequestErrorMessageException.invalidParameter(
+            Mono.error(
+                ConcreteRequestErrorMessageException.invalidParameter(
                     "Cannot find any facility with UNLocationCode + Facility code: "
                         + unLocationCode
                         + ", "
