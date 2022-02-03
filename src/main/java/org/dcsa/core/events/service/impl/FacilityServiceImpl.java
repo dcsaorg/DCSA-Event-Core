@@ -9,6 +9,7 @@ import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.test.web.servlet.result.FlashAttributeResultMatchers;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -33,23 +34,26 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
       FacilityCodeListProvider facilityCodeListProvider,
       String facilityCode) {
 
-    BiFunction<String, String, Mono<Facility>> method;
-    switch (Objects.requireNonNull(
-        facilityCodeListProvider, "The attribute facilityCodeListProvider cannot be null.")) {
-      case SMDG:
-        method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
-        break;
-      case BIC:
-        method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
-        break;
-      default:
-        throw ConcreteRequestErrorMessageException.invalidParameter(
-            "Unsupported facility code list provider: " + facilityCodeListProvider);
-    }
-    return method
-        .apply(
-            Objects.requireNonNull(unLocationCode, "The attribute unLocationCode cannot be null."),
-            Objects.requireNonNull(facilityCode, "The attribute facilityCode cannot be null."))
+    if (unLocationCode == null)
+      return Mono.error(
+          ConcreteRequestErrorMessageException.invalidParameter(
+              "The attribute unLocationCode cannot be null"));
+    if (facilityCode == null)
+      return Mono.error(
+          ConcreteRequestErrorMessageException.invalidParameter(
+              "The attribute facilityCode cannot be null"));
+
+    return Mono.just(facilityCodeListProvider)
+        .flatMap(
+            facilityCodeListProvider1 -> {
+              if (facilityCodeListProvider1 == FacilityCodeListProvider.SMDG) {
+                return facilityRepository.findByUnLocationCodeAndFacilitySMDGCode(
+                    unLocationCode, facilityCode);
+              } else {
+                return facilityRepository.findByUnLocationCodeAndFacilityBICCode(
+                    unLocationCode, facilityCode);
+              }
+            })
         .switchIfEmpty(
             Mono.error(
                 ConcreteRequestErrorMessageException.invalidParameter(
