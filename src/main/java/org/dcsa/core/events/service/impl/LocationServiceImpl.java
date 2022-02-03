@@ -94,6 +94,7 @@ public class LocationServiceImpl
         .onErrorReturn(new LocationTO());
   }
 
+  @SuppressWarnings("OptionalGetWithoutIsPresent")
   @Override
   public Mono<LocationTO> fetchLocationDeepObjByID(String id) {
     if (id == null) return Mono.empty();
@@ -111,12 +112,10 @@ public class LocationServiceImpl
                             .map(Optional::of)
                             .defaultIfEmpty(Optional.empty()))
                     .flatMap(
-                        t2 -> {
-                          LocationTO locTO = locationMapper.locationToDTO(location);
-                          t2.getT1().ifPresent(locTO::setAddress);
-                          t2.getT2().ifPresent(locTO::setFacility);
-                          return Mono.just(locTO);
-                        }))
+                        t2 ->
+                            Mono.just(
+                                locationMapper.locationToDTO(
+                                    location, t2.getT1().get(), t2.getT2().get()))))
         .onErrorReturn(new LocationTO());
   }
 
@@ -144,12 +143,7 @@ public class LocationServiceImpl
                 return locationRepository
                     .save(location)
                     .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
-                    .map(
-                        l -> {
-                          LocationTO lTO = locationMapper.locationToDTO(l);
-                          lTO.setAddress(a);
-                          return lTO;
-                        });
+                    .map(l -> locationMapper.locationToDTO(l, a, null));
               });
     }
   }
@@ -186,10 +180,8 @@ public class LocationServiceImpl
                 .map(Optional::of)
                 .defaultIfEmpty(Optional.empty()))
         .flatMap(
-            t2 -> {
-              LocationTO locTO =
-                  locationMapper.locationToDTO(location, t2.getT1().get(), t2.getT2().get());
-              return Mono.just(locTO);
-            });
+            t2 ->
+                Mono.just(
+                    locationMapper.locationToDTO(location, t2.getT1().get(), t2.getT2().get())));
   }
 }
