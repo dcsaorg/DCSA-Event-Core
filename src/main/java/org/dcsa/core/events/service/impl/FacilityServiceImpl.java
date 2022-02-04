@@ -49,9 +49,13 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
               if (facilityCodeListProvider1 == FacilityCodeListProvider.SMDG) {
                 return facilityRepository.findByUnLocationCodeAndFacilitySMDGCode(
                     unLocationCode, facilityCode);
-              } else {
+              } else if (facilityCodeListProvider1 == FacilityCodeListProvider.BIC) {
                 return facilityRepository.findByUnLocationCodeAndFacilityBICCode(
                     unLocationCode, facilityCode);
+              } else {
+                return Mono.error(
+                    ConcreteRequestErrorMessageException.invalidParameter(
+                        "Unsupported facility code list provider: " + facilityCodeListProvider1));
               }
             })
         .switchIfEmpty(
