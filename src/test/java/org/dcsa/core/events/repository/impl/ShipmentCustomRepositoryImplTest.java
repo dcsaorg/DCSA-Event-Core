@@ -1,6 +1,6 @@
 package org.dcsa.core.events.repository.impl;
 
-import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class ShipmentCustomRepositoryImplTest {
     PageRequest pageRequest = PageRequest.of(0, 10);
 
     shipmentCustomRepository.findShipmentsAndBookingsByDocumentStatus(
-        DocumentStatus.RECE, pageRequest);
+        ShipmentEventTypeCode.RECE, pageRequest);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
@@ -51,7 +51,7 @@ public class ShipmentCustomRepositoryImplTest {
     PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "confirmationDateTime"));
 
     shipmentCustomRepository.findShipmentsAndBookingsByDocumentStatus(
-      DocumentStatus.PENU, pageRequest);
+      ShipmentEventTypeCode.PENU, pageRequest);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
@@ -71,7 +71,7 @@ public class ShipmentCustomRepositoryImplTest {
     PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("confirmationDateTime"), Sort.Order.desc("documentStatus")));
 
     shipmentCustomRepository.findShipmentsAndBookingsByDocumentStatus(
-      DocumentStatus.PENU, pageRequest);
+      ShipmentEventTypeCode.PENU, pageRequest);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);

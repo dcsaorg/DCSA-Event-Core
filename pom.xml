@@ -20,7 +20,7 @@
 		<dcsa.version>0.8.26</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
-		<revision>0.0.52</revision>
+		<revision>0.0.53</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
@@ -103,5 +103,23 @@
 			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Event-Core</url>
 		</repository>
 	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
