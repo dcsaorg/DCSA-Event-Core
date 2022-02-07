@@ -8,6 +8,7 @@
 		<version>2.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>org.dcsa</groupId>
 	<artifactId>dcsa_event_core</artifactId>
 	<version>${revision}${sha1}${changelist}</version>
