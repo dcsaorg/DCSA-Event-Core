@@ -11,5 +11,8 @@ import java.util.UUID;
 @Repository
 public interface DocumentPartyRepository extends ExtendedRepository<DocumentParty, UUID> {
   Flux<DocumentParty> findByBookingID(UUID bookingID);
+
+  Flux<DocumentParty> findByShippingInstructionID(String bookingID);
+
   Mono<Void> deleteByBookingID(UUID bookingID);
 }
