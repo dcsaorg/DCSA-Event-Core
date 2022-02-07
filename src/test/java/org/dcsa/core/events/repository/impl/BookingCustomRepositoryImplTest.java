@@ -1,6 +1,6 @@
 package org.dcsa.core.events.repository.impl;
 
-import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ public class BookingCustomRepositoryImplTest {
 	@Test
 	@DisplayName("Get booking summaries with documentStatus Filter should return a query with an one criteria present")
 	void bookingSummaryRequestWithDocumentStatusFilterShouldReturnCarrierRequestBookingReferenceCriteria() {
-		DocumentStatus documentStatus = DocumentStatus.RECE;
+		ShipmentEventTypeCode documentStatus = ShipmentEventTypeCode.RECE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasCarrierBookingRequestReference(null), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(Criteria.empty(), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
@@ -55,7 +55,7 @@ public class BookingCustomRepositoryImplTest {
 	@DisplayName("Get booking summaries with carrierRequestBookingReference and documentStatus filters should return a query with two criterias")
 	void bookingSummaryRequestWithCarrierRequestBookingReferenceAndDocumentStatusFilterShouldReturnCarrierRequestBookingReferenceCriteria() {
 		String carrierBookingRequestReference = UUID.randomUUID().toString();
-		DocumentStatus documentStatus = DocumentStatus.REJE;
+		ShipmentEventTypeCode documentStatus = ShipmentEventTypeCode.REJE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasCarrierBookingRequestReference(carrierBookingRequestReference), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(where("carrier_booking_request_reference").is(carrierBookingRequestReference), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
@@ -78,7 +78,7 @@ public class BookingCustomRepositoryImplTest {
 	@Test
 	@DisplayName("Get booking summaries with documentStatus Filter should return a query with an one criteria present")
 	void bookingSummaryRequestWithDocumentStatusFilterShouldReturnBookingIDCriteria() {
-		DocumentStatus documentStatus = DocumentStatus.RECE;
+		ShipmentEventTypeCode documentStatus = ShipmentEventTypeCode.RECE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasBookingID(null), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(Criteria.empty(), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
@@ -89,7 +89,7 @@ public class BookingCustomRepositoryImplTest {
 	@DisplayName("Get booking summaries with bookingID and documentStatus filters should return a query with two criteria")
 	void bookingSummaryRequestWithBookingIDAndDocumentStatusFilterShouldReturnBookingIDCriteria() {
 		UUID bookingID = UUID.randomUUID();
-		DocumentStatus documentStatus = DocumentStatus.REJE;
+		ShipmentEventTypeCode documentStatus = ShipmentEventTypeCode.REJE;
 		Criteria criteria = Criteria.from(bookingCustomRepository.getCriteriaHasBookingID(bookingID), bookingCustomRepository.getCriteriaHasDocumentStatus(documentStatus));
 		Criteria expectedCriteria = Criteria.from(where("id").is(bookingID), where("document_status").is(documentStatus));
 		Assertions.assertEquals(expectedCriteria.getGroup().get(0).toString(), criteria.getGroup().get(0).toString());
