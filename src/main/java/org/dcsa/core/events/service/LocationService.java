@@ -5,11 +5,25 @@ import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.service.ExtendedBaseService;
 import reactor.core.publisher.Mono;
 
+import java.util.function.Function;
+
 public interface LocationService extends ExtendedBaseService<Location, String> {
 
-    Mono<LocationTO> ensureResolvable(LocationTO locationTO);
+  Mono<LocationTO> ensureResolvable(LocationTO locationTO);
 
-    Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
+  Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
 
-    Mono<LocationTO> findTOById(String locationID);
+  Mono<LocationTO> findTOById(String locationID);
+
+  Mono<LocationTO> fetchLocationByID(String id);
+
+  Mono<LocationTO> fetchLocationDeepObjByID(String id);
+
+  Mono<LocationTO> createLocationByTO(
+      LocationTO locationTO, Function<String, Mono<Boolean>> updateEDocumentationCallback);
+
+  Mono<LocationTO> resolveLocationByTO(
+      String currentLocationIDInEDocumentation,
+      LocationTO locationTO,
+      Function<String, Mono<Boolean>> updateEDocumentationCallback);
 }

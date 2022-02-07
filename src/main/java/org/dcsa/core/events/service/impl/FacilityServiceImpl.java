@@ -5,9 +5,11 @@ import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.service.FacilityService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.test.web.servlet.result.FlashAttributeResultMatchers;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -16,32 +18,57 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityRepository, Facility, UUID> implements FacilityService {
+public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityRepository, Facility, UUID>
+    implements FacilityService {
 
-    private final FacilityRepository facilityRepository;
+  private final FacilityRepository facilityRepository;
 
-    @Override
-    public FacilityRepository getRepository() {
-        return facilityRepository;
-    }
+  @Override
+  public FacilityRepository getRepository() {
+    return facilityRepository;
+  }
 
-    @Override
-    public Mono<Facility> findByUNLocationCodeAndFacilityCode(String unLocationCode, FacilityCodeListProvider facilityCodeListProvider, String facilityCode) {
-        BiFunction<String, String, Mono<Facility>> method;
-        switch (Objects.requireNonNull(facilityCodeListProvider, "facilityCodeListProvider")) {
-            case SMDG:
-                method = facilityRepository::findByUnLocationCodeAndFacilitySMDGCode;
-                break;
-            case BIC:
-                method = facilityRepository::findByUnLocationCodeAndFacilityBICCode;
-                break;
-            default:
-                throw new CreateException("Unsupported facility code list provider: " + facilityCodeListProvider);
-        }
-        return method.apply(
-                    Objects.requireNonNull(unLocationCode, "unLocationCode"),
-                    Objects.requireNonNull(facilityCode, "facilityCode")
-                ).switchIfEmpty(Mono.error(new CreateException("Cannot find any facility with UNLocationCode + Facility code: "
-                        + unLocationCode + ", " + facilityCode)));
-    }
+  @Override
+  public Mono<Facility> findByUNLocationCodeAndFacilityCode(
+      String unLocationCode,
+      FacilityCodeListProvider facilityCodeListProvider,
+      String facilityCode) {
+
+    if (unLocationCode == null)
+      return Mono.error(
+          ConcreteRequestErrorMessageException.invalidParameter(
+              "The attribute unLocationCode cannot be null"));
+    if (facilityCode == null)
+      return Mono.error(
+          ConcreteRequestErrorMessageException.invalidParameter(
+              "The attribute facilityCode cannot be null"));
+
+    return Mono.just(facilityCodeListProvider)
+        .flatMap(
+            facilityCodeListProvider1 -> {
+              if (facilityCodeListProvider1 == FacilityCodeListProvider.SMDG) {
+                return facilityRepository.findByUnLocationCodeAndFacilitySMDGCode(
+                    unLocationCode, facilityCode);
+              } else if (facilityCodeListProvider1 == FacilityCodeListProvider.BIC) {
+                return facilityRepository.findByUnLocationCodeAndFacilityBICCode(
+                    unLocationCode, facilityCode);
+              } else {
+                return Mono.error(
+                    ConcreteRequestErrorMessageException.invalidParameter(
+                        "Unsupported facility code list provider: " + facilityCodeListProvider1));
+              }
+            })
+        .switchIfEmpty(
+            Mono.error(
+                ConcreteRequestErrorMessageException.invalidParameter(
+                    "Cannot find any facility with UNLocationCode + Facility code: "
+                        + unLocationCode
+                        + ", "
+                        + facilityCode)));
+  }
+
+  @Override
+  public Mono<Facility> findByIdOrEmpty(UUID id) {
+    return facilityRepository.findByIdOrEmpty(id);
+  }
 }

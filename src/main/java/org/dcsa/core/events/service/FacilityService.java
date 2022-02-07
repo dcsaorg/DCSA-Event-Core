@@ -8,5 +8,10 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface FacilityService extends ExtendedBaseService<Facility, UUID> {
-    Mono<Facility> findByUNLocationCodeAndFacilityCode(String unLocationCode, FacilityCodeListProvider facilityCodeListProvider, String facilityCode);
+  Mono<Facility> findByUNLocationCodeAndFacilityCode(
+      String unLocationCode,
+      FacilityCodeListProvider facilityCodeListProvider,
+      String facilityCode);
+
+  Mono<Facility> findByIdOrEmpty(UUID id);
 }
