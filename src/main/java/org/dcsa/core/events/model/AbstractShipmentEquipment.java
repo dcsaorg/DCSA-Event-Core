@@ -17,5 +17,6 @@ public abstract class AbstractShipmentEquipment {
   @Column("cargo_gross_weight_unit")
   private WeightUnit cargoGrossWeightUnit;
 
-  //ToDo add isShipperOwned here after decision in conversation with Henrik and Nicolas
+  @Column("is_shipper_owned")
+  private Boolean isShipperOwned;
 }
