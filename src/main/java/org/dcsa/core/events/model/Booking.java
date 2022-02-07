@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.*;
+import org.dcsa.core.validator.EnumSubset;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -12,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.BOOKING_DOCUMENT_STATUSES;
 
 @Table("booking")
 @NoArgsConstructor
@@ -27,7 +29,8 @@ public class Booking implements Persistable<UUID> {
   private String carrierBookingRequestReference;
 
   @Column("document_status")
-  private DocumentStatus documentStatus;
+  @EnumSubset(anyOf = BOOKING_DOCUMENT_STATUSES)
+  private ShipmentEventTypeCode documentStatus;
 
   @Column("receipt_type_at_origin")
   private ReceiptDeliveryType receiptTypeAtOrigin;

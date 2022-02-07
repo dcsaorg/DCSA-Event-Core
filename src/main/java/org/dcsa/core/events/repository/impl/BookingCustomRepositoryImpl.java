@@ -2,7 +2,7 @@ package org.dcsa.core.events.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Booking;
-import org.dcsa.core.events.model.enums.DocumentStatus;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.repository.BookingCustomRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -21,7 +21,7 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
   private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
   @Override
-  public Flux<Booking> findAllByDocumentStatus(DocumentStatus documentStatus, Pageable pageable) {
+  public Flux<Booking> findAllByDocumentStatus(ShipmentEventTypeCode documentStatus, Pageable pageable) {
 
     Criteria criteria = Criteria.from(getCriteriaHasDocumentStatus(documentStatus));
 
@@ -36,7 +36,7 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
   }
 
   @Override
-  public Mono<Long> countAllByDocumentStatus(DocumentStatus documentStatus) {
+  public Mono<Long> countAllByDocumentStatus(ShipmentEventTypeCode documentStatus) {
 
     Criteria criteria = getCriteriaHasDocumentStatus(documentStatus);
 
@@ -60,7 +60,7 @@ public class BookingCustomRepositoryImpl implements BookingCustomRepository {
     return criteria;
   }
 
-  protected Criteria getCriteriaHasDocumentStatus(DocumentStatus documentStatus) {
+  protected Criteria getCriteriaHasDocumentStatus(ShipmentEventTypeCode documentStatus) {
     Criteria criteria = Criteria.empty();
     if (documentStatus != null) {
       criteria = where("document_status").is(documentStatus);

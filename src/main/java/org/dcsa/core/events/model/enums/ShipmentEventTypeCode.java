@@ -1,21 +1,35 @@
 package org.dcsa.core.events.model.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum ShipmentEventTypeCode {
-    RECE,
-    DRFT,
-    PENA,
-    PENU,
-    REJE,
-    APPR,
-    ISSU,
-    SURR,
-    SUBM,
-    VOID,
-    CONF,
-    PENC,
-    CANC,
-    CMPL,
-    RELS,
-    REQS,
-    HOLD
+    RECE("Received"),
+    DRFT("Draft"),
+    PENA("Pending Approval"),
+
+    PENU("Pending Update"),
+    REJE("Rejected"),
+    APPR("Approved"),
+    ISSU("Issued"),
+    SURR("Surrendered"),
+    SUBM("Submitted"),
+    VOID("Void"),
+
+    CONF("Confirmed"),
+    PENC("Pending Confirmation"),
+    CANC("Cancelled"),
+    CMPL("Completed"),
+    RELS("Released"),
+    REQS("Requested"),
+    HOLD("On hold");
+
+
+    /**
+     * The values allowed when used as a DocumentStatus
+     */
+    public static final String BOOKING_DOCUMENT_STATUSES = "RECE,PENU,REJE,CONF,PENC,CANC";
+    private final String value;
 }
