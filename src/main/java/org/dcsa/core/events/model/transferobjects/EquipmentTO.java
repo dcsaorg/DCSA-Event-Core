@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.WeightUnit;
 
@@ -13,6 +14,7 @@ public class EquipmentTO {
 	@Size(max = 15)
 	private String equipmentReference;
 
+	@JsonProperty("ISOEquipmentCode")
 	@Size(max = 4)
 	private String isoEquipmentCode;
 
