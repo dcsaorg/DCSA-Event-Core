@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.transferobjects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.VolumeUnit;
 import org.dcsa.core.events.model.enums.WeightUnit;
@@ -18,6 +19,7 @@ public class CargoItemTO {
 	@NotNull(message = "Description of goods is required.")
 	private String descriptionOfGoods;
 
+	@JsonProperty("HSCode")
 	@NotNull(message = "HS code is required.")
 	private String hsCode;
 
