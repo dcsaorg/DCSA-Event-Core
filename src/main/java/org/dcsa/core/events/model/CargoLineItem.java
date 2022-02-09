@@ -5,11 +5,13 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.base.AbstractCargoLineItem;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
 @NoArgsConstructor
 @Data
+@Table("cargo_line_item")
 public class CargoLineItem extends AbstractCargoLineItem {
 
     @Id
@@ -18,10 +20,4 @@ public class CargoLineItem extends AbstractCargoLineItem {
     @Column("cargo_item_id")
     private UUID cargoItemID;
 
-//	public CargoLineItemTO toCargoLineItemTO() {
-//		CargoLineItemTO cargoLineItem = new CargoLineItemTO();
-//		cargoLineItem.setCargoLineItemID(this.getCargoLineItemID());
-//		cargoLineItem.setShippingMarks(this.getShippingMarks());
-//		return cargoLineItem;
-//	}
 }

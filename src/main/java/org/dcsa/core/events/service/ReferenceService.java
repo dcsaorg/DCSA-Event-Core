@@ -20,6 +20,8 @@ public interface ReferenceService extends BaseService<Reference, UUID> {
 
   Mono<List<ReferenceTO>> findByShippingInstructionID(String shippingInstructionID);
 
+  Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID);
+
   Mono<List<ReferenceTO>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID);
 

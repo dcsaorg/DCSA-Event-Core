@@ -65,6 +65,13 @@ public class ReferenceServiceImpl
   }
 
   @Override
+  public Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID) {
+    return referenceRepository.findByCargoItemID(cargoItemID)
+      .map(transformRefToRefTO)
+      .collectList();
+  }
+
+  @Override
   public Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionID(
       List<ReferenceTO> references, String shippingInstructionID) {
 

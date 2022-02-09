@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.UUID;
 
-public interface ShipmentEquipmentRepository extends ExtendedRepository<ShipmentEquipment, UUID> {
+public interface ShipmentEquipmentRepository extends ExtendedRepository<ShipmentEquipment, UUID>, ShipmentEquipmentCustomRepository {
 
   Flux<ShipmentEquipment> findAllByShipmentIDIn(List<UUID> shipmentIDs);
 
