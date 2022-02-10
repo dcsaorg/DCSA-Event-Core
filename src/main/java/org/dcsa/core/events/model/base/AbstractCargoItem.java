@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.enums.WeightUnit;
 import org.dcsa.core.events.model.enums.VolumeUnit;
+import org.dcsa.core.events.model.enums.WeightUnit;
 import org.dcsa.core.model.AuditBase;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -17,32 +17,33 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public abstract class AbstractCargoItem extends AuditBase {
 
+  @Column("description_of_goods")
+  @NotNull
+  private String descriptionOfGoods;
 
-    @Column("description_of_goods")
-    @NotNull
-    private String descriptionOfGoods;
+  @JsonProperty("HSCode")
+  @NotNull
+  @Size(max = 10)
+  @Column("hs_code")
+  private String hsCode;
 
-    @JsonProperty("HSCode")
-    @Column("hs_code")
-    @Size(max = 10)
-    @NotNull
-    private String hsCode;
+  @NotNull
+  @Column("number_of_packages")
+  private Integer numberOfPackages;
 
-    @Column("number_of_packages")
-    private Integer numberOfPackages;
+  @NotNull private Float weight;
 
-    private Float weight;
+  private Float volume;
 
-    private Float volume;
+  @NotNull
+  @Column("weight_unit")
+  private WeightUnit weightUnit;
 
-    @Column("weight_unit")
-    private WeightUnit weightUnit;
+  @Column("volume_unit")
+  private VolumeUnit volumeUnit;
 
-    @Column("volume_unit")
-    private VolumeUnit volumeUnit;
-
-    @Column("package_code")
-    @Size(max = 3)
-    private String packageCode;
-
+  @Size(max = 3)
+  @NotNull
+  @Column("package_code")
+  private String packageCode;
 }
