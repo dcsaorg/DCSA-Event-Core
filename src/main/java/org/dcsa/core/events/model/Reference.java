@@ -31,6 +31,7 @@ public class Reference extends AuditBase implements GetId<UUID> {
   private ReferenceTypeCode referenceType;
 
   @Size(max = 100)
+  @NotNull
   private String referenceValue;
 
   @Column("shipping_instruction_id")
