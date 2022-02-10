@@ -14,6 +14,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.sql.Join;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ public class Vessel extends AuditBase {
     @Column("id")
     private UUID id;
 
+    @NotNull
     @Column("vessel_imo_number")
     @ValidVesselIMONumber
     private String vesselIMONumber;
