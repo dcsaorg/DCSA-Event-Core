@@ -39,7 +39,6 @@ public class ActiveReeferSettings extends AuditBase implements Persistable<UUID>
 
     @Column("temperature_unit")
     @Size(max = 3)
-    @NotNull
     private TemperatureUnit temperatureUnit;
     
     @Column("humidity_min")
