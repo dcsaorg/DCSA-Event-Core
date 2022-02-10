@@ -11,7 +11,6 @@ import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.FacilityService;
 import org.dcsa.core.events.service.LocationService;
-import org.dcsa.core.events.util.Util;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -71,13 +70,10 @@ public class LocationServiceImpl
     }
 
     return locationTOMono
-        .flatMap(
-            locTo ->
-                Util.createOrFindByContent(
-                    locTo,
-                    locationRepository::findByContent,
-                    locTO -> this.create(locTO.toLocation())))
-        .map(location -> location.toLocationTO(locationTO.getAddress(), locationTO.getFacility()));
+            .flatMap(locationRepository::findByContent)
+            .switchIfEmpty(Mono.defer(() -> locationRepository.save(locationTO.toLocation())))
+            .doOnNext(loc -> locationTO.setId(loc.getId()))
+            .map(location -> location.toLocationTO(locationTO.getAddress(), locationTO.getFacility()));
   }
 
   @Override

@@ -2,14 +2,13 @@ package org.dcsa.core.events.model.base;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.dcsa.core.model.GetId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.Size;
 
 @Data
-public class AbstractParty implements GetId<String> {
+public class AbstractParty {
 
     @Id
     @JsonIgnore
