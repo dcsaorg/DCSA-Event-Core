@@ -14,5 +14,6 @@ public interface ShipmentEquipmentMapper {
 //	ShipmentEquipmentTO shipmentEquipmentToDTO(ShipmentEquipment shipmentEquipment);
 
 	@Mapping(source = "shipmentID", target = "shipmentID")
+	@Mapping(source = "shipmentEquipmentTO.equipment.equipmentReference", target = "equipmentReference")
 	ShipmentEquipment dtoToShipmentEquipment(ShipmentEquipmentTO shipmentEquipmentTO, UUID shipmentID);
 }

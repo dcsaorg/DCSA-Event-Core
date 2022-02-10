@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -19,14 +21,17 @@ import java.util.UUID;
 public class ShipmentEquipment extends AbstractShipmentEquipment implements GetId<UUID> {
 
   @Id
+  @JsonIgnore
   @Column("id")
   private UUID id;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonIgnore
+  @NotNull
   @Column("shipment_id")
   private UUID shipmentID;
 
-  @Column("equipment_reference")
+  @NotNull
   @Size(max = 15)
+  @Column("equipment_reference")
   private String equipmentReference;
 }
