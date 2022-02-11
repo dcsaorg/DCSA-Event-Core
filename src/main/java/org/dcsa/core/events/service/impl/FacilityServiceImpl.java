@@ -7,6 +7,7 @@ import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.service.FacilityService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
+import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.result.FlashAttributeResultMatchers;
@@ -70,5 +71,11 @@ public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityReposit
   @Override
   public Mono<Facility> findByIdOrEmpty(UUID id) {
     return facilityRepository.findByIdOrEmpty(id);
+  }
+
+  @Override
+  public Mono<Facility> findById(UUID uuid) {
+    return facilityRepository.findById(uuid)
+             .switchIfEmpty(Mono.error(new NotFoundException("Facility with id " + uuid + " missing")));
   }
 }

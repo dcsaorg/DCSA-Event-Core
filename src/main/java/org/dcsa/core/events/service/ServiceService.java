@@ -6,6 +6,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface ServiceService extends ExtendedBaseService<Service, UUID>  {
+public interface ServiceService {
     Mono<Service> findByCarrierServiceCode(String carrierServiceCode);
+
+    Mono<Service> create(Service service);
 }

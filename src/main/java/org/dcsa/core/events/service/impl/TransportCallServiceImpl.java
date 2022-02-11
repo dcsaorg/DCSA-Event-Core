@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.Seal;
 import org.dcsa.core.events.model.TransportCall;
-import org.dcsa.core.events.model.TransportEvent;
 import org.dcsa.core.events.model.enums.DocumentReferenceType;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.TransportCallRepository;
 import org.dcsa.core.events.service.TransportCallService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,14 +17,9 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class TransportCallServiceImpl extends ExtendedBaseServiceImpl<TransportCallRepository, TransportCall, String> implements TransportCallService {
+public class TransportCallServiceImpl implements TransportCallService {
     private final ReferenceRepository referenceRepository;
     private final TransportCallRepository transportCallRepository;
-
-    @Override
-    public TransportCallRepository getRepository() {
-        return transportCallRepository;
-    }
 
     @Override
     public Mono<List<DocumentReferenceTO>> findDocumentReferencesForTransportCallID(String transportCallID) {
@@ -51,6 +44,11 @@ public class TransportCallServiceImpl extends ExtendedBaseServiceImpl<TransportC
     public Mono<List<Seal>> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference) {
         return transportCallRepository.findSealsForTransportCallIDAndEquipmentReference(transportCallID, equipmentReference)
                 .collectList();
+    }
+
+    @Override
+    public Mono<TransportCall> create(TransportCall transportCall) {
+        return transportCallRepository.save(transportCall);
     }
 
 }

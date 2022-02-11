@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface CarrierService extends ExtendedBaseService<Carrier, UUID> {
+public interface CarrierService {
 
     Mono<Carrier> findByCode(CarrierCodeListProvider carrierCodeListProvider, String carrierCode);
 }

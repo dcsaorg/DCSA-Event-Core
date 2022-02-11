@@ -6,7 +6,6 @@ import org.dcsa.core.events.model.transferobjects.ReferenceTO;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.dcsa.core.util.MappingUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -19,9 +18,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class ReferenceServiceImpl
-    extends ExtendedBaseServiceImpl<ReferenceRepository, Reference, UUID>
-    implements ReferenceService {
+public class ReferenceServiceImpl implements ReferenceService {
 
   enum ImplementationType {
     BOOKING,
@@ -29,11 +26,6 @@ public class ReferenceServiceImpl
   }
 
   private final ReferenceRepository referenceRepository;
-
-  @Override
-  public ReferenceRepository getRepository() {
-    return this.referenceRepository;
-  }
 
   @Override
   public Mono<List<ReferenceTO>> createReferencesByBookingIDAndTOs(

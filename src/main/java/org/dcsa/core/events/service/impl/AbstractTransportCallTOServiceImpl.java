@@ -48,11 +48,6 @@ public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTrans
     private R2dbcDialect r2dbcDialect;
 
     @Override
-    public Flux<T> findAll() {
-        return findAllExtended(newExtendedRequest());
-    }
-
-    @Override
     public Flux<T> findAllExtended(ExtendedRequest<T> extendedRequest) {
         return getRepository().findAllExtended(extendedRequest);
     }
@@ -193,12 +188,6 @@ public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTrans
         }
         return carrierMono.flatMap(serviceService::create);
     }
-
-    @Override
-    public String getIdOfEntity(T entity) {
-        return entity.getTransportCallID();
-    }
-
 
     public ExtendedRequest<T> newExtendedRequest() {
         return new ExtendedRequest<>(extendedParameters, r2dbcDialect, getModelClass());

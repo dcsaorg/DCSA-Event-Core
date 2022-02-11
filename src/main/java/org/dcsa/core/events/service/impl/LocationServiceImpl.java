@@ -10,7 +10,7 @@ import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.FacilityService;
 import org.dcsa.core.events.service.LocationService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.exception.GetException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -20,9 +20,7 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class LocationServiceImpl
-    extends ExtendedBaseServiceImpl<LocationRepository, Location, String>
-    implements LocationService {
+public class LocationServiceImpl implements LocationService {
 
   private final FacilityService facilityService;
   private final AddressService addressService;
@@ -31,10 +29,6 @@ public class LocationServiceImpl
 
   private final LocationMapper locationMapper;
 
-  @Override
-  public LocationRepository getRepository() {
-    return locationRepository;
-  }
 
   public Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID) {
     return locationRepository
@@ -81,7 +75,9 @@ public class LocationServiceImpl
 
   @Override
   public Mono<LocationTO> findTOById(String locationID) {
-    return findById(locationID).flatMap(this::getLocationTO);
+    return locationRepository.findById(locationID)
+            .switchIfEmpty(Mono.error(new GetException("Cannot find location with ID: " + locationID)))
+            .flatMap(this::getLocationTO);
   }
 
   @Override
