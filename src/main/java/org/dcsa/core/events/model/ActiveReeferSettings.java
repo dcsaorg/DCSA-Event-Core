@@ -19,16 +19,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Table("active_reefer_settings")
-@EqualsAndHashCode(callSuper = true)
-public class ActiveReeferSettings extends AuditBase implements Persistable<UUID> {
+public class ActiveReeferSettings implements Persistable<UUID> {
 
     @Id
     /* We do not show this in JSON as it is an internal detail */
     @Column("shipment_equipment_id")
     private UUID shipmentEquipmentID;
 
-    @Transient
-    @JsonIgnore
     private boolean isNewRecord;
 
     @Column("temperature_min")
