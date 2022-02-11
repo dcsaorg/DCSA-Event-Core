@@ -13,7 +13,6 @@ import org.dcsa.core.events.service.EventSubscriptionService;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.UpdateException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.dcsa.core.util.ValidationUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -94,14 +93,6 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
     }
 
     protected Mono<EventSubscription> checkEventSubscription(EventSubscription eventSubscription) {
-        String vessel = eventSubscription.getVesselIMONumber();
-        if (vessel != null){
-            try{
-                ValidationUtils.validateVesselIMONumber(vessel);
-            } catch (Exception e){
-                return Mono.error(new UpdateException(e.getLocalizedMessage()));
-            }
-        }
         // Ensure that the callback url at least looks valid.
         try {
             new URI(eventSubscription.getCallbackUrl());

@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class Party extends AbstractParty implements SetId<String> {
+public class Party extends AbstractParty {
 
     @Column("address_id")
     private UUID addressID;

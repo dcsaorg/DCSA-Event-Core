@@ -12,7 +12,6 @@ import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.dcsa.core.util.ValidationUtils;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -37,14 +36,6 @@ public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository,
 
     @Override
     public Mono<Vessel> create(Vessel vessel) {
-        if (vessel.getVesselIMONumber() == null) {
-            return Mono.error(new CreateException("Missing vessel IMO number"));
-        }
-        try {
-            ValidationUtils.validateVesselIMONumber(vessel.getVesselIMONumber());
-        } catch (IllegalArgumentException e) {
-            return Mono.error(new CreateException(e.getLocalizedMessage()));
-        }
         //  Fails if duplicate key is created.
         // One should check first using findById before creating, return error if key(VesselIMONumber) exists.
         return preCreateHook(vessel)

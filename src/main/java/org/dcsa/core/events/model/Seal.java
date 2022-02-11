@@ -35,7 +35,6 @@ public class Seal extends AuditBase {
 
     @Column("seal_source_code")
     @Size(max = 5)
-    @NotNull
     private String sealSource;
 
     @Column("seal_type_code")

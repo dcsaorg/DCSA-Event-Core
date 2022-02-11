@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.repository.AddressRepository;
 import org.dcsa.core.events.service.AddressService;
-import org.dcsa.core.events.util.Util;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -24,11 +23,13 @@ public class AddressServiceImpl extends ExtendedBaseServiceImpl<AddressRepositor
 
   @Override
   public Mono<Address> ensureResolvable(Address address) {
-    return Util.createOrFindByContent(address, addressRepository::findByContent, this::create);
+      return addressRepository.findByContent(address)
+              .switchIfEmpty(Mono.defer(() -> addressRepository.save(address)));
   }
 
   @Override
   public Mono<Address> findByIdOrEmpty(UUID id) {
     return addressRepository.findByIdOrEmpty(id);
   }
+
 }
