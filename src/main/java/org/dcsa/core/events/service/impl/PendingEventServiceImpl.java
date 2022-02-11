@@ -169,7 +169,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                     }
                     return eventSubscriptionService.update(submissionResult.getEventSubscription())
                             .thenMany(Flux.fromIterable(submissionResult.getPendingMessages()))
-                            .concatMap(pendingEventRepository::insert)
+                            .concatMap(pendingEventRepository::save)
                             .then(Mono.just(submissionResult));
                 });
 

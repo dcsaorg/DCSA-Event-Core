@@ -2,15 +2,13 @@ package org.dcsa.core.events.repository;
 
 import org.dcsa.core.repository.ExtendedRepository;
 import org.dcsa.core.events.model.PendingMessage;
-import org.dcsa.core.repository.InsertAddonRepository;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface PendingEventRepository extends ExtendedRepository<PendingMessage, UUID>, InsertAddonRepository<PendingMessage> {
+public interface PendingEventRepository extends ExtendedRepository<PendingMessage, UUID> {
 
     // PostgreSQL specific (due to "FOR UPDATE SKIP LOCKED")
     @Query("DELETE FROM unmapped_event_queue WHERE event_id = ("
