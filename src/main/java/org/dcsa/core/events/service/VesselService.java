@@ -8,5 +8,11 @@ import java.util.UUID;
 
 public interface VesselService extends ExtendedBaseService<Vessel, UUID> {
 
+    Mono<Vessel> create(Vessel vessel);
+
+    Mono<Vessel> update(Vessel vessel);
+
     Mono<Vessel> findByVesselIMONumber(String vesselIMONumber);
+
+    Mono<Vessel> findById(UUID vesselID);
 }

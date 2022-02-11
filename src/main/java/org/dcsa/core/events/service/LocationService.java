@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
-public interface LocationService extends ExtendedBaseService<Location, String> {
+public interface LocationService {
 
   Mono<LocationTO> ensureResolvable(LocationTO locationTO);
 

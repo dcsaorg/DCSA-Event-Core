@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface GenericEventService extends EventService<Event> {
 
     Mono<Event> findByEventTypeAndEventID(EventType eventType, UUID eventID);
+
+    Mono<Event> create(Event event);
 }

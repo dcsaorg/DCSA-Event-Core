@@ -7,4 +7,6 @@ public interface TransportEventService extends EventService<TransportEvent> {
     Mono<TransportEvent> loadRelatedEntities(TransportEvent event);
 
     Mono<TransportEvent> mapTransportCall(TransportEvent transportEvent);
+
+    Mono<TransportEvent> create(TransportEvent transportEvent);
 }

@@ -8,6 +8,7 @@ import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.ShipmentEventService;
+import org.dcsa.core.exception.GetException;
 import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -29,10 +30,9 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
         return shipmentEventRepository;
     }
 
-    //Overriding base method here, as it marks empty results as an error, meaning we can't use switchOnEmpty()
     @Override
     public Mono<ShipmentEvent> findById(UUID id) {
-        return getRepository().findById(id);
+        return shipmentEventRepository.findById(id);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
 
     @Override
     public Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent) {
-        return super.create(shipmentEvent).flatMap(
+        return shipmentEventRepository.save(shipmentEvent).flatMap(
                 se -> {
                     UnmappedEvent unmappedEvent = new UnmappedEvent();
                     unmappedEvent.setNewRecord(true);

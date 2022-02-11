@@ -5,4 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface ShipmentEventService extends EventService<ShipmentEvent> {
     Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent event);
+
+    Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent);
 }

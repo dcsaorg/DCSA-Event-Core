@@ -11,18 +11,18 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @org.springframework.stereotype.Service
-public class ServiceServiceImpl extends ExtendedBaseServiceImpl<ServiceRepository, Service, UUID> implements ServiceService {
+public class ServiceServiceImpl implements ServiceService {
 
     private final ServiceRepository serviceRepository;
 
     @Override
-    public ServiceRepository getRepository() {
-        return serviceRepository;
+    public Mono<Service> findByCarrierServiceCode(String carrierServiceCode) {
+        return serviceRepository.findByCarrierServiceCode(carrierServiceCode);
     }
 
     @Override
-    public Mono<Service> findByCarrierServiceCode(String carrierServiceCode) {
-        return serviceRepository.findByCarrierServiceCode(carrierServiceCode);
+    public Mono<Service> create(Service service) {
+        return serviceRepository.save(service);
     }
 
 }

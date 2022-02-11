@@ -11,7 +11,7 @@ import org.dcsa.core.events.repository.PartyRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.PartyService;
 import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.exception.GetException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,20 +22,11 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, Party, String> implements PartyService {
+public class PartyServiceImpl implements PartyService {
     private final AddressService addressService;
     private final PartyRepository partyRepository;
     private final PartyIdentifyingCodeRepository partyCodeListResponsibleAgencyRepository;
     private static final Address EMPTY_ADDRESS = new Address();
-
-    @Override
-    public PartyRepository getRepository() {
-        return partyRepository;
-    }
-
-    public Flux<Party> findAllById(Iterable<String> ids) {
-        return partyRepository.findAllById(ids);
-    }
 
     @Override
     public Mono<PartyTO> ensureResolvable(PartyTO partyTO) {
@@ -51,7 +42,7 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
 
         return partyTOMono
             .flatMap(
-                pTo -> this.create(pTo.toParty()))
+                pTo -> partyRepository.save(pTo.toParty()))
             .flatMap(
                 party ->
                         Mono.justOrEmpty(partyTO.getIdentifyingCodes())
@@ -93,7 +84,8 @@ public class PartyServiceImpl extends ExtendedBaseServiceImpl<PartyRepository, P
 
     @Override
     public Mono<PartyTO> findTOById(String partyID) {
-        return findById(partyID)
+        return partyRepository.findById(partyID)
+                .switchIfEmpty(Mono.error(new GetException("Cannot find party with ID: " + partyID)))
                 .flatMap(this::loadRelatedEntities);
     }
     private  Mono<PartyTO> loadRelatedEntities(Party party){

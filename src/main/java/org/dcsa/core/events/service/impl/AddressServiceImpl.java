@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.repository.AddressRepository;
 import org.dcsa.core.events.service.AddressService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -12,14 +12,8 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class AddressServiceImpl extends ExtendedBaseServiceImpl<AddressRepository, Address, UUID>
-    implements AddressService {
+public class AddressServiceImpl implements AddressService {
   private final AddressRepository addressRepository;
-
-  @Override
-  public AddressRepository getRepository() {
-    return addressRepository;
-  }
 
   @Override
   public Mono<Address> ensureResolvable(Address address) {
@@ -30,6 +24,12 @@ public class AddressServiceImpl extends ExtendedBaseServiceImpl<AddressRepositor
   @Override
   public Mono<Address> findByIdOrEmpty(UUID id) {
     return addressRepository.findByIdOrEmpty(id);
+  }
+
+  @Override
+  public Mono<Address> findById(UUID uuid) {
+      return addressRepository.findById(uuid)
+              .switchIfEmpty(Mono.error(new NotFoundException("Address with id " + uuid + " missing")));
   }
 
 }

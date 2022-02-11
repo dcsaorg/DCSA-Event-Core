@@ -1,14 +1,12 @@
 package org.dcsa.core.events.service;
 
-import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.transferobjects.ReferenceTO;
-import org.dcsa.core.service.BaseService;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ReferenceService extends BaseService<Reference, UUID> {
+public interface ReferenceService {
 
   Mono<List<ReferenceTO>> createReferencesByBookingIDAndTOs(
       UUID bookingID, List<ReferenceTO> references);

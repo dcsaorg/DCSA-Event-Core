@@ -1,8 +1,10 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.EquipmentEvent;
 import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.UnmappedEvent;
+import org.dcsa.core.events.repository.EquipmentEventRepository;
 import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.*;
@@ -28,6 +30,11 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     @Override
     public OperationsEventRepository getRepository() {
         return operationsEventRepository;
+    }
+
+    @Override
+    public Mono<OperationsEvent> findById(UUID id) {
+        return operationsEventRepository.findById(id);
     }
 
     @Override
@@ -92,7 +99,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                   }
                   return Mono.just(oe);
               })
-              .flatMap(super::create)
+              .flatMap(operationsEventRepository::save)
               .flatMap(timestampDefinitionService::markOperationsEventAsTimestamp)
               .flatMap(
                       ope -> {

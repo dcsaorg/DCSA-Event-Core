@@ -30,10 +30,9 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
         return equipmentEventRepository;
     }
 
-    //Overriding base method here, as it marks empty results as an error, meaning we can't use switchOnEmpty()
     @Override
     public Mono<EquipmentEvent> findById(UUID id) {
-        return getRepository().findById(id);
+        return equipmentEventRepository.findById(id);
     }
 
 
@@ -65,7 +64,7 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
 
     @Override
     public Mono<EquipmentEvent> create(EquipmentEvent equipmentEvent) {
-        return super.create(equipmentEvent).flatMap(
+        return equipmentEventRepository.save(equipmentEvent).flatMap(
                 ee -> {
                     UnmappedEvent unmappedEvent = new UnmappedEvent();
                     unmappedEvent.setNewRecord(true);

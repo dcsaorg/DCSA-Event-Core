@@ -16,14 +16,9 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class CarrierServiceImpl extends ExtendedBaseServiceImpl<CarrierRepository, Carrier, UUID> implements CarrierService {
+public class CarrierServiceImpl implements CarrierService {
 
     private final CarrierRepository carrierRepository;
-
-    @Override
-    public CarrierRepository getRepository() {
-        return carrierRepository;
-    }
 
     @Override
     public Mono<Carrier> findByCode(CarrierCodeListProvider carrierCodeListProvider, String carrierCode) {
