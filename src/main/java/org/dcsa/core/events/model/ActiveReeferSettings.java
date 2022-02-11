@@ -26,6 +26,7 @@ public class ActiveReeferSettings implements Persistable<UUID> {
     @Column("shipment_equipment_id")
     private UUID shipmentEquipmentID;
 
+    @Transient
     private boolean isNewRecord;
 
     @Column("temperature_min")
