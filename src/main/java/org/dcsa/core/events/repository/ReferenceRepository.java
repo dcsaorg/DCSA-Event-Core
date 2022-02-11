@@ -56,6 +56,8 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
 
   Flux<Reference> findByBookingID(UUID bookingID);
 
+  Flux<Reference> findByCargoItemID(UUID cargoItemID);
+
   Mono<Void> deleteByBookingID(UUID bookingID);
 
   Mono<Void> deleteByShippingInstructionID(String shippingInstructionID);

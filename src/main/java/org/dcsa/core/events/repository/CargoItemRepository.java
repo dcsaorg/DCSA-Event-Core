@@ -8,7 +8,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.UUID;
 
-public interface CargoItemRepository extends ExtendedRepository<CargoItem, UUID> {
+public interface CargoItemRepository extends ExtendedRepository<CargoItem, UUID>, CargoItemCustomRepository {
 
     Flux<CargoItem> findAllByShippingInstructionID(String shippingInstructionID);
     Mono<Void> deleteAllByIdIn(List<UUID> cargoItemIDs);

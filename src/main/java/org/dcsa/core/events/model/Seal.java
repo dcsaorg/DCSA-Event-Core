@@ -42,11 +42,4 @@ public class Seal extends AuditBase {
     @NotNull
     private String sealType;
 
-//    public SealTO toSealTO() {
-//        SealTO sealTO = new SealTO();
-//        sealTO.setSealNumber(this.getSealNumber());
-//        sealTO.setSealSource(SealSourceCode.valueOf(this.getSealSource()));
-//        sealTO.setSealType(SealTypeCode.valueOf(this.getSealType()));
-//        return sealTO;
-//    }
 }

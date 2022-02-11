@@ -37,6 +37,56 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   private final ShipmentEquipmentMapper shipmentEquipmentMapper;
 
   @Override
+  public Mono<List<ShipmentEquipmentTO>> findShipmentEquipmentByShipmentID(UUID shipmentID) {
+    return shipmentEquipmentRepository
+        .findShipmentEquipmentDetailsByShipmentID(shipmentID)
+        .flatMap(
+            shipmentEquipmentDetails -> {
+              UUID shipmentEquipmentID = shipmentEquipmentDetails.getShipmentEquipmentID();
+              ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
+              shipmentEquipmentTO.setEquipment(
+                  equipmentMapper.shipmentEquipmentDetailsToDTO(shipmentEquipmentDetails));
+              shipmentEquipmentTO.setCargoGrossWeightUnit(
+                  shipmentEquipmentDetails.getCargoGrossWeightUnit());
+              shipmentEquipmentTO.setCargoGrossWeight(
+                  shipmentEquipmentDetails.getCargoGrossWeight());
+              return Mono.when(
+                      cargoItemRepository
+                          .findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
+                              shipmentEquipmentID)
+                          .flatMap(
+                              cargoItemWithCargoLineItems ->
+                                  referenceService
+                                      .findByCargoItemID(cargoItemWithCargoLineItems.getId())
+                                      .mapNotNull(
+                                          referenceTOS -> {
+                                            CargoItemTO cargoItemTO =
+                                                cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
+                                                    cargoItemWithCargoLineItems);
+                                            cargoItemTO.setReferences(referenceTOS);
+                                            return cargoItemTO;
+                                          })
+                                      .switchIfEmpty(
+                                          Mono.just(
+                                              cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
+                                                  cargoItemWithCargoLineItems))))
+                          .collectList()
+                          .doOnNext(shipmentEquipmentTO::setCargoItems),
+                      activeReeferSettingsRepository
+                          .findById(shipmentEquipmentID)
+                          .map(activeReeferSettingsMapper::activeReeferSettingsToDTO)
+                          .doOnNext(shipmentEquipmentTO::setActiveReeferSettings),
+                      sealRepository
+                          .findAllByShipmentEquipmentID(shipmentEquipmentID)
+                          .map(sealMapper::sealToDTO)
+                          .collectList()
+                          .doOnNext(shipmentEquipmentTO::setSeals))
+                  .thenReturn(shipmentEquipmentTO);
+            })
+        .collectList();
+  }
+
+  @Override
   public Mono<List<ShipmentEquipmentTO>> createShipmentEquipment(
       UUID shipmentID, String shippingInstructionID, List<ShipmentEquipmentTO> shipmentEquipments) {
     if (Objects.isNull(shipmentEquipments) || shipmentEquipments.isEmpty()) {
@@ -75,7 +125,9 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .flatMap(
             shipmentEquipmentTO ->
                 shipmentEquipmentRepository
-                    .save(shipmentEquipmentMapper.dtoToShipmentEquipment(shipmentEquipmentTO, shipmentID))
+                    .save(
+                        shipmentEquipmentMapper.dtoToShipmentEquipment(
+                            shipmentEquipmentTO, shipmentID))
                     .flatMapMany(
                         shipmentEquipment ->
                             Mono.zip(
@@ -118,7 +170,9 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .flatMap(
             cargoItemTO ->
                 cargoItemRepository
-                    .save(cargoItemMapper.dtoToCargoItem(cargoItemTO, shipmentEquipmentID, shippingInstructionID))
+                    .save(
+                        cargoItemMapper.dtoToCargoItem(
+                            cargoItemTO, shipmentEquipmentID, shippingInstructionID))
                     .map(cargoItem -> cargoItem.getId())
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
@@ -137,7 +191,8 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
       return Mono.empty();
     }
     return Flux.fromIterable(cargoItemTO.getCargoLineItems())
-      .map(cargoLineItemTO -> cargoLineItemMapper.dtoToCargoLineItem(cargoLineItemTO,cargoItemID))
+        .map(
+            cargoLineItemTO -> cargoLineItemMapper.dtoToCargoLineItem(cargoLineItemTO, cargoItemID))
         .flatMap(cargoLineItemRepository::save)
         .collectList()
         .map(

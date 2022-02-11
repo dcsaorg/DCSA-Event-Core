@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface ShipmentEquipmentService {
 	Mono<List<ShipmentEquipmentTO>> createShipmentEquipment(UUID shipmentID, String shippingInstructionID, List<ShipmentEquipmentTO> shipmentEquipments);
+
+	Mono<List<ShipmentEquipmentTO>> findShipmentEquipmentByShipmentID(UUID shipmentID);
 }
