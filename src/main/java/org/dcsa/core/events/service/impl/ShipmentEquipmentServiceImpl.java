@@ -93,7 +93,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   private Mono<ActiveReeferSettingsTO> saveActiveReeferSettings(
       UUID shipmentEquipmentID, ActiveReeferSettingsTO activeReeferSettingsTO) {
     return Mono.justOrEmpty(activeReeferSettingsTO)
-        .map(arsTO -> activeReeferSettingsMapper.dtoToActiveReeferSettings(arsTO, shipmentEquipmentID))
+        .map(arsTO -> activeReeferSettingsMapper.dtoToActiveReeferSettings(arsTO, shipmentEquipmentID, true))
         .flatMap(activeReeferSettingsRepository::save)
         .map(activeReeferSettingsMapper::activeReeferSettingsToDTO);
   }
