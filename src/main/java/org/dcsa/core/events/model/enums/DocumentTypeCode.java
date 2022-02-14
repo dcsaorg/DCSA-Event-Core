@@ -13,5 +13,8 @@ public enum DocumentTypeCode {
     CAS,
     CUS,
     DGD,
-    OOG
-}
+    OOG;
+
+    public final static String EBL_DOCUMENT_TYPE_CODES = "BKG,SHI";
+
+    }
