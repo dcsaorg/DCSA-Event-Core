@@ -75,80 +75,94 @@ class ShipmentServiceImpl implements ShipmentService {
   }
 
   Mono<List<ShipmentCutOffTimeTO>> fetchShipmentCutOffTimeByShipmentID(UUID shipmentID) {
-    if (shipmentID == null) return Mono.just(Collections.emptyList());
-    return shipmentCutOffTimeRepository
-        .findAllByShipmentID(shipmentID)
-        .map(shipmentMapper::shipmentCutOffTimeToDTO)
-        .collectList()
+    return Mono.justOrEmpty(shipmentID)
+        .flatMap(
+            sID ->
+                shipmentCutOffTimeRepository
+                    .findAllByShipmentID(sID)
+                    .map(shipmentMapper::shipmentCutOffTimeToDTO)
+                    .collectList())
         .defaultIfEmpty(Collections.emptyList());
   }
 
   Mono<List<ShipmentLocationTO>> fetchShipmentLocationsByBookingID(UUID bookingID) {
-    if (bookingID == null) return Mono.just(Collections.emptyList());
-    return shipmentLocationRepository
-        .findByBookingID(bookingID)
+    return Mono.justOrEmpty(bookingID)
         .flatMap(
-            sl ->
-                locationService
-                    .fetchLocationByID(sl.getLocationID())
+            bID ->
+                shipmentLocationRepository
+                    .findByBookingID(bID)
                     .flatMap(
-                        lTO -> {
-                          ShipmentLocationTO shipmentLocationTO =
-                              shipmentMapper.shipmentLocationToDTO(sl);
-                          shipmentLocationTO.setLocation(lTO);
-                          return Mono.just(shipmentLocationTO);
-                        }))
-        .collectList()
+                        sl ->
+                            locationService
+                                .fetchLocationByID(sl.getLocationID())
+                                .flatMap(
+                                    lTO -> {
+                                      ShipmentLocationTO shipmentLocationTO =
+                                          shipmentMapper.shipmentLocationToDTO(sl);
+                                      shipmentLocationTO.setLocation(lTO);
+                                      return Mono.just(shipmentLocationTO);
+                                    }))
+                    .collectList())
         .defaultIfEmpty(Collections.emptyList());
   }
 
   Mono<List<CarrierClauseTO>> fetchCarrierClausesByShipmentID(UUID shipmentID) {
-    if (shipmentID == null) return Mono.just(Collections.emptyList());
-    return shipmentCarrierClausesRepository
-        .findAllByShipmentID(shipmentID)
+    return Mono.justOrEmpty(shipmentID)
         .flatMap(
-            shipmentCarrierClause ->
-                carrierClauseRepository.findById(shipmentCarrierClause.getCarrierClauseID()))
-        .flatMap(x -> Mono.just(carrierClauseMapper.carrierClauseToDTO(x)))
-        .collectList()
+            sID ->
+                shipmentCarrierClausesRepository
+                    .findAllByShipmentID(sID)
+                    .flatMap(
+                        shipmentCarrierClause ->
+                            carrierClauseRepository.findById(
+                                shipmentCarrierClause.getCarrierClauseID()))
+                    .flatMap(x -> Mono.just(carrierClauseMapper.carrierClauseToDTO(x)))
+                    .collectList())
         .defaultIfEmpty(Collections.emptyList());
   }
 
   Mono<List<ConfirmedEquipmentTO>> fetchConfirmedEquipmentByByBookingID(UUID bookingID) {
-    if (bookingID == null) return Mono.just(Collections.emptyList());
-    return requestedEquipmentRepository
-        .findByBookingID(bookingID)
-        .map(confirmedEquipmentMapper::requestedEquipmentToDto)
-        .collectList()
+    return Mono.justOrEmpty(bookingID)
+        .flatMap(
+            bID ->
+                requestedEquipmentRepository
+                    .findByBookingID(bID)
+                    .map(confirmedEquipmentMapper::requestedEquipmentToDto)
+                    .collectList())
         .defaultIfEmpty(Collections.emptyList());
   }
 
   Mono<List<ChargeTO>> fetchChargesByShipmentID(UUID shipmentID) {
-    if (shipmentID == null) return Mono.just(Collections.emptyList());
-    return chargeRepository
-        .findAllByShipmentID(shipmentID)
-        .map(chargeMapper::chargeToDTO)
-        .collectList()
+    return Mono.justOrEmpty(shipmentID)
+        .flatMap(
+            sID ->
+                chargeRepository
+                    .findAllByShipmentID(sID)
+                    .map(chargeMapper::chargeToDTO)
+                    .collectList())
         .defaultIfEmpty(Collections.emptyList());
   }
 
   Mono<List<TransportTO>> fetchTransportsByShipmentID(UUID shipmentID) {
-    if (shipmentID == null) return Mono.just(Collections.emptyList());
-    return shipmentTransportRepository
-        .findAllByShipmentID(shipmentID)
+    return Mono.justOrEmpty(shipmentID)
         .flatMap(
-            st ->
-                transportService
-                    .findByTransportID(st.getTransportID())
-                    .map(
-                        tTO -> {
-                          tTO.setTransportPlanStage(st.getTransportPlanStageCode());
-                          tTO.setTransportPlanStageSequenceNumber(
-                              st.getTransportPlanStageSequenceNumber());
-                          tTO.setIsUnderShippersResponsibility(
-                              st.getIsUnderShippersResponsibility());
-                          return tTO;
-                        }))
-        .collectList();
+            sID ->
+                shipmentTransportRepository
+                    .findAllByShipmentID(sID)
+                    .flatMap(
+                        st ->
+                            transportService
+                                .findByTransportID(st.getTransportID())
+                                .map(
+                                    tTO -> {
+                                      tTO.setTransportPlanStage(st.getTransportPlanStageCode());
+                                      tTO.setTransportPlanStageSequenceNumber(
+                                          st.getTransportPlanStageSequenceNumber());
+                                      tTO.setIsUnderShippersResponsibility(
+                                          st.getIsUnderShippersResponsibility());
+                                      return tTO;
+                                    }))
+                    .collectList())
+        .defaultIfEmpty(Collections.emptyList());
   }
 }

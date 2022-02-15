@@ -37,12 +37,13 @@ public class TransportServiceImpl implements TransportService {
   private final LocationService locationService;
 
   @Override
-  public Flux<TransportTO> findByTransportID(UUID id) {
+  public Flux<TransportTO> findByTransportID(UUID transportID) {
+    if (transportID == null) return Flux.empty();
     return transportRepository
-        .findAllById(List.of(id))
+        .findAllById(List.of(transportID))
         .flatMap(
             transport ->
-                fetchTransportCallById(transport.getLoadTransportCallID())
+                fetchTransportCallByID(transport.getLoadTransportCallID())
                     .flatMap(
                         tc -> {
                           TransportTO transportTO = transportMapper.transportToDTO(transport);
@@ -50,7 +51,7 @@ public class TransportServiceImpl implements TransportService {
                           transportTO.setTransportReference(transport.getTransportReference());
 
                           return Mono.when(
-                                  fetchTransportEventByTransportId(transport.getTransportID())
+                                  fetchTransportEventByTransportID(transport.getTransportID())
                                       .doOnNext(
                                           t2 -> {
                                             transportTO.setPlannedDepartureDate(
@@ -58,24 +59,24 @@ public class TransportServiceImpl implements TransportService {
                                             transportTO.setPlannedArrivalDate(
                                                 t2.getT2().getEventDateTime());
                                           }),
-                                  fetchLocationByTransportCallId(transport.getLoadTransportCallID())
+                                  fetchLocationByTransportCallID(transport.getLoadTransportCallID())
                                       .doOnNext(transportTO::setLoadLocation),
-                                  fetchLocationByTransportCallId(
+                                  fetchLocationByTransportCallID(
                                           transport.getDischargeTransportCallID())
                                       .doOnNext(transportTO::setLoadLocation),
-                                  fetchModeOfTransportByTransportCallId(
+                                  fetchModeOfTransportByTransportCallID(
                                           transport.getLoadTransportCallID())
                                       .doOnNext(
                                           mod ->
                                               transportTO.setModeOfTransport(
                                                   mod.getDcsaTransportType())),
-                                  fetchVesselByTransportCallId(tc.getTransportCallID())
+                                  fetchVesselByTransportCallID(tc.getTransportCallID())
                                       .doOnNext(
                                           v -> {
                                             transportTO.setVesselName(v.getVesselName());
                                             transportTO.setVesselIMONumber(v.getVesselIMONumber());
                                           }),
-                                  fetchImportExportVoyageNumberByTransportCallId(tc)
+                                  fetchImportExportVoyageNumberByTransportCallID(tc)
                                       .doOnNext(
                                           cvnMap -> {
                                             transportTO.setImportVoyageNumber(
@@ -87,45 +88,46 @@ public class TransportServiceImpl implements TransportService {
                         }));
   }
 
-  Mono<Tuple2<TransportEvent, TransportEvent>> fetchTransportEventByTransportId(UUID transportId) {
-    return transportRepository
-        .findById(transportId)
+  Mono<Tuple2<TransportEvent, TransportEvent>> fetchTransportEventByTransportID(UUID transportId) {
+    return Mono.justOrEmpty(transportId)
         .flatMap(
-            x ->
-                Mono.zip(
-                        transportEventRepository
-                            .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                x.getLoadTransportCallID(),
-                                TransportEventTypeCode.ARRI,
-                                EventClassifierCode.PLN),
-                        transportEventRepository
-                            .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                x.getDischargeTransportCallID(),
-                                TransportEventTypeCode.DEPA,
-                                EventClassifierCode.PLN))
-                    .flatMap(y -> Mono.just(Tuples.of(y.getT1(), y.getT2()))));
+            tID ->
+                transportRepository
+                    .findById(transportId)
+                    .flatMap(
+                        x ->
+                            Mono.zip(
+                                    transportEventRepository
+                                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                                            x.getLoadTransportCallID(),
+                                            TransportEventTypeCode.ARRI,
+                                            EventClassifierCode.PLN),
+                                    transportEventRepository
+                                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                                            x.getDischargeTransportCallID(),
+                                            TransportEventTypeCode.DEPA,
+                                            EventClassifierCode.PLN))
+                                .flatMap(y -> Mono.just(Tuples.of(y.getT1(), y.getT2())))));
   }
 
-  private Mono<TransportCall> fetchTransportCallById(String transportCallId) {
-    if (transportCallId == null) return Mono.empty();
-    return transportCallRepository.findById(transportCallId);
+  Mono<TransportCall> fetchTransportCallByID(String transportCallID) {
+    return Mono.justOrEmpty(transportCallID).flatMap(transportCallRepository::findById);
   }
 
-  Mono<LocationTO> fetchLocationByTransportCallId(String id) {
-    if (id == null) return Mono.empty();
-    return fetchTransportCallById(id)
+  Mono<LocationTO> fetchLocationByTransportCallID(String id) {
+    return Mono.justOrEmpty(id)
+        .flatMap(this::fetchTransportCallByID)
         .flatMap(transportCall -> locationService.fetchLocationByID(transportCall.getLocationID()));
   }
 
-  Mono<ModeOfTransport> fetchModeOfTransportByTransportCallId(String transportCallId) {
-    if (transportCallId == null) return Mono.empty();
-    return modeOfTransportRepository.findByTransportCallID(transportCallId);
+  Mono<ModeOfTransport> fetchModeOfTransportByTransportCallID(String transportCallId) {
+    return Mono.justOrEmpty(transportCallId)
+        .flatMap(modeOfTransportRepository::findByTransportCallID);
   }
 
-  Mono<Vessel> fetchVesselByTransportCallId(String transportCallId) {
-
-    if (transportCallId == null) return Mono.empty();
-    return fetchTransportCallById(transportCallId)
+  Mono<Vessel> fetchVesselByTransportCallID(String transportCallId) {
+    return Mono.justOrEmpty(transportCallId)
+        .flatMap(this::fetchTransportCallByID)
         .flatMap(
             x -> {
               if (x.getVesselID() == null) {
@@ -135,7 +137,7 @@ public class TransportServiceImpl implements TransportService {
             });
   }
 
-  Mono<Map<String, String>> fetchImportExportVoyageNumberByTransportCallId(
+  Mono<Map<String, String>> fetchImportExportVoyageNumberByTransportCallID(
       TransportCall transportCall) {
     if (transportCall == null) return Mono.just(Collections.emptyMap());
     if (transportCall.getImportVoyageID() == null) return Mono.just(Collections.emptyMap());
@@ -145,7 +147,8 @@ public class TransportServiceImpl implements TransportService {
         .flatMap(
             voyage -> {
               Mono<Voyage> exportVoyage;
-              if (!transportCall.getExportVoyageID().equals(transportCall.getImportVoyageID())) {
+              if (transportCall.getExportVoyageID() != null
+                  && !transportCall.getExportVoyageID().equals(transportCall.getImportVoyageID())) {
                 exportVoyage = voyageRepository.findById(transportCall.getExportVoyageID());
               } else {
                 exportVoyage = Mono.just(voyage);

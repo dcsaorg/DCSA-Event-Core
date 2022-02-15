@@ -34,7 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Test for ShipmentService implementation")
+@DisplayName("Test for ShipmentService implementation.")
 class ShipmentServiceImplTest {
 
   // mappers
