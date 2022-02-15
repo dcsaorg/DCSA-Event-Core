@@ -3,7 +3,6 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
-import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
@@ -70,10 +69,14 @@ public class LocationServiceImpl
     }
 
     return locationTOMono
-            .flatMap(locationRepository::findByContent)
-            .switchIfEmpty(Mono.defer(() -> locationRepository.save(locationTO.toLocation())))
-            .doOnNext(loc -> locationTO.setId(loc.getId()))
-            .map(location -> location.toLocationTO(locationTO.getAddress(), locationTO.getFacility()));
+        .flatMap(locationRepository::findByContent)
+        .switchIfEmpty(
+            Mono.defer(() -> locationRepository.save(locationMapper.dtoToLocation(locationTO))))
+        .doOnNext(loc -> locationTO.setId(loc.getId()))
+        .map(
+            location ->
+                locationMapper.locationToDTO(
+                    location, locationTO.getAddress(), locationTO.getFacility()));
   }
 
   @Override
@@ -127,7 +130,8 @@ public class LocationServiceImpl
 
     if (Objects.isNull(locationTO.getAddress())) {
       return locationRepository
-          .save(location)
+          .findByContent(locationTO)
+          .switchIfEmpty(Mono.defer(() -> locationRepository.save(location)))
           .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
           .map(locationMapper::locationToDTO);
     } else {
@@ -136,8 +140,10 @@ public class LocationServiceImpl
           .flatMap(
               a -> {
                 location.setAddressID(a.getId());
+                locationTO.setAddress(a);
                 return locationRepository
-                    .save(location)
+                    .findByContent(locationTO)
+                    .switchIfEmpty(Mono.defer(() -> locationRepository.save(location)))
                     .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
                     .map(l -> locationMapper.locationToDTO(l, a, null));
               });
