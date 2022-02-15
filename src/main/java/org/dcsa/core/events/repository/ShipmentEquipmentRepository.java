@@ -16,6 +16,10 @@ public interface ShipmentEquipmentRepository extends ReactiveCrudRepository<Ship
 
   Mono<ShipmentEquipment> findShipmentEquipmentByShipmentID(UUID shipmentID);
 
+  Mono<Void> deleteShipmentEquipmentByShipmentID(UUID shipmentID);
+
+  Mono<ShipmentEquipment> findShipmentEquipmentByShipmentID(UUID shipmentID);
+
   Flux<ShipmentEquipment> findAllByShipmentIDIn(List<UUID> shipmentIDs);
 
   Mono<ShipmentEquipment> findByEquipmentReference(String equipmentReference);

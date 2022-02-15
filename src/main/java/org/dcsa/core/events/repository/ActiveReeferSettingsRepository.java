@@ -6,4 +6,5 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import java.util.UUID;
 
 public interface ActiveReeferSettingsRepository extends ReactiveCrudRepository<ActiveReeferSettings, UUID> {
+    Mono<Void> deleteByShipmentEquipmentID(UUID shipmentEquipmentID);
 }
