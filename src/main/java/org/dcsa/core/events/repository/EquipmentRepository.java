@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface EquipmentRepository extends ExtendedRepository<Equipment, String> {
+    Mono<Void> deleteAllByEquipmentReference(String equipmentReference);
     Mono<Equipment> findByEquipmentReference(String equipmentReference);
 }

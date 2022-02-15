@@ -11,6 +11,10 @@ import java.util.UUID;
 
 public interface ShipmentEquipmentRepository extends ExtendedRepository<ShipmentEquipment, UUID>, ShipmentEquipmentCustomRepository {
 
+  Mono<Void> deleteShipmentEquipmentByShipmentID(UUID shipmentID);
+
+  Mono<ShipmentEquipment> findShipmentEquipmentByShipmentID(UUID shipmentID);
+
   Flux<ShipmentEquipment> findAllByShipmentIDIn(List<UUID> shipmentIDs);
 
   Mono<ShipmentEquipment> findByEquipmentReference(String equipmentReference);
