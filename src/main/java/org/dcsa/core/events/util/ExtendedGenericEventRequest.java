@@ -153,7 +153,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                     if (field.isSynthetic() || Modifier.isStatic(field.getModifiers()) || field.isAnnotationPresent(Transient.class)) {
                         continue;
                     }
-                    QueryField queryField = QueryFields.queryFieldFromField(Event.class, field, clazz, eventTable, true);
+                    QueryField queryField = QueryFields.queryFieldFromField(field, eventTable, true);
                     if (seen.add(queryField.getJsonName())) {
                         builder = builder.registerQueryField(queryField);
                     }
