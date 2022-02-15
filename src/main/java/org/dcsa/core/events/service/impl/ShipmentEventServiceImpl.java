@@ -26,7 +26,7 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public ShipmentEventRepository getRepository() {
+    protected ShipmentEventRepository getRepository() {
         return shipmentEventRepository;
     }
 

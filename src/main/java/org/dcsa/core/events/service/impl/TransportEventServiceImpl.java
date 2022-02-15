@@ -28,7 +28,7 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     private boolean mapReferences;
 
     @Override
-    public TransportEventRepository getRepository() {
+    protected TransportEventRepository getRepository() {
         return transportEventRepository;
     }
 
