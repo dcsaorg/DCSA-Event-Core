@@ -1,12 +1,11 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Equipment;
-import org.dcsa.core.repository.ExtendedRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface EquipmentRepository extends ExtendedRepository<Equipment, String> {
-    Mono<Void> deleteAllByEquipmentReference(String equipmentReference);
+public interface EquipmentRepository extends ReactiveCrudRepository<Equipment, String> {
     Mono<Equipment> findByEquipmentReference(String equipmentReference);
 }

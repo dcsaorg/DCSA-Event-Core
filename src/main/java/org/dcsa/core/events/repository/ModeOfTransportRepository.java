@@ -4,11 +4,12 @@ import org.dcsa.core.events.model.ModeOfTransport;
 import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface ModeOfTransportRepository extends ExtendedRepository<ModeOfTransport, String> {
+public interface ModeOfTransportRepository extends ReactiveCrudRepository<ModeOfTransport, String> {
 
   @Query(
       "SELECT mot.* from transport_call tc " +

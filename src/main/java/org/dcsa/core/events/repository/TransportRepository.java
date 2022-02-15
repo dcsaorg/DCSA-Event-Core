@@ -3,11 +3,12 @@ package org.dcsa.core.events.repository;
 import org.dcsa.core.events.model.Transport;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
-public interface TransportRepository extends ExtendedRepository<Transport, UUID> {
+public interface TransportRepository extends ReactiveCrudRepository<Transport, UUID> {
 
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "
