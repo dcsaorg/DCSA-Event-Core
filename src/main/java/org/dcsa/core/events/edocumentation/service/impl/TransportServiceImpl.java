@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.util.Collections;
 import java.util.List;
@@ -97,17 +96,16 @@ public class TransportServiceImpl implements TransportService {
                     .flatMap(
                         x ->
                             Mono.zip(
-                                    transportEventRepository
-                                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                            x.getLoadTransportCallID(),
-                                            TransportEventTypeCode.ARRI,
-                                            EventClassifierCode.PLN),
-                                    transportEventRepository
-                                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                            x.getDischargeTransportCallID(),
-                                            TransportEventTypeCode.DEPA,
-                                            EventClassifierCode.PLN))
-                                .flatMap(y -> Mono.just(Tuples.of(y.getT1(), y.getT2())))));
+                                transportEventRepository
+                                    .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                                        x.getLoadTransportCallID(),
+                                        TransportEventTypeCode.ARRI,
+                                        EventClassifierCode.PLN),
+                                transportEventRepository
+                                    .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                                        x.getDischargeTransportCallID(),
+                                        TransportEventTypeCode.DEPA,
+                                        EventClassifierCode.PLN))));
   }
 
   Mono<TransportCall> fetchTransportCallByID(String transportCallID) {
