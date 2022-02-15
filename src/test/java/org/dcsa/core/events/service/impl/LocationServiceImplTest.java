@@ -89,6 +89,7 @@ class LocationServiceImplTest {
     locationTO.setAddress(null);
 
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
+    when(locationRepository.findByContent(any())).thenReturn(Mono.empty());
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
         .assertNext(
@@ -102,10 +103,51 @@ class LocationServiceImplTest {
   }
 
   @Test
+  @DisplayName("Test trying to create an existing locationTO without address")
+  void testExistingLocationByTOWithoutAddress() {
+
+    locationTO.setAddress(null);
+
+    when(locationRepository.findByContent(any())).thenReturn(Mono.just(location));
+
+    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
+        .assertNext(
+            l -> {
+              verify(addressService, never()).ensureResolvable(any());
+              verify(locationRepository, never()).save(any());
+
+              assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(address.getId(), l.getAddressID());
+            })
+        .verifyComplete();
+  }
+
+  @Test
   @DisplayName("Test create locationTO with address")
   void testCreateLocationByTOWithAddress() {
 
+    when(locationRepository.findByContent(any())).thenReturn(Mono.empty());
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
+    when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
+
+    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
+        .assertNext(
+            l -> {
+                verify(addressService).ensureResolvable(any());
+                verify(locationRepository).save(any());
+
+                assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(facility.getFacilityID(), l.getFacilityID());
+              assertEquals(address.getId(), l.getAddressID());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test trying to create an existing locationTO with address")
+  void testExistingLocationByTOWithAddress() {
+
+    when(locationRepository.findByContent(any())).thenReturn(Mono.just(location));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
