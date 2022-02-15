@@ -26,7 +26,7 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public EquipmentEventRepository getRepository() {
+    protected EquipmentEventRepository getRepository() {
         return equipmentEventRepository;
     }
 

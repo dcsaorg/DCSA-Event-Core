@@ -28,7 +28,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public OperationsEventRepository getRepository() {
+    protected OperationsEventRepository getRepository() {
         return operationsEventRepository;
     }
 
