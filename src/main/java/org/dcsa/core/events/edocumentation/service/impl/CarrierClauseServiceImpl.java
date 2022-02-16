@@ -24,8 +24,7 @@ public class CarrierClauseServiceImpl implements CarrierClauseService {
       String transportDocumentReference) {
     return shipmentCarrierClausesRepository
         .findAllByTransportDocumentReference(transportDocumentReference)
-        .switchIfEmpty(Flux.empty())
-        .mapNotNull(ShipmentCarrierClause::getCarrierClauseID)
+        .map(ShipmentCarrierClause::getCarrierClauseID)
         .flatMap(carrierClauseRepository::findById)
         .map(carrierClauseMapper::carrierClauseToDTO);
   }
@@ -34,8 +33,7 @@ public class CarrierClauseServiceImpl implements CarrierClauseService {
   public Flux<CarrierClauseTO> fetchCarrierClausesByShipmentID(UUID shipmentID) {
     return shipmentCarrierClausesRepository
       .findAllByShipmentID(shipmentID)
-      .switchIfEmpty(Flux.empty())
-      .mapNotNull(ShipmentCarrierClause::getCarrierClauseID)
+      .map(ShipmentCarrierClause::getCarrierClauseID)
       .flatMap(carrierClauseRepository::findById)
       .map(carrierClauseMapper::carrierClauseToDTO);
   }
