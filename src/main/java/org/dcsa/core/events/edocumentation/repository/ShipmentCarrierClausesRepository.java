@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface ShipmentCarrierClausesRepository
     extends ReactiveCrudRepository<ShipmentCarrierClause, UUID> {
   Flux<ShipmentCarrierClause> findAllByShipmentID(UUID shipmentID);
+  Flux<ShipmentCarrierClause> findAllByTransportDocumentReference(String transportDocumentReference);
 }
