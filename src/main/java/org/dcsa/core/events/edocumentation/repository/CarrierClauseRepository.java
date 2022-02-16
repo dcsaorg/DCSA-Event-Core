@@ -11,13 +11,13 @@ import java.util.UUID;
 @Repository
 public interface CarrierClauseRepository extends ReactiveCrudRepository<CarrierClause, UUID> {
 
-  @Query("select cc.id, cc.clause_content "
+  @Query("select cc.* "
 		+ "from dcsa_im_v3_0.carrier_clauses cc "
 		+ "join dcsa_im_v3_0.shipment_carrier_clauses scc on scc.carrier_clause_id = cc.id "
 		+ "where scc.shipment_id  = :shipmentID")
   Flux<CarrierClause> fetchAllByShipmentID(UUID shipmentID);
 
-	@Query("select cc.id, cc.clause_content "
+	@Query("select cc.* "
 		+ "from carrier_clauses cc "
 		+ "join shipment_carrier_clauses scc on scc.carrier_clause_id = cc.id "
 		+ "where scc.transport_document_reference = :transportDocumentReference")

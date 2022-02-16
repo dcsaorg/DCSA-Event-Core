@@ -1,7 +1,6 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.dcsa.core.events.edocumentation.model.mapper.CarrierClauseMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ChargeMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ConfirmedEquipmentMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ShipmentMapper;
@@ -28,7 +27,6 @@ class ShipmentServiceImpl implements ShipmentService {
 
   // mappers
   private final ShipmentMapper shipmentMapper;
-  private final CarrierClauseMapper carrierClauseMapper;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
   private final ChargeMapper chargeMapper;
 
