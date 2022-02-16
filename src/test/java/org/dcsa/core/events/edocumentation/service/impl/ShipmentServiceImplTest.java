@@ -4,9 +4,11 @@ import org.dcsa.core.events.edocumentation.model.mapper.CarrierClauseMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ChargeMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ConfirmedEquipmentMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ShipmentMapper;
+import org.dcsa.core.events.edocumentation.model.transferobject.CarrierClauseTO;
 import org.dcsa.core.events.edocumentation.model.transferobject.TransportTO;
 import org.dcsa.core.events.edocumentation.repository.*;
 import org.dcsa.core.events.edocumentation.service.BookingService;
+import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.*;
@@ -51,13 +53,12 @@ class ShipmentServiceImplTest {
   @Mock LocationService locationService;
   @Mock TransportService transportService;
   @Mock BookingService bookingService;
+  @Mock CarrierClauseService carrierClauseService;
 
   // repos
   @Mock ShipmentRepository shipmentRepository;
   @Mock ShipmentCutOffTimeRepository shipmentCutOffTimeRepository;
   @Mock ShipmentLocationRepository shipmentLocationRepository;
-  @Mock ShipmentCarrierClausesRepository shipmentCarrierClausesRepository;
-  @Mock CarrierClauseRepository carrierClauseRepository;
   @Mock RequestedEquipmentRepository requestedEquipmentRepository;
   @Mock ChargeRepository chargeRepository;
   @Mock ShipmentTransportRepository shipmentTransportRepository;
@@ -69,11 +70,11 @@ class ShipmentServiceImplTest {
   LocationTO locationTO;
   ShipmentLocation shipmentLocation;
   ShipmentCarrierClause shipmentCarrierClause;
-  CarrierClause carrierClause;
   RequestedEquipment requestedEquipment;
   Charge charge;
   ShipmentTransport shipmentTransport;
   TransportTO transportTO;
+  CarrierClauseTO carrierClauseTO;
   Shipment shipment;
 
   @BeforeEach
@@ -96,9 +97,8 @@ class ShipmentServiceImplTest {
     shipmentCarrierClause.setCarrierClauseID(UUID.randomUUID());
     shipmentCarrierClause.setTransportDocumentReference("ref");
 
-    carrierClause = new CarrierClause();
-    carrierClause.setId(UUID.randomUUID());
-    carrierClause.setClauseContent("clause content");
+    carrierClauseTO = new CarrierClauseTO();
+    carrierClauseTO.setClauseContent("clause content");
 
     requestedEquipment = new RequestedEquipment();
     requestedEquipment.setBookingID(UUID.randomUUID());
@@ -232,10 +232,6 @@ class ShipmentServiceImplTest {
   void fetchCarrierClausesByShipmentIDForNullID() {
 
     StepVerifier.create(shipmentService.fetchCarrierClausesByShipmentID(null))
-        .assertNext(
-            res -> {
-              assertEquals(0, res.size());
-            })
         .verifyComplete();
   }
 
@@ -244,7 +240,7 @@ class ShipmentServiceImplTest {
       "Test fetchCarrierClausesByShipmentID should return empty list if no results returned.")
   void fetchCarrierClausesByShipmentIDForValidIDButEmptyRes() {
 
-    when(shipmentCarrierClausesRepository.findAllByShipmentID(any())).thenReturn(Flux.empty());
+    when(carrierClauseService.fetchCarrierClausesByShipmentID(any())).thenReturn(Flux.empty());
 
     StepVerifier.create(shipmentService.fetchCarrierClausesByShipmentID(UUID.randomUUID()))
         .assertNext(
@@ -258,9 +254,8 @@ class ShipmentServiceImplTest {
   @DisplayName("Test fetchCarrierClausesByShipmentID should return valid result for valid ID.")
   void fetchCarrierClausesByShipmentIDForValidID() {
 
-    when(shipmentCarrierClausesRepository.findAllByShipmentID(any()))
-        .thenReturn(Flux.just(shipmentCarrierClause));
-    when(carrierClauseRepository.findById(any(UUID.class))).thenReturn(Mono.just(carrierClause));
+    when(carrierClauseService.fetchCarrierClausesByShipmentID(any()))
+        .thenReturn(Flux.just(carrierClauseTO));
 
     StepVerifier.create(shipmentService.fetchCarrierClausesByShipmentID(UUID.randomUUID()))
         .assertNext(
@@ -358,6 +353,7 @@ class ShipmentServiceImplTest {
         .verifyComplete();
   }
 
+  @Test
   @DisplayName("Test fetchTransportsByShipmentID should return empty list if ID is null.")
   void fetchTransportsByShipmentIDForNullID() {
 
@@ -411,9 +407,8 @@ class ShipmentServiceImplTest {
         .thenReturn(Flux.just(shipmentCutOffTime));
     when(shipmentLocationRepository.findByBookingID(any())).thenReturn(Flux.just(shipmentLocation));
 
-    when(shipmentCarrierClausesRepository.findAllByShipmentID(any()))
-        .thenReturn(Flux.just(shipmentCarrierClause));
-    when(carrierClauseRepository.findById(any(UUID.class))).thenReturn(Mono.just(carrierClause));
+    when(carrierClauseService.fetchCarrierClausesByShipmentID(any()))
+        .thenReturn(Flux.just(carrierClauseTO));
     when(requestedEquipmentRepository.findByBookingID(any()))
         .thenReturn(Flux.just(requestedEquipment));
     when(chargeRepository.findAllByShipmentID(any())).thenReturn(Flux.just(charge));
