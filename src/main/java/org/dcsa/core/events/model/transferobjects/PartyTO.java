@@ -33,14 +33,6 @@ public class PartyTO extends AbstractParty {
 
     private List<IdentifyingCode> identifyingCodes;
 
-    public Party toParty() {
-        Party party = MappingUtils.instanceFrom(this, Party::new, AbstractParty.class);
-        if (this.address != null) {
-            party.setAddressID(address.getId());
-        }
-        return party;
-    }
-
     public void adjustIdentifyingCodesIfNmftaIsPresent(){
         if (StringUtils.isNotEmpty(this.getNmftaCode())) {
             if (null != identifyingCodes
