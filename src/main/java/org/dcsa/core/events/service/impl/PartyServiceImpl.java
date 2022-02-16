@@ -5,6 +5,7 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
 import org.dcsa.core.events.model.PartyIdentifyingCode;
 import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
+import org.dcsa.core.events.model.mapper.PartyMapper;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.PartyIdentifyingCodeRepository;
 import org.dcsa.core.events.repository.PartyRepository;
@@ -26,6 +27,7 @@ public class PartyServiceImpl implements PartyService {
     private final AddressService addressService;
     private final PartyRepository partyRepository;
     private final PartyIdentifyingCodeRepository partyCodeListResponsibleAgencyRepository;
+    private final PartyMapper partyMapper;
     private static final Address EMPTY_ADDRESS = new Address();
 
     @Override
@@ -42,7 +44,7 @@ public class PartyServiceImpl implements PartyService {
 
         return partyTOMono
             .flatMap(
-                pTo -> partyRepository.save(pTo.toParty()))
+                pTo -> partyRepository.save(partyMapper.dtoToParty(pTo)))
             .flatMap(
                 party ->
                         Mono.justOrEmpty(partyTO.getIdentifyingCodes())

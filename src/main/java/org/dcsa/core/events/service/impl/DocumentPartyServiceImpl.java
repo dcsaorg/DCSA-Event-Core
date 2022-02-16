@@ -143,7 +143,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
       return Mono.just(Collections.emptyList());
     }
 
-    return Flux.fromStream(documentParties.stream())
+    return Flux.fromIterable(documentParties)
         .flatMap(
             dp ->
                 // party is mandatory, cannot be null in document party as per API specs
@@ -199,7 +199,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
 
       partyMap =
           partyRepository
-              .save(partyTO.toParty())
+              .save(partyMapper.dtoToParty(partyTO))
               .map(
                   p ->
                       Tuples.of(
@@ -216,7 +216,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
               .ensureResolvable(partyTO.getAddress())
               .flatMap(
                   a -> {
-                    Party party = partyTO.toParty();
+                    Party party = partyMapper.dtoToParty(partyTO);
                     return partyRepository
                         .save(party)
                         .map(
