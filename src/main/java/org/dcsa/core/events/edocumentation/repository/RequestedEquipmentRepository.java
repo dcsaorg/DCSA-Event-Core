@@ -1,4 +1,4 @@
-package org.dcsa.core.events.repository;
+package org.dcsa.core.events.edocumentation.repository;
 
 import org.dcsa.core.events.model.RequestedEquipment;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
