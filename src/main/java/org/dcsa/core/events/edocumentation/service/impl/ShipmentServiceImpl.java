@@ -1,13 +1,13 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.dcsa.core.events.edocumentation.model.mapper.CarrierClauseMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ChargeMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ConfirmedEquipmentMapper;
 import org.dcsa.core.events.edocumentation.model.mapper.ShipmentMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.*;
 import org.dcsa.core.events.edocumentation.repository.*;
 import org.dcsa.core.events.edocumentation.service.BookingService;
+import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.ShipmentService;
 import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.repository.ShipmentRepository;
@@ -27,7 +27,6 @@ class ShipmentServiceImpl implements ShipmentService {
 
   // mappers
   private final ShipmentMapper shipmentMapper;
-  private final CarrierClauseMapper carrierClauseMapper;
   private final ConfirmedEquipmentMapper confirmedEquipmentMapper;
   private final ChargeMapper chargeMapper;
 
@@ -40,8 +39,7 @@ class ShipmentServiceImpl implements ShipmentService {
   private final ShipmentRepository shipmentRepository;
   private final ShipmentCutOffTimeRepository shipmentCutOffTimeRepository;
   private final ShipmentLocationRepository shipmentLocationRepository;
-  private final ShipmentCarrierClausesRepository shipmentCarrierClausesRepository;
-  private final CarrierClauseRepository carrierClauseRepository;
+  private final CarrierClauseService carrierClauseService;
   private final RequestedEquipmentRepository requestedEquipmentRepository;
   private final ChargeRepository chargeRepository;
   private final ShipmentTransportRepository shipmentTransportRepository;
@@ -107,18 +105,10 @@ class ShipmentServiceImpl implements ShipmentService {
   }
 
   Mono<List<CarrierClauseTO>> fetchCarrierClausesByShipmentID(UUID shipmentID) {
+
     return Mono.justOrEmpty(shipmentID)
         .flatMap(
-            sID ->
-                shipmentCarrierClausesRepository
-                    .findAllByShipmentID(sID)
-                    .flatMap(
-                        shipmentCarrierClause ->
-                            carrierClauseRepository.findById(
-                                shipmentCarrierClause.getCarrierClauseID()))
-                    .flatMap(x -> Mono.just(carrierClauseMapper.carrierClauseToDTO(x)))
-                    .collectList())
-        .defaultIfEmpty(Collections.emptyList());
+            sID -> carrierClauseService.fetchCarrierClausesByShipmentID(shipmentID).collectList());
   }
 
   Mono<List<ConfirmedEquipmentTO>> fetchConfirmedEquipmentByByBookingID(UUID bookingID) {
