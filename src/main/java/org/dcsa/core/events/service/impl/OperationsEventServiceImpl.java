@@ -1,15 +1,13 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.EquipmentEvent;
 import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.UnmappedEvent;
-import org.dcsa.core.events.repository.EquipmentEventRepository;
 import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.*;
 import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +16,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<OperationsEventRepository, OperationsEvent, UUID> implements OperationsEventService {
+public class OperationsEventServiceImpl extends QueryServiceImpl<OperationsEventRepository, OperationsEvent, UUID> implements OperationsEventService {
 
     private final OperationsEventRepository operationsEventRepository;
     private final TransportCallTOService transportCallTOService;

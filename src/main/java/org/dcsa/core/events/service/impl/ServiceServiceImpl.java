@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Service;
 import org.dcsa.core.events.repository.ServiceRepository;
 import org.dcsa.core.events.service.ServiceService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @org.springframework.stereotype.Service

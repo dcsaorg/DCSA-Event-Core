@@ -10,7 +10,7 @@ import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
+public class EquipmentEventServiceImpl extends QueryServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
     private final EquipmentEventRepository equipmentEventRepository;
     private final EquipmentRepository equipmentRepository;
     private final TransportCallService transportCallService;

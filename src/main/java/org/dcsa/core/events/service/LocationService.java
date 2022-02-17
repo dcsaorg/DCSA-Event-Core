@@ -1,8 +1,6 @@
 package org.dcsa.core.events.service;
 
-import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.service.ExtendedBaseService;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;

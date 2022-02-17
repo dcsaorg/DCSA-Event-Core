@@ -14,7 +14,7 @@ import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.DeleteException;
 import org.dcsa.core.exception.GetException;
 import org.dcsa.core.exception.UpdateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
+public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
     // This is not guaranteed to be correct, but it will work "most of the time".
     private static final List<String> EMPTY_SQL_LIST = List.of("");
 
