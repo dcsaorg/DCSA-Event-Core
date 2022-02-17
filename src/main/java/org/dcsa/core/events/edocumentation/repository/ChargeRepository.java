@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ChargeRepository extends ReactiveCrudRepository<Charge, String> {
   Flux<Charge> findAllByShipmentID(UUID shipmentID);
+  Flux<Charge> findAllByTransportDocumentReference(String transportDocumentReference);
 }
