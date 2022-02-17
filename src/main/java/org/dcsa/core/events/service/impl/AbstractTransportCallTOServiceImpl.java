@@ -14,7 +14,7 @@ import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.dcsa.core.util.MappingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTransportCallTORepository<T>, T extends TransportCallTO> extends ExtendedBaseServiceImpl<R, T, String> implements AbstractTransportCallTOService<T> {
+public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTransportCallTORepository<T>, T extends TransportCallTO> extends QueryServiceImpl<R, T, String> implements AbstractTransportCallTOService<T> {
 
     @Autowired
     private CarrierService carrierService;

@@ -10,7 +10,7 @@ import org.dcsa.core.events.service.VesselService;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class VesselServiceImpl extends ExtendedBaseServiceImpl<VesselRepository, Vessel, UUID> implements VesselService {
+public class VesselServiceImpl extends QueryServiceImpl<VesselRepository, Vessel, UUID> implements VesselService {
 
     private final VesselRepository vesselRepository;
     private final CarrierService carrierService;

@@ -8,8 +8,7 @@ import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.events.service.TransportEventService;
-import org.dcsa.core.exception.GetException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<TransportEventRepository, TransportEvent, UUID> implements TransportEventService {
+public class TransportEventServiceImpl extends QueryServiceImpl<TransportEventRepository, TransportEvent, UUID> implements TransportEventService {
     private final TransportEventRepository transportEventRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;

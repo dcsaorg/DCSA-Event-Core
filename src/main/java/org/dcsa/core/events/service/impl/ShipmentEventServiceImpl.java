@@ -8,8 +8,7 @@ import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.ShipmentEventService;
-import org.dcsa.core.exception.GetException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,7 +19,7 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
+public class ShipmentEventServiceImpl extends QueryServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
     private final ShipmentEventRepository shipmentEventRepository;
     private final ReferenceRepository referenceRepository;
     private final UnmappedEventRepository unmappedEventRepository;

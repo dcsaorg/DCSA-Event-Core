@@ -1,12 +1,12 @@
 package org.dcsa.core.events.service;
 
-import org.dcsa.core.service.ExtendedBaseService;
+import org.dcsa.core.service.QueryService;
 import org.dcsa.core.events.model.Vessel;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface VesselService extends ExtendedBaseService<Vessel, UUID> {
+public interface VesselService extends QueryService<Vessel, UUID> {
 
     Mono<Vessel> create(Vessel vessel);
 

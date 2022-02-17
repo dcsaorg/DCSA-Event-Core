@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Voyage;
 import org.dcsa.core.events.repository.VoyageRepository;
 import org.dcsa.core.events.service.VoyageService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

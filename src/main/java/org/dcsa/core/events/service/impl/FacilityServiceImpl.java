@@ -6,20 +6,16 @@ import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.events.repository.FacilityRepository;
 import org.dcsa.core.events.service.FacilityService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
-import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.NotFoundException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.test.web.servlet.result.FlashAttributeResultMatchers;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class FacilityServiceImpl extends ExtendedBaseServiceImpl<FacilityRepository, Facility, UUID>
+public class FacilityServiceImpl extends QueryServiceImpl<FacilityRepository, Facility, UUID>
     implements FacilityService {
 
   private final FacilityRepository facilityRepository;
