@@ -13,7 +13,6 @@ import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.repository.ShipmentRepository;
 import org.dcsa.core.events.service.LocationService;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
@@ -45,7 +44,7 @@ class ShipmentServiceImpl implements ShipmentService {
   private final ShipmentTransportRepository shipmentTransportRepository;
 
   @Override
-  public Flux<ShipmentTO> findByShippingInstructionID(String id) {
+  public Mono<List<ShipmentTO>> findByShippingInstructionID(String id) {
     return shipmentRepository
         .findByShippingInstructionID(id)
         .map(s -> Tuples.of(s, shipmentMapper.shipmentToDTO(s)))
@@ -69,7 +68,8 @@ class ShipmentServiceImpl implements ShipmentService {
                       fetchTransportsByShipmentID(t.getT1().getShipmentID())
                           .doOnNext(shipmentTO::setTransports))
                   .thenReturn(shipmentTO);
-            });
+            })
+        .collectList();
   }
 
   Mono<List<ShipmentCutOffTimeTO>> fetchShipmentCutOffTimeByShipmentID(UUID shipmentID) {
