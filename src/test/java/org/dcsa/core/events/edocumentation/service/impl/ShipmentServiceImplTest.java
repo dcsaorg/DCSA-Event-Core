@@ -423,24 +423,24 @@ class ShipmentServiceImplTest {
             result -> {
               assertEquals(
                   shipmentCutOffTime.getCutOffDateTimeCode(),
-                  result.getShipmentCutOffTimes().get(0).getCutOffDateTimeCode());
+                  result.get(0).getShipmentCutOffTimes().get(0).getCutOffDateTimeCode());
               assertEquals(
                   shipmentCutOffTime.getCutOffDateTime(),
-                  result.getShipmentCutOffTimes().get(0).getCutOffDateTime());
+                  result.get(0).getShipmentCutOffTimes().get(0).getCutOffDateTime());
               assertEquals(
-                  "Hamburg", result.getShipmentLocations().get(0).getLocation().getLocationName());
-              assertEquals("Tokyo", result.getShipmentLocations().get(0).getDisplayedName());
-              assertEquals("clause content", result.getCarrierClauses().get(0).getClauseContent());
+                  "Hamburg", result.get(0).getShipmentLocations().get(0).getLocation().getLocationName());
+              assertEquals("Tokyo", result.get(0).getShipmentLocations().get(0).getDisplayedName());
+              assertEquals("clause content", result.get(0).getCarrierClauses().get(0).getClauseContent());
               assertEquals(
-                  "22GP", result.getConfirmedEquipments().get(0).getConfirmedEquipmentSizetype());
-              assertEquals(3, result.getConfirmedEquipments().get(0).getConfirmedEquipmentUnits());
+                  "22GP", result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentSizetype());
+              assertEquals(3, result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentUnits());
               assertEquals(
-                  charge.getChargeTypeCode(), result.getCharges().get(0).getChargeTypeCode());
-              assertEquals("WHAT", result.getCharges().get(0).getCalculationBasis());
-              assertEquals(PaymentTerm.PRE, result.getCharges().get(0).getPaymentTermCode());
-              assertEquals("YOYO", result.getTransports().get(0).getTransportName());
+                  charge.getChargeTypeCode(), result.get(0).getCharges().get(0).getChargeTypeCode());
+              assertEquals("WHAT", result.get(0).getCharges().get(0).getCalculationBasis());
+              assertEquals(PaymentTerm.PRE, result.get(0).getCharges().get(0).getPaymentTermCode());
+              assertEquals("YOYO", result.get(0).getTransports().get(0).getTransportName());
               assertEquals(
-                  DCSATransportType.VESSEL, result.getTransports().get(0).getModeOfTransport());
+                  DCSATransportType.VESSEL, result.get(0).getTransports().get(0).getModeOfTransport());
             })
         .verifyComplete();
   }
