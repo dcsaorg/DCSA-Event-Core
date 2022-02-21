@@ -16,7 +16,10 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -56,6 +59,23 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
       String shippingInstructionID) {
     return this.fetchDocumentPartiesByID(
         shippingInstructionID, ColumnReferenceType.SHIPPING_INSTRUCTION);
+  }
+
+  @Override
+  public Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionID(
+      String shippingInstructionID, List<DocumentPartyTO> documentPartyTOs) {
+    // this will create orphan parties
+    return documentPartyRepository
+        .findByShippingInstructionID(shippingInstructionID)
+        .flatMap(
+            documentParty ->
+                displayedAddressRepository
+                    .deleteAllByDocumentPartyID(documentParty.getId())
+                    .thenReturn(documentParty))
+        .flatMap(
+            ignored -> documentPartyRepository.deleteByShippingInstructionID(shippingInstructionID))
+        .then(
+            createDocumentPartiesByShippingInstructionID(shippingInstructionID, documentPartyTOs));
   }
 
   Mono<List<DocumentPartyTO>> fetchDocumentPartiesByID(Object id, ColumnReferenceType implType) {
@@ -236,15 +256,11 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
             t -> {
               Stream<PartyContactDetails> partyContactDetailsStream =
                   partyTO.getPartyContactDetails().stream()
-                      .map(
-                          pcdTO -> {
-                            PartyContactDetails pcd = pcdTO.toPartyContactDetails(t.getT1());
-                            return pcd;
-                          });
+                      .map(pcdTO -> pcdTO.toPartyContactDetails(t.getT1()));
 
               return partyContactDetailsRepository
                   .saveAll(Flux.fromStream(partyContactDetailsStream))
-                  .map(partyContactDetails -> partyContactDetails.toPartyTO())
+                  .map(PartyContactDetails::toPartyTO)
                   .collectList()
                   .flatMap(
                       pcds -> {
