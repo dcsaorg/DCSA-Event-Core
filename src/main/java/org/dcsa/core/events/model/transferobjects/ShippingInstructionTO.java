@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentTO;
 import org.dcsa.core.events.model.base.AbstractShippingInstruction;
 
 import javax.validation.Valid;
@@ -30,6 +31,10 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
   @Valid private List<DocumentPartyTO> documentParties;
 
   @Valid private List<ReferenceTO> references;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  private List<ShipmentTO> shipments;
 
   /**
    * Pull the carrierBookingReference from cargo items into the ShippingInstruction if possible
