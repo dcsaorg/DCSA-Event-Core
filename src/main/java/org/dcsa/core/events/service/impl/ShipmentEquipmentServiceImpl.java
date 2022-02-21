@@ -1,20 +1,19 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.dcsa.core.events.model.CargoItem;
 import org.dcsa.core.events.model.mapper.*;
 import org.dcsa.core.events.model.transferobjects.*;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.events.service.ShipmentEquipmentService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +27,8 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   private final CargoItemRepository cargoItemRepository;
   private final CargoLineItemRepository cargoLineItemRepository;
   private final ReferenceService referenceService;
+
+  private final ShipmentRepository shipmentRepository;
 
   private final SealMapper sealMapper;
   private final CargoLineItemMapper cargoLineItemMapper;
@@ -87,6 +88,47 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   }
 
   @Override
+  public Mono<List<ShipmentEquipmentTO>> resolveShipmentEquipmentsForShippingInstructionID(
+      List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
+    return cargoItemRepository
+        .findAllByShippingInstructionID(shippingInstructionTO.getShippingInstructionID())
+        .flatMap(
+            cargoItems ->
+                Mono.when(
+                        sealRepository.deleteAllByShipmentEquipmentID(
+                            cargoItems.getShipmentEquipmentID()),
+                        activeReeferSettingsRepository.deleteByShipmentEquipmentID(
+                            cargoItems.getShipmentEquipmentID()))
+                    .thenReturn(cargoItems))
+        .flatMap(
+            cargoItem ->
+                shipmentEquipmentRepository
+                    .findShipmentEquipmentByShipmentID(cargoItem.getShipmentEquipmentID())
+                    .flatMap(
+                        shipmentEquipment ->
+                            equipmentRepository
+                                .deleteAllByEquipmentReference(
+                                    shipmentEquipment.getEquipmentReference())
+                                .thenReturn(shipmentEquipment))
+                    .flatMap(
+                        shipmentEquipment ->
+                            shipmentEquipmentRepository
+                                .deleteShipmentEquipmentByShipmentID(
+                                    shipmentEquipment.getShipmentID())
+                                .thenReturn(new ShipmentEquipmentTO()))
+                    .thenReturn(cargoItem))
+        .flatMap(
+            cargoItem ->
+                cargoLineItemRepository
+                    .deleteByCargoItemID(cargoItem.getId())
+                    .thenReturn(cargoItem))
+        .flatMap(
+            cargoItem -> cargoItemRepository.deleteById(cargoItem.getId()).thenReturn(cargoItem))
+        .collectList()
+        .flatMap(ignored -> insertShipmentEquipmentTOs(shipmentEquipments, shippingInstructionTO));
+  }
+
+  @Override
   public Mono<List<ShipmentEquipmentTO>> createShipmentEquipment(
       UUID shipmentID, String shippingInstructionID, List<ShipmentEquipmentTO> shipmentEquipments) {
     if (Objects.isNull(shipmentEquipments) || shipmentEquipments.isEmpty()) {
@@ -117,6 +159,41 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .collectList();
   }
 
+  @Override
+  public Mono<List<ShipmentEquipmentTO>> insertShipmentEquipmentTOs(
+      List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
+    if (shipmentEquipments == null) return Mono.empty();
+    String carrierBookingReference = getCarrierBookingReference(shippingInstructionTO);
+    // TODO: we have a known bug here that needs to be addressed.
+    //  carrierBookingReference can differ from each cargoItem.
+    return shipmentRepository
+        .findByCarrierBookingReference(carrierBookingReference)
+        .switchIfEmpty(
+            Mono.error(
+                ConcreteRequestErrorMessageException.invalidParameter(
+                    "No shipment found with carrierBookingReference: " + carrierBookingReference)))
+        .flatMap(
+            x ->
+                createShipmentEquipment(
+                    x.getShipmentID(),
+                    shippingInstructionTO.getShippingInstructionID(),
+                    shipmentEquipments));
+  }
+
+  // TODO: fix once we know carrierBookingReference can be null (none on SI and no CargoItems)
+  //  https://dcsa.atlassian.net/browse/DDT-854
+  String getCarrierBookingReference(ShippingInstructionTO shippingInstructionTO) {
+    if (shippingInstructionTO.getCarrierBookingReference() == null) {
+      List<CargoItemTO> cargoItems = new ArrayList<>();
+      for (ShipmentEquipmentTO shipmentEquipmentTO :
+          shippingInstructionTO.getShipmentEquipments()) {
+        cargoItems.addAll(shipmentEquipmentTO.getCargoItems());
+      }
+      return cargoItems.get(0).getCarrierBookingReference();
+    }
+    return shippingInstructionTO.getCarrierBookingReference();
+  }
+
   // Returns Flux of Tuples of shipmentEquipmentID and ShipmentEquipmentTO)
   private Flux<Tuple2<UUID, ShipmentEquipmentTO>> saveShipmentEquipment(
       UUID shipmentID, List<ShipmentEquipmentTO> shipmentEquipmentList) {
@@ -145,7 +222,10 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   private Mono<ActiveReeferSettingsTO> saveActiveReeferSettings(
       UUID shipmentEquipmentID, ActiveReeferSettingsTO activeReeferSettingsTO) {
     return Mono.justOrEmpty(activeReeferSettingsTO)
-        .map(arsTO -> activeReeferSettingsMapper.dtoToActiveReeferSettings(arsTO, shipmentEquipmentID, true))
+        .map(
+            arsTO ->
+                activeReeferSettingsMapper.dtoToActiveReeferSettings(
+                    arsTO, shipmentEquipmentID, true))
         .flatMap(activeReeferSettingsRepository::save)
         .map(activeReeferSettingsMapper::activeReeferSettingsToDTO);
   }
@@ -173,7 +253,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                     .save(
                         cargoItemMapper.dtoToCargoItem(
                             cargoItemTO, shipmentEquipmentID, shippingInstructionID))
-                    .map(cargoItem -> cargoItem.getId())
+                    .map(CargoItem::getId)
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
         .flatMap(
