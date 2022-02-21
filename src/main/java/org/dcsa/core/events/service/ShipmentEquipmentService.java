@@ -12,7 +12,7 @@ public interface ShipmentEquipmentService {
 
 	Mono<List<ShipmentEquipmentTO>> findShipmentEquipmentByShipmentID(UUID shipmentID);
 
-	Mono<List<ShipmentEquipmentTO>> insertShipmentEquipmentTOs(List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO);
+	Mono<List<ShipmentEquipmentTO>> addShipmentEquipmentToShippingInstruction(List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO);
 
 	Mono<List<ShipmentEquipmentTO>> resolveShipmentEquipmentsForShippingInstructionID(List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO);
 }

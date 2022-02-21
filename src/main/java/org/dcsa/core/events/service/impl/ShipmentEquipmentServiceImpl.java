@@ -125,7 +125,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .flatMap(
             cargoItem -> cargoItemRepository.deleteById(cargoItem.getId()).thenReturn(cargoItem))
         .collectList()
-        .flatMap(ignored -> insertShipmentEquipmentTOs(shipmentEquipments, shippingInstructionTO));
+        .flatMap(ignored -> addShipmentEquipmentToShippingInstruction(shipmentEquipments, shippingInstructionTO));
   }
 
   @Override
@@ -160,7 +160,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   }
 
   @Override
-  public Mono<List<ShipmentEquipmentTO>> insertShipmentEquipmentTOs(
+  public Mono<List<ShipmentEquipmentTO>> addShipmentEquipmentToShippingInstruction(
       List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
     if (shipmentEquipments == null) return Mono.empty();
     String carrierBookingReference = getCarrierBookingReference(shippingInstructionTO);
@@ -173,9 +173,9 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                 ConcreteRequestErrorMessageException.invalidParameter(
                     "No shipment found with carrierBookingReference: " + carrierBookingReference)))
         .flatMap(
-            x ->
+            shipment ->
                 createShipmentEquipment(
-                    x.getShipmentID(),
+                    shipment.getShipmentID(),
                     shippingInstructionTO.getShippingInstructionID(),
                     shipmentEquipments));
   }
