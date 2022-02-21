@@ -2,6 +2,7 @@ package org.dcsa.core.events.model.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public enum DCSAResponsibleAgencyCode {
   ISO("5"),
@@ -31,7 +32,7 @@ public enum DCSAResponsibleAgencyCode {
   }
 
   public static DCSAResponsibleAgencyCode legacyCode2DCSACode(String legacyCode) {
-    DCSAResponsibleAgencyCode dcsaCode = LEGACY_CODES_2_DCSA_CODE.get(legacyCode);
+    DCSAResponsibleAgencyCode dcsaCode = LEGACY_CODES_2_DCSA_CODE.get(Objects.requireNonNull(legacyCode));
     if (dcsaCode == null) {
       throw new IllegalArgumentException("Invalid code list responsible agency code");
     }
@@ -39,7 +40,9 @@ public enum DCSAResponsibleAgencyCode {
   }
 
   public static void ensureIsValidLegacyCode(String legacyCode) {
-    legacyCode2DCSACode(legacyCode);
+    if (legacyCode != null) {
+      legacyCode2DCSACode(legacyCode);
+    }
   }
 
   static {
