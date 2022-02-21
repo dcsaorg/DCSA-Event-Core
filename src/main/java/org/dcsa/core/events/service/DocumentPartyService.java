@@ -18,4 +18,7 @@ public interface DocumentPartyService {
 
   Mono<List<DocumentPartyTO>> fetchDocumentPartiesByByShippingInstructionID(
       String shippingInstructionID);
+
+  Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionID(
+      String shippingInstructionID, List<DocumentPartyTO> documentPartyTOs);
 }
