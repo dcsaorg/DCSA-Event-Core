@@ -23,14 +23,45 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
 
   private static final Table CARGO_ITEM_TABLE = Table.create("cargo_item");
   private static final Table CARGO_LINE_ITEM_TABLE = Table.create("cargo_line_item");
+  private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
   private static final Table SHIPMENT_TABLE = Table.create("shipment");
+
+  // We need a LinkedHashMap because the test case relies on the order of values()
+  private static final Map<String, Column> QUERY_COLUMN_MAP = Collections.unmodifiableMap(new LinkedHashMap<>() {{
+    put("ci.id", Column.create("id", CARGO_ITEM_TABLE));
+    put(
+            "ci.description_of_goods", Column.create("description_of_goods", CARGO_ITEM_TABLE));
+    put("ci.hs_code", Column.create("hs_code", CARGO_ITEM_TABLE));
+    put("ci.weight", Column.create("weight", CARGO_ITEM_TABLE));
+    put("ci.volume", Column.create("volume", CARGO_ITEM_TABLE));
+    put("ci.weight_unit", Column.create("weight_unit", CARGO_ITEM_TABLE));
+    put("ci.volume_unit", Column.create("volume_unit", CARGO_ITEM_TABLE));
+    put(
+            "ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
+    put(
+            "ci.shipping_instruction_id", Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
+    put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
+    put(
+            "ci.shipment_equipment_id", Column.create("shipment_equipment_id", CARGO_ITEM_TABLE));
+    put("se.id", Column.create("id", SHIPMENT_EQUIPMENT_TABLE));
+    put("se.shipment_id", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
+    put("s.shipment_id", Column.create("id", SHIPMENT_TABLE));
+    put(
+            "s.carrier_booking_reference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
+    put(
+            "cli.cargo_line_item_id", Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
+    put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));
+    put(
+            "cli.shipping_marks", Column.create("shipping_marks", CARGO_LINE_ITEM_TABLE));
+    put("cli.id", Column.create("id", CARGO_LINE_ITEM_TABLE));
+  }});
 
   @Override
   public Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
       UUID shipmentEquipmentID) {
 
     //	Programmatically creates the below query:
-    //		SELECT ci.id, ci.shipment_id, ci.description_of_goods, ci.hs_code, ci.weight, ci.volume,
+    //		SELECT ci.id, ci.description_of_goods, ci.hs_code, ci.weight, ci.volume,
     // ci.weight_unit, ci.volume_unit, ci.number_of_packages, ci.shipping_instruction_id,
     //		ci.package_code, ci.shipment_equipment_id, cli.cargo_line_item_id, cli.shipping_marks,
     // cli.id
@@ -42,17 +73,20 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
 
     Select selectJoin =
         Select.builder()
-            .select(queryColumnMap().values())
+            .select(QUERY_COLUMN_MAP.values())
             .from(CARGO_ITEM_TABLE)
             .join(CARGO_LINE_ITEM_TABLE)
-            .on(queryColumnMap().get("cli.cargo_item_id"))
-            .equals(queryColumnMap().get("ci.id"))
+            .on(column("cli.cargo_item_id"))
+            .equals(column("ci.id"))
+            .join(SHIPMENT_EQUIPMENT_TABLE)
+            .on(column("ci.shipment_equipment_id"))
+            .equals(column("se.id"))
             .join(SHIPMENT_TABLE)
-            .on(queryColumnMap().get("s.shipment_id"))
-            .equals(queryColumnMap().get("ci.shipment_id"))
+            .on(column("se.shipment_id"))
+            .equals(column("s.shipment_id"))
             .where(
                 Conditions.isEqual(
-                    queryColumnMap().get("ci.shipment_equipment_id"),
+                    column("ci.shipment_equipment_id"),
                     SQL.literalOf(shipmentEquipmentID)))
             .build();
 
@@ -89,8 +123,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     CargoItemWithCargoLineItems cargoItemWithCargoLineItems = new CargoItemWithCargoLineItems();
     cargoItemWithCargoLineItems.setId(
         UUID.fromString(String.valueOf(cargoItemResult.get("ci.id"))));
-    cargoItemWithCargoLineItems.setShipmentID(
-        UUID.fromString(String.valueOf(cargoItemResult.get("ci.shipment_id"))));
     cargoItemWithCargoLineItems.setDescriptionOfGoods(
         String.valueOf(cargoItemResult.get("ci.description_of_goods")));
     cargoItemWithCargoLineItems.setHsCode(String.valueOf(cargoItemResult.get("ci.hs_code")));
@@ -129,33 +161,8 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     return cargoItemWithCargoLineItems;
   }
 
-  private Map<String, Column> queryColumnMap() {
-    Map<String, Column> selectedColumns = new HashMap<>();
-    selectedColumns.put("ci.id", Column.create("id", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.shipment_id", Column.create("shipment_id", CARGO_ITEM_TABLE));
-    selectedColumns.put(
-        "ci.description_of_goods", Column.create("description_of_goods", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.hs_code", Column.create("hs_code", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.weight", Column.create("weight", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.volume", Column.create("volume", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.weight_unit", Column.create("weight_unit", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.volume_unit", Column.create("volume_unit", CARGO_ITEM_TABLE));
-    selectedColumns.put(
-        "ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
-    selectedColumns.put(
-        "ci.shipping_instruction_id", Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
-    selectedColumns.put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
-    selectedColumns.put(
-        "ci.shipment_equipment_id", Column.create("shipment_equipment_id", CARGO_ITEM_TABLE));
-    selectedColumns.put("s.shipment_id", Column.create("id", SHIPMENT_TABLE));
-    selectedColumns.put(
-        "s.carrier_booking_reference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
-    selectedColumns.put(
-        "cli.cargo_line_item_id", Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
-    selectedColumns.put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));
-    selectedColumns.put(
-        "cli.shipping_marks", Column.create("shipping_marks", CARGO_LINE_ITEM_TABLE));
-    selectedColumns.put("cli.id", Column.create("id", CARGO_LINE_ITEM_TABLE));
-    return selectedColumns;
+  private static Column column(String name) {
+    assert QUERY_COLUMN_MAP.get(name) != null : "Bad column name: " + name;
+    return QUERY_COLUMN_MAP.get(name);
   }
 }
