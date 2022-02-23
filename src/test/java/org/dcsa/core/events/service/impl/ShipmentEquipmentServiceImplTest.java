@@ -114,7 +114,6 @@ class ShipmentEquipmentServiceImplTest {
     cargoItem.setId(UUID.randomUUID());
     cargoItem.setShipmentEquipmentID(shipmentEquipmentId);
     cargoItem.setShippingInstructionID(shippingInstructionId);
-    cargoItem.setShipmentID(shipmentID);
     cargoItem.setPackageCode("ABC");
     cargoItem.setHsCode("testHSCode");
     cargoItem.setNumberOfPackages(1);
@@ -195,7 +194,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 
       when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
@@ -252,7 +250,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
       shipmentEquipmentTO.setActiveReeferSettings(null);
 
@@ -303,7 +300,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
       shipmentEquipmentTO.setSeals(null);
 
@@ -402,7 +398,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
       shipmentEquipmentTO
           .getCargoItems()
@@ -456,7 +451,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 
       SealTO sealTO = shipmentEquipmentTO.getSeals().get(0);
@@ -519,7 +513,6 @@ class ShipmentEquipmentServiceImplTest {
       UUID shipmentEquipmentID = UUID.randomUUID();
       shipmentEquipment.setShipmentID(shipmentID);
       shipmentEquipment.setId(shipmentEquipmentID);
-      cargoItem.setShipmentID(shipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 
       CargoLineItemTO cargoLineItemTO1 = new CargoLineItemTO();
@@ -626,7 +619,6 @@ class ShipmentEquipmentServiceImplTest {
       cargoItemWithCargoLineItems = new CargoItemCustomRepository.CargoItemWithCargoLineItems();
       cargoItemWithCargoLineItems.setCargoLineItems(List.of(cargoLineItem));
       cargoItemWithCargoLineItems.setShipmentEquipmentID(shipmentEquipment.getId());
-      cargoItemWithCargoLineItems.setShipmentID(shipmentEquipment.getShipmentID());
       cargoItemWithCargoLineItems.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems.setVolumeUnit(cargoItem.getVolumeUnit());
@@ -642,7 +634,6 @@ class ShipmentEquipmentServiceImplTest {
 
       cargoItemWithCargoLineItems2 = new CargoItemCustomRepository.CargoItemWithCargoLineItems();
       cargoItemWithCargoLineItems2.setShipmentEquipmentID(shipmentEquipment.getId());
-      cargoItemWithCargoLineItems2.setShipmentID(shipmentEquipment.getShipmentID());
       cargoItemWithCargoLineItems2.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems2.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems2.setVolumeUnit(cargoItem.getVolumeUnit());

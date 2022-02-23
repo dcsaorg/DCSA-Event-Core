@@ -19,10 +19,6 @@ public class CargoItem extends AbstractCargoItem {
 
   @Id private UUID id;
 
-  @Column("shipment_id")
-  @NotNull
-  private UUID shipmentID;
-
   @Column("shipping_instruction_id")
   private String shippingInstructionID;
 
