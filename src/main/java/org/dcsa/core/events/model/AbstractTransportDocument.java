@@ -24,18 +24,18 @@ public abstract class AbstractTransportDocument extends AuditBase {
 
     @Column("issue_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate dateOfIssue;
+    private LocalDate issueDate;
 
     @Column("shipped_onboard_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate onboardDate;
+    private LocalDate shippedOnBoardDate;
 
     @Column("received_for_shipment_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate receivedForShipmentDate;
 
-    @Column("terms_and_conditions")
-    private String termsAndConditions;
+    @Column("number_of_originals")
+    private Integer numberOfOriginals;
 
     @Column("issuer")
     @Size(max = 4)
