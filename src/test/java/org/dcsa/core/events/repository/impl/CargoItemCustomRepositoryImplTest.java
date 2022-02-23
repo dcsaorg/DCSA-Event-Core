@@ -40,14 +40,16 @@ public class CargoItemCustomRepositoryImplTest {
 		String executedQuery = queryCaptor.getValue();
 		Assertions.assertNotNull(executedQuery);
 		String expectedQuery =
-			"SELECT cargo_item.id, cargo_item.shipping_instruction_id, cargo_item.shipment_id, cargo_item.weight, " +
-				"cargo_item.hs_code, shipment.carrier_booking_reference, cargo_item.description_of_goods, " +
-				"cargo_line_item.cargo_line_item_id, cargo_line_item.cargo_item_id, cargo_item.volume_unit, " +
-				"cargo_item.number_of_packages, cargo_item.weight_unit, shipment.id, cargo_item.shipment_equipment_id, " +
-				"cargo_item.volume, cargo_item.package_code, cargo_line_item.id, cargo_line_item.shipping_marks " +
+			"SELECT cargo_item.id, cargo_item.description_of_goods, cargo_item.hs_code, cargo_item.weight, " +
+				"cargo_item.volume, cargo_item.weight_unit, cargo_item.volume_unit, cargo_item.number_of_packages, " +
+				"cargo_item.shipping_instruction_id, cargo_item.package_code, cargo_item.shipment_equipment_id, " +
+				"shipment_equipment.id, shipment_equipment.shipment_id, shipment.id, " +
+				"shipment.carrier_booking_reference, cargo_line_item.cargo_line_item_id, " +
+				"cargo_line_item.cargo_item_id, cargo_line_item.shipping_marks, cargo_line_item.id " +
 				"FROM cargo_item " +
 				"JOIN cargo_line_item ON cargo_line_item.cargo_item_id = cargo_item.id " +
-				"JOIN shipment ON shipment.id = cargo_item.shipment_id " +
+				"JOIN shipment_equipment ON cargo_item.shipment_equipment_id = shipment_equipment.id "+
+				"JOIN shipment ON shipment_equipment.shipment_id = shipment.id " +
 				"WHERE cargo_item.shipment_equipment_id = " + shipmentEquipmentID;
 		Assertions.assertEquals(expectedQuery, executedQuery);
 	}
@@ -116,7 +118,6 @@ public class CargoItemCustomRepositoryImplTest {
 
 		CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult = cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
 		assertEquals(shipmentEquipmentID, cargoItemsResult.getShipmentEquipmentID());
-		assertEquals(shipmentID, cargoItemsResult.getShipmentID());
 		assertEquals("CBR1", cargoItemsResult.getCarrierBookingReference());
 
 		//assertions on cargoLineItems
