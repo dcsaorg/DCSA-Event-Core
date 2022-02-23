@@ -11,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,8 +39,7 @@ public abstract class AbstractTransportDocument extends AuditBase {
     private Integer numberOfOriginals;
 
     @Column("issuer")
-    @Size(max = 4)
-    private String issuer;
+    private UUID issuer;
 
     @Column("shipping_instruction_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
