@@ -31,23 +31,19 @@ public interface ShipmentEquipmentRepository extends ReactiveCrudRepository<Ship
 
   @Query(
       "SELECT DISTINCT se.equipment_reference FROM shipment_equipment se "
-          + "JOIN shipment s "
-          + "ON se.shipment_id = s.id "
           + "JOIN cargo_item ci "
-          + "ON ci.shipment_id = s.id"
+          + "ON ci.shipment_equipment_id = se.id"
           + "LEFT JOIN reference r "
-          + "ON r.shipment_id = s.id "
+          + "ON r.shipment_id = se.shipment_id "
           + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID")
   Flux<String> findEquipmentReferenceByShippingInstructionID(String shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT se.equipment_reference FROM shipment_equipment se "
-          + "JOIN shipment s "
-          + "ON se.shipment_id = s.id "
           + "JOIN cargo_item ci "
-          + "ON ci.shipment_id = s.id"
+          + "ON ci.shipment_equipment_id = se.id"
           + "LEFT JOIN reference r "
-          + "ON r.shipment_id = s.id "
+          + "ON r.shipment_id = se.shipment_id "
           + "JOIN transport_document td "
           + "ON (td.shipping_instruction_id = ci.shipping_instruction_id OR td.shipping_instruction_id = r.shipping_instruction_id) "
           + "WHERE td.transport_document_reference = :transportDocumentRef")
