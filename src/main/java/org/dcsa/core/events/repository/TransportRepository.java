@@ -22,8 +22,11 @@ public interface TransportRepository extends ReactiveCrudRepository<Transport, U
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "
           + "JOIN shipment_transport st "
+          + " ON st.transport_id = t.id"
+          + "JOIN shipment_equipment se"
+          + " ON se.shipment_id = st.shipment_id"
           + "JOIN cargo_item ci "
-          + "ON ci.shipment_id = st.shipment_id "
+          + " ON ci.shipment_equipment_id = se.id "
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = st.shipment_id "
           + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID)")
@@ -32,8 +35,11 @@ public interface TransportRepository extends ReactiveCrudRepository<Transport, U
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "
           + "JOIN shipment_transport st "
+          + " ON st.transport_id = t.id"
+          + "JOIN shipment_equipment se"
+          + " ON se.shipment_id = st.shipment_id"
           + "JOIN cargo_item ci "
-          + "ON ci.shipment_id = st.shipment_id "
+          + " ON ci.shipment_equipment_id = se.id "
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = st.shipment_id "
           + "JOIN transport_document td "

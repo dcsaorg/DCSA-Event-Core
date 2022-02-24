@@ -57,9 +57,6 @@ public class CargoItemCustomRepositoryImplTest {
 	@Test
 	@DisplayName("Test fetch cargo items without shipmentEquipment Should fail")
 	void testCargoItemCustomRepositoryQueryWithoutShipmentEquipmentID() {
-		ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
-		UUID shipmentEquipmentID = UUID.randomUUID();
-
 		Exception exception = assertThrows(NullPointerException.class, () -> {
 			cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(null);
 		});
@@ -75,12 +72,10 @@ public class CargoItemCustomRepositoryImplTest {
 	void testMapResultSetWithAllFieldsPresent() {
 		Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
 		UUID cargoItemId = UUID.randomUUID();
-		UUID shipmentID = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
 		String shippingInstructionID = UUID.randomUUID().toString();
 
 		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.shipment_id", shipmentID);
 		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
 		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
 		cargoItemWithCargoLineItem1.put("ci.weight", 100F);
@@ -98,7 +93,6 @@ public class CargoItemCustomRepositoryImplTest {
 
 		Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
 		cargoItemWithCargoLineItem2.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem2.put("ci.shipment_id", shipmentID);
 		cargoItemWithCargoLineItem2.put("ci.description_of_goods", "description of goods");
 		cargoItemWithCargoLineItem2.put("ci.hs_code", "720711");
 		cargoItemWithCargoLineItem2.put("ci.weight", 100F);
@@ -134,12 +128,10 @@ public class CargoItemCustomRepositoryImplTest {
 	void testMapResultSetWithoutCargoLineItems() {
 		Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
 		UUID cargoItemId = UUID.randomUUID();
-		UUID shipmentID = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
 		String shippingInstructionID = UUID.randomUUID().toString();
 
 		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.shipment_id", shipmentID);
 		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
 		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
 		cargoItemWithCargoLineItem1.put("ci.weight", 100F);
@@ -167,11 +159,9 @@ public class CargoItemCustomRepositoryImplTest {
 	void testMapResultSetWithOnlyMandatoryFieldsPresent() {
 		Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
 		UUID cargoItemId = UUID.randomUUID();
-		UUID shipmentID = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
 
 		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.shipment_id", shipmentID);
 		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
 		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
 		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
@@ -179,7 +169,6 @@ public class CargoItemCustomRepositoryImplTest {
 
 		Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
 		cargoItemWithCargoLineItem2.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem2.put("ci.shipment_id", shipmentID);
 		cargoItemWithCargoLineItem2.put("ci.description_of_goods", "description of goods");
 		cargoItemWithCargoLineItem2.put("ci.hs_code", "720711");
 		cargoItemWithCargoLineItem2.put("ci.shipment_equipment_id", shipmentEquipmentID);
