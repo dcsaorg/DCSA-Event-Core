@@ -3,6 +3,14 @@
 The repository contains event functionality shared among different applications, i.e. the DCSA Event API functionality.
 It is packaged as a jar, and uploaded to GitHub packages, to be downloaded via Maven
 
+
+Code standard
+-------------------------------------
+We use [Google Java Style](https://google.github.io/styleguide/javaguide.html), when using
+IntelliJ it is recommended to download and activate the
+[google-java-format plugin](https://github.com/google/google-java-format).
+
+
 ### To build manually, run:
 ```
 mvn clean install -nsu
