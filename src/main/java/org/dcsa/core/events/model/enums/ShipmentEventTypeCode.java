@@ -29,7 +29,7 @@ public enum ShipmentEventTypeCode {
     /**
      * The values allowed when used as a DocumentStatus in Booking.
      */
-    public static final String BOOKING_DOCUMENT_STATUSES = "RECE,PENU,REJE,CONF,PENC,CANC";
+    public static final String BOOKING_DOCUMENT_STATUSES = "RECE,PENU,REJE,CONF,PENC,CANC,CMPL";
 
     /**
      * The values allowed when used as a DocumentStatus in EBL.
