@@ -7,9 +7,11 @@ import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.LocationRepository;
+import org.dcsa.core.events.repository.UnLocationRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.FacilityService;
 import org.dcsa.core.events.service.LocationService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.GetException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -26,6 +28,7 @@ public class LocationServiceImpl implements LocationService {
   private final AddressService addressService;
 
   private final LocationRepository locationRepository;
+  private final UnLocationRepository unLocationRepository;
 
   private final LocationMapper locationMapper;
 
@@ -38,16 +41,18 @@ public class LocationServiceImpl implements LocationService {
 
   @Override
   public Mono<LocationTO> ensureResolvable(LocationTO locationTO) {
+    Mono<LocationTO> locationTOMono = ensureUnLocationResolvable(locationTO);
+
     Address address = locationTO.getAddress();
-    Mono<LocationTO> locationTOMono;
     if (address != null) {
       locationTOMono =
-          addressService
-              .ensureResolvable(address)
-              .doOnNext(locationTO::setAddress)
-              .thenReturn(locationTO);
-    } else {
-      locationTOMono = Mono.just(locationTO);
+        locationTOMono
+          .flatMap(loc ->
+            addressService
+                .ensureResolvable(address)
+                .doOnNext(locationTO::setAddress)
+                .thenReturn(locationTO)
+          );
     }
     if (locationTO.getFacilityCode() != null) {
       locationTOMono =
@@ -123,15 +128,18 @@ public class LocationServiceImpl implements LocationService {
     }
 
     Location location = locationMapper.dtoToLocation(locationTO);
+    Mono<LocationTO> mono = ensureUnLocationResolvable(locationTO);
 
     if (Objects.isNull(locationTO.getAddress())) {
-      return locationRepository
+      return mono.flatMap(loc ->
+        locationRepository
           .findByContent(locationTO)
           .switchIfEmpty(Mono.defer(() -> locationRepository.save(location)))
           .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
-          .map(locationMapper::locationToDTO);
+          .map(locationMapper::locationToDTO));
     } else {
-      return addressService
+      return mono.flatMap(loc ->
+        addressService
           .ensureResolvable(locationTO.getAddress())
           .flatMap(
               a -> {
@@ -142,7 +150,7 @@ public class LocationServiceImpl implements LocationService {
                     .switchIfEmpty(Mono.defer(() -> locationRepository.save(location)))
                     .flatMap(l -> updateEDocumentation.apply(l.getId()).thenReturn(l))
                     .map(l -> locationMapper.locationToDTO(l, a, null));
-              });
+              }));
     }
   }
 
@@ -181,5 +189,14 @@ public class LocationServiceImpl implements LocationService {
             t2 ->
                 Mono.just(
                     locationMapper.locationToDTO(location, t2.getT1().get(), t2.getT2().get())));
+  }
+
+  private Mono<LocationTO> ensureUnLocationResolvable(LocationTO locationTO) {
+  return Mono.justOrEmpty(locationTO.getUnLocationCode())
+    .flatMap(unLocationRepository::findById)
+    .switchIfEmpty(Mono.error(ConcreteRequestErrorMessageException.invalidParameter(
+                  "UnLocation with unLocationCode "
+                + locationTO.getUnLocationCode() + " not part of reference implementation data set")))
+    .thenReturn(locationTO);
   }
 }
