@@ -3,9 +3,11 @@ package org.dcsa.core.events.service.impl;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
+import org.dcsa.core.events.model.UnLocation;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.LocationRepository;
+import org.dcsa.core.events.repository.UnLocationRepository;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.FacilityService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +24,21 @@ import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Test for LocationService implementation")
 class LocationServiceImplTest {
 
   @Mock LocationRepository locationRepository;
+  @Mock UnLocationRepository unLocationRepository;
   @Mock FacilityService facilityService;
   @Mock AddressService addressService;
 
@@ -38,10 +46,11 @@ class LocationServiceImplTest {
 
   @Spy LocationMapper locationMapper = Mappers.getMapper(LocationMapper.class);
 
-  LocationTO locationTO;
-  Location location;
-  Address address;
-  Facility facility;
+  private LocationTO locationTO;
+  private Location location;
+  private UnLocation unLocation;
+  private Address address;
+  private Facility facility;
 
   private final Mono<Boolean> doNothingCallback = Mono.just(true);
 
@@ -74,6 +83,9 @@ class LocationServiceImplTest {
     location.setLatitude("x".repeat(11));
     location.setAddressID(address.getId());
     location.setFacilityID(facility.getFacilityID());
+
+    unLocation = new UnLocation();
+    unLocation.setUnLocationCode("x".repeat(5));
   }
 
   private void initTO() {
@@ -90,6 +102,7 @@ class LocationServiceImplTest {
 
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
     when(locationRepository.findByContent(any())).thenReturn(Mono.empty());
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.just(unLocation));
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
         .assertNext(
@@ -109,6 +122,7 @@ class LocationServiceImplTest {
     locationTO.setAddress(null);
 
     when(locationRepository.findByContent(any())).thenReturn(Mono.just(location));
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.just(unLocation));
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
         .assertNext(
@@ -128,6 +142,7 @@ class LocationServiceImplTest {
 
     when(locationRepository.findByContent(any())).thenReturn(Mono.empty());
     when(locationRepository.save(any())).thenReturn(Mono.just(location));
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.just(unLocation));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
@@ -148,6 +163,7 @@ class LocationServiceImplTest {
   void testExistingLocationByTOWithAddress() {
 
     when(locationRepository.findByContent(any())).thenReturn(Mono.just(location));
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.just(unLocation));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
     StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
@@ -157,6 +173,26 @@ class LocationServiceImplTest {
               assertEquals(address.getId(), l.getAddressID());
             })
         .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test trying to create a location with unknown UnLocation")
+  void testCreateWithUnknownUnLocation() {
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.empty());
+
+    StepVerifier.create(locationService.createLocationByTO(locationTO, x -> doNothingCallback))
+      .expectErrorMessage("UnLocation with unLocationCode xxxxx not part of reference implementation data set")
+      .verify();
+  }
+
+  @Test
+  @DisplayName("Test trying to ensure location is resolvable with unknown UnLocation")
+  void testEnsureResolvableWithUnknownUnLocation() {
+    when(unLocationRepository.findById((String) any())).thenReturn(Mono.empty());
+
+    StepVerifier.create(locationService.ensureResolvable(locationTO))
+      .expectErrorMessage("UnLocation with unLocationCode xxxxx not part of reference implementation data set")
+      .verify();
   }
 
   @Test
