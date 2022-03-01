@@ -10,6 +10,7 @@ import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentTO;
 import org.dcsa.core.events.model.base.AbstractShippingInstruction;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
 
   @JsonProperty("utilizedTransportEquipments")
   @Valid
+  @NotEmpty
   private List<ShipmentEquipmentTO> shipmentEquipments;
 
   @Valid private List<DocumentPartyTO> documentParties;

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.AbstractShipmentEquipment;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class ShipmentEquipmentTO extends AbstractShipmentEquipment {
 	EquipmentTO equipment;
 
 	@Valid
+	@NotEmpty
 	private List<CargoItemTO> cargoItems;
 
 	@Valid
