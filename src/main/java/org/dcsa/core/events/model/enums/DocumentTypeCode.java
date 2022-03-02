@@ -15,6 +15,6 @@ public enum DocumentTypeCode {
     DGD,
     OOG;
 
-    public final static String EBL_DOCUMENT_TYPE_CODES = "BKG,SHI";
+    public final static String EBL_DOCUMENT_TYPE_CODES = "SHI,TRD";
 
-    }
+}
