@@ -1,6 +1,5 @@
 package org.dcsa.core.events.edocumentation.model.transferobject;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.PaymentTerm;
 
@@ -11,10 +10,9 @@ import javax.validation.constraints.Size;
 public
 class ChargeTO {
 
-  @NotNull(message = "ChargeTypeCode is required.")
-  @Size(max = 20, message = "ChargeTypeCode has a max size of 20.")
-  @JsonProperty("chargeType")
-  private String chargeTypeCode;
+  @NotNull(message = "ChargeType is required.")
+  @Size(max = 20, message = "ChargeType has a max size of 20.")
+  private String chargeType;
 
   @NotNull(message = "CurrencyAmount is required.")
   private Double currencyAmount;

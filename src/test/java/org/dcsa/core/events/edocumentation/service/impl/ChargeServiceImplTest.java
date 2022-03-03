@@ -35,7 +35,7 @@ class ChargeServiceImplTest {
   @BeforeEach
   void init() {
     charge = new Charge();
-    charge.setChargeTypeCode("chargeTypeCode");
+    charge.setChargeType("chargeTypeCode");
     charge.setTransportDocumentReference("TransportDocumentReference1");
     charge.setShipmentID(UUID.randomUUID());
     charge.setCalculationBasis("calculationBasics");
@@ -55,7 +55,7 @@ class ChargeServiceImplTest {
             chargeService.fetchChargesByTransportDocumentReference("TransportDocumentReference1"))
         .assertNext(
             chargeTO -> {
-              assertEquals(charge.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge.getQuantity(), chargeTO.getQuantity());
             })
         .verifyComplete();
@@ -65,7 +65,7 @@ class ChargeServiceImplTest {
   @DisplayName("Test fetch multiple charges for transport document should return multiple charges")
   void testFetchMultipleChargesByTransportDocument() {
     Charge charge2 = new Charge();
-    charge2.setChargeTypeCode("chargeTypeCode2");
+    charge2.setChargeType("chargeTypeCode2");
     charge2.setTransportDocumentReference("TransportDocumentReference1");
     charge2.setShipmentID(UUID.randomUUID());
     charge2.setCalculationBasis("calculationBasics");
@@ -82,12 +82,12 @@ class ChargeServiceImplTest {
             chargeService.fetchChargesByTransportDocumentReference("TransportDocumentReference1"))
         .assertNext(
             chargeTO -> {
-              assertEquals(charge.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge.getQuantity(), chargeTO.getQuantity());
             })
         .assertNext(
             chargeTO -> {
-              assertEquals(charge2.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge2.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge2.getQuantity(), chargeTO.getQuantity());
             })
         .verifyComplete();
@@ -111,7 +111,7 @@ class ChargeServiceImplTest {
     StepVerifier.create(chargeService.fetchChargesByShipmentID(UUID.randomUUID()))
         .assertNext(
             chargeTO -> {
-              assertEquals(charge.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge.getCalculationBasis(), chargeTO.getCalculationBasis());
             })
         .verifyComplete();
@@ -121,7 +121,7 @@ class ChargeServiceImplTest {
   @DisplayName("Test fetch multiple charges by shipmentID should return multiple charges")
   void testFetchMultipleChargesByShipmentID() {
     Charge charge2 = new Charge();
-    charge2.setChargeTypeCode("chargeTypeCode2");
+    charge2.setChargeType("chargeTypeCode2");
     charge2.setTransportDocumentReference("TransportDocumentReference1");
     charge2.setShipmentID(UUID.randomUUID());
     charge2.setCalculationBasis("calculationBasics");
@@ -136,12 +136,12 @@ class ChargeServiceImplTest {
     StepVerifier.create(chargeService.fetchChargesByShipmentID(UUID.randomUUID()))
         .assertNext(
             chargeTO -> {
-              assertEquals(charge.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge.getUnitPrice(), chargeTO.getUnitPrice());
             })
         .assertNext(
             chargeTO -> {
-              assertEquals(charge2.getChargeTypeCode(), chargeTO.getChargeTypeCode());
+              assertEquals(charge2.getChargeType(), chargeTO.getChargeType());
               assertEquals(charge2.getCurrencyAmount(), chargeTO.getCurrencyAmount());
             })
         .verifyComplete();
