@@ -235,8 +235,9 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
           addressService
               .ensureResolvable(partyTO.getAddress())
               .flatMap(
-                  a -> {
+                  address -> {
                     Party party = partyMapper.dtoToParty(partyTO);
+                    party.setAddressID(address.getId());
                     return partyRepository
                         .save(party)
                         .map(
@@ -244,7 +245,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
                               PartyTO pTO =
                                   p.toPartyTO(
                                       partyTO.getNmftaCode(),
-                                      partyTO.getAddress(),
+                                      address,
                                       partyTO.getIdentifyingCodes());
                               return Tuples.of(p.getId(), pTO);
                             });
