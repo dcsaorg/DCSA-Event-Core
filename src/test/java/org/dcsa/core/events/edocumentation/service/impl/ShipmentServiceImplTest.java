@@ -106,7 +106,7 @@ class ShipmentServiceImplTest {
     requestedEquipment.setConfirmedEquipmentUnits(3);
 
     charge = new Charge();
-    charge.setChargeTypeCode("x".repeat(20));
+    charge.setChargeType("x".repeat(20));
     charge.setId(UUID.randomUUID().toString());
     charge.setShipmentID(UUID.randomUUID());
     charge.setCalculationBasis("WHAT");
@@ -343,7 +343,7 @@ class ShipmentServiceImplTest {
         .assertNext(
             res -> {
               assertEquals(1, res.size());
-              assertEquals(charge.getChargeTypeCode(), res.get(0).getChargeTypeCode());
+              assertEquals(charge.getChargeType(), res.get(0).getChargeType());
               assertEquals("WHAT", res.get(0).getCalculationBasis());
               assertEquals(PaymentTerm.PRE, res.get(0).getPaymentTermCode());
               assertEquals(12.12, res.get(0).getCurrencyAmount());
@@ -435,7 +435,7 @@ class ShipmentServiceImplTest {
                   "22GP", result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentSizetype());
               assertEquals(3, result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentUnits());
               assertEquals(
-                  charge.getChargeTypeCode(), result.get(0).getCharges().get(0).getChargeTypeCode());
+                  charge.getChargeType(), result.get(0).getCharges().get(0).getChargeType());
               assertEquals("WHAT", result.get(0).getCharges().get(0).getCalculationBasis());
               assertEquals(PaymentTerm.PRE, result.get(0).getCharges().get(0).getPaymentTermCode());
               assertEquals("YOYO", result.get(0).getTransports().get(0).getTransportName());
