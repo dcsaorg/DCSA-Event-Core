@@ -69,9 +69,7 @@ public interface BookingRepository
       OffsetDateTime updatedDateTime);
 
     @Query(
-      "SELECT DISTINCT b.* FROM cargo_item ci "
-          + "JOIN shipment_equipment se ON se.id = ci.shipment_equipment_id "
-          + "JOIN shipment s ON s.id = se.shipment_id "
+      "SELECT DISTINCT b.* FROM shipment s "
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference")
   Flux<Booking> findAllByCarrierBookingReference(String carrierBookingReference);
