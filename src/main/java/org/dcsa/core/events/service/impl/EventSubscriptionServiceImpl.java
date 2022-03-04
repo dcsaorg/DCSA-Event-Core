@@ -252,39 +252,39 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
       case SHI:
         carrierBookingReferences =
             bookingRepository
-                .findCarrierBookingRefsByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierBookingRefsByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
             voyageRepository
-                .findCarrierVoyageNumbersByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierVoyageNumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         carrierServiceCodes =
             serviceRepository
-                .findCarrierServiceCodesByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierServiceCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
 
         transportDocumentReferences =
             transportDocumentRepository
-                .findDistinctTransportDocumentReferencesByShippingInstructionID(
+                .findDistinctTransportDocumentReferencesByShippingInstructionReference(
                     shipmentEvent.getDocumentID())
                 .map(TransportDocument::getTransportDocumentReference)
                 .collectList();
 
         transportDocumentTypeCodes =
             transportDocumentTypeRepository
-                .findCodesByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         transportCallIDs =
             transportCallRepository
-                .findTransportCallIDByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findTransportCallIDByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         equipmentReferences =
             shipmentEquipmentRepository
-                .findEquipmentReferenceByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findEquipmentReferenceByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =
             transportRepository
-                .findVesselIMONumbersByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findVesselIMONumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
 
         break;

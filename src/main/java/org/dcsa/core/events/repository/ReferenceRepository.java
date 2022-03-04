@@ -14,12 +14,12 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
   @Query(
       "SELECT reference.* "
           + "FROM reference "
-          + "WHERE shipping_instruction_id = :shippingInstructionID "
+          + "WHERE shipping_instruction_id = :shippingInstructionReference "
           + "OR shipment_id IN ( SELECT s.id from shipment s "
           + "JOIN shipment_equipment se ON s.id = se.shipment_id "
           + "JOIN cargo_item ci ON ci.shipment_equipment_id = se.id "
-          + "WHERE ci.shipping_instruction_id = :shippingInstructionID ) ")
-  Flux<Reference> findByShippingInstructionID(String shippingInstructionID);
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionReference ) ")
+  Flux<Reference> findByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT reference.* "
@@ -62,5 +62,5 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
 
   Mono<Void> deleteByBookingID(UUID bookingID);
 
-  Mono<Void> deleteByShippingInstructionID(String shippingInstructionID);
+  Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);
 }

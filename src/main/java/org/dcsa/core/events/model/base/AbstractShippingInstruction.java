@@ -24,7 +24,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Id
   @Size(max = 100)
   @Column("id")
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @EnumSubset(anyOf = EBL_DOCUMENT_STATUSES)
   @Column("document_status")

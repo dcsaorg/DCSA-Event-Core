@@ -26,7 +26,7 @@ public class ShipmentLocation {
 
   @Size(max = 100)
   @Column("shipping_instruction_id ")
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @Column("shipment_location_type_code")
   private LocationType shipmentLocationTypeCode;

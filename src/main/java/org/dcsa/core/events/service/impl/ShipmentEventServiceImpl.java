@@ -53,7 +53,7 @@ public class ShipmentEventServiceImpl extends QueryServiceImpl<ShipmentEventRepo
                 return shipmentEventReferences
                         .apply(
                                 shipmentEvent,
-                                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
+                                referenceRepository.findByShippingInstructionReference(shipmentEvent.getDocumentID()))
                         .thenReturn(shipmentEvent);
             default:
                 return Mono.just(shipmentEvent);

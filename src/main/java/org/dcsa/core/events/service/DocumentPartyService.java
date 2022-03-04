@@ -11,14 +11,14 @@ public interface DocumentPartyService {
   Mono<List<DocumentPartyTO>> createDocumentPartiesByBookingID(
       UUID bookingID, List<DocumentPartyTO> documentParties);
 
-  Mono<List<DocumentPartyTO>> createDocumentPartiesByShippingInstructionID(
-      String shippingInstructionID, List<DocumentPartyTO> documentParties);
+  Mono<List<DocumentPartyTO>> createDocumentPartiesByShippingInstructionReference(
+      String shippingInstructionReference, List<DocumentPartyTO> documentParties);
 
   Mono<List<DocumentPartyTO>> fetchDocumentPartiesByBookingID(UUID bookingID);
 
-  Mono<List<DocumentPartyTO>> fetchDocumentPartiesByByShippingInstructionID(
-      String shippingInstructionID);
+  Mono<List<DocumentPartyTO>> fetchDocumentPartiesByByShippingInstructionReference(
+      String shippingInstructionReference);
 
-  Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionID(
-      String shippingInstructionID, List<DocumentPartyTO> documentPartyTOs);
+  Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionReference(
+      String shippingInstructionReference, List<DocumentPartyTO> documentPartyTOs);
 }

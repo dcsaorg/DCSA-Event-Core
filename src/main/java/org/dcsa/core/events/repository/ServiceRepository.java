@@ -43,8 +43,8 @@ public interface ServiceRepository extends ReactiveCrudRepository<Service, UUID>
           + " ON ci.shipment_equipment_id = se.id "
           + "LEFT JOIN reference r"
           + " ON r.shipment_id = st.shipment_id"
-          + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR reference.shipping_instruction_id = :shippingInstructionID)")
-  Flux<String> findCarrierServiceCodesByShippingInstructionID(String shippingInstructionID);
+          + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR reference.shipping_instruction_id = :shippingInstructionReference)")
+  Flux<String> findCarrierServiceCodesByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT s.carrier_service_code FROM service s "

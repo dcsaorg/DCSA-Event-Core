@@ -9,7 +9,7 @@ public interface LocationService {
 
   Mono<LocationTO> ensureResolvable(LocationTO locationTO);
 
-  Mono<LocationTO> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
+  Mono<LocationTO> findPaymentLocationByShippingInstructionReference(String shippingInstructionReference);
 
   Mono<LocationTO> findTOById(String locationID);
 

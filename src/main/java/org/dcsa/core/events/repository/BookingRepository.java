@@ -33,8 +33,8 @@ public interface BookingRepository
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
           + "JOIN shipment_equipment se ON s.id = se.shipment_id "
           + "JOIN cargo_item ci ON se.id = ci.shipment_equipment_id "
-          + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
-  Flux<String> findCarrierBookingRefsByShippingInstructionID(String shippingInstructionID);
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionReference")
+  Flux<String> findCarrierBookingRefsByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -80,7 +80,7 @@ public interface BookingRepository
           + "JOIN shipment_equipment se ON se.id = ci.shipment_equipment_id "
           + "JOIN shipment s ON s.id = se.shipment_id "
           + "JOIN booking b ON b.id = s.booking_id "
-          + "WHERE si.id = :shippingInstructionID")
-  Flux<Booking> findAllByShippingInstructionID(String shippingInstructionID);
+          + "WHERE si.id = :shippingInstructionReference")
+  Flux<Booking> findAllByShippingInstructionReference(String shippingInstructionReference);
 
 }

@@ -80,25 +80,25 @@ class ReferenceServiceImplTest {
               Reference capturedArgument =
                   Objects.requireNonNull(argumentCaptor.getValue().iterator().next());
               assertEquals(bookingID, capturedArgument.getBookingID());
-              assertNull(capturedArgument.getShippingInstructionID());
+              assertNull(capturedArgument.getShippingInstructionReference());
             })
         .verifyComplete();
   }
 
   @Test
-  @DisplayName("Test create reference with shippingInstructionID")
+  @DisplayName("Test create reference with shippingInstructionReference")
   @SuppressWarnings("unchecked")
-  void testWithShippingInstructionID() {
-    String shippingInstructionID = UUID.randomUUID().toString();
-    reference.setShippingInstructionID(shippingInstructionID);
+  void testWithShippingInstructionReference() {
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    reference.setShippingInstructionReference(shippingInstructionReference);
 
     when(referenceRepository.saveAll(any(Iterable.class))).thenReturn(Flux.just(reference));
 
     ArgumentCaptor<Iterable<Reference>> argumentCaptor = ArgumentCaptor.forClass(Iterable.class);
 
     StepVerifier.create(
-            referenceService.createReferencesByShippingInstructionIDAndTOs(
-                shippingInstructionID, Collections.singletonList(referenceTO)))
+            referenceService.createReferencesByShippingInstructionReferenceAndTOs(
+                shippingInstructionReference, Collections.singletonList(referenceTO)))
         .assertNext(
             referenceTOS -> {
               assertNotNull(referenceTOS.get(0).getReferenceValue());
@@ -106,22 +106,22 @@ class ReferenceServiceImplTest {
               verify(referenceRepository).saveAll(argumentCaptor.capture());
               Reference capturedArgument =
                   Objects.requireNonNull(argumentCaptor.getValue().iterator().next());
-              assertEquals(shippingInstructionID, capturedArgument.getShippingInstructionID());
+              assertEquals(shippingInstructionReference, capturedArgument.getShippingInstructionReference());
               assertNull(capturedArgument.getBookingID());
             })
         .verifyComplete();
   }
 
   @Test
-  @DisplayName("Test create reference without shippingInstructionID")
-  void testWithoutShippingInstructionID() {
+  @DisplayName("Test create reference without shippingInstructionReference")
+  void testWithoutShippingInstructionReference() {
     StepVerifier.create(
-            referenceService.createReferencesByShippingInstructionIDAndTOs(
+            referenceService.createReferencesByShippingInstructionReferenceAndTOs(
                 null, Collections.singletonList(referenceTO)))
         .expectErrorSatisfies(
             throwable -> {
               Assertions.assertTrue(throwable instanceof CreateException);
-              assertEquals("ShippingInstructionID cannot be null", throwable.getMessage());
+              assertEquals("ShippingInstructionReference cannot be null", throwable.getMessage());
             })
         .verify();
   }
@@ -160,18 +160,18 @@ class ReferenceServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test to find references by ShippingInstructionID")
-  void testFindReferencesByShippingInstructionID() {
+  @DisplayName("Test to find references by ShippingInstructionReference")
+  void testFindReferencesByShippingInstructionReference() {
 
-    String shippingInstructionID = UUID.randomUUID().toString();
-    reference.setShippingInstructionID(shippingInstructionID);
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    reference.setShippingInstructionReference(shippingInstructionReference);
 
-    when(referenceRepository.findByShippingInstructionID(any())).thenReturn(Flux.just(reference));
+    when(referenceRepository.findByShippingInstructionReference(any())).thenReturn(Flux.just(reference));
 
-    StepVerifier.create(referenceService.findByShippingInstructionID(shippingInstructionID))
+    StepVerifier.create(referenceService.findByShippingInstructionReference(shippingInstructionReference))
         .assertNext(
             rs -> {
-              verify(referenceRepository).findByShippingInstructionID(shippingInstructionID);
+              verify(referenceRepository).findByShippingInstructionReference(shippingInstructionReference);
               assertEquals(ReferenceTypeCode.FF, rs.get(0).getReferenceType());
               assertEquals("test", rs.get(0).getReferenceValue());
             })

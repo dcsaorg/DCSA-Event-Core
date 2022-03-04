@@ -176,10 +176,10 @@ class DocumentPartyServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test create DocumentParty with shippingInstructionID")
-  void testWithShippingInstructionID() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+  @DisplayName("Test create DocumentParty with shippingInstructionReference")
+  void testWithShippingInstructionReference() {
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
 
     when(partyRepository.save(any())).thenReturn(Mono.just(party));
     when(partyContactDetailsRepository.saveAll(any(Flux.class)))
@@ -194,8 +194,8 @@ class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-            documentPartyService.createDocumentPartiesByShippingInstructionID(
-                shippingInstructionId, documentParties))
+            documentPartyService.createDocumentPartiesByShippingInstructionReference(
+                shippingInstructionReference, documentParties))
         .assertNext(
             documentPartyTOS -> {
               verify(addressService).ensureResolvable(any());
@@ -207,16 +207,16 @@ class DocumentPartyServiceImplTest {
 
               verify(documentPartyRepository).save(argumentCaptor.capture());
               assertEquals(
-                  shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+                  shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
             })
         .verifyComplete();
   }
 
   @Test
   @DisplayName("Test create DocumentParty withoutDisplayedAddress")
-  void testWithShippingInstructionIDWithoutDisplayedAddress() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+  void testWithShippingInstructionReferenceWithoutDisplayedAddress() {
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
     DocumentPartyTO documentPartyTOWithoutDisplayedAddress = new DocumentPartyTO();
     documentPartyTOWithoutDisplayedAddress.setParty(documentPartyTO.getParty());
     documentPartyTOWithoutDisplayedAddress.setPartyFunction(documentPartyTO.getPartyFunction());
@@ -234,8 +234,8 @@ class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-        documentPartyService.createDocumentPartiesByShippingInstructionID(
-          shippingInstructionId, Collections.singletonList(documentPartyTOWithoutDisplayedAddress)))
+        documentPartyService.createDocumentPartiesByShippingInstructionReference(
+          shippingInstructionReference, Collections.singletonList(documentPartyTOWithoutDisplayedAddress)))
       .assertNext(
         documentPartyTOS -> {
           verify(addressService).ensureResolvable(any());
@@ -246,7 +246,7 @@ class DocumentPartyServiceImplTest {
 
           verify(documentPartyRepository).save(argumentCaptor.capture());
           assertEquals(
-            shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+            shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
         })
       .verifyComplete();
   }
@@ -254,8 +254,8 @@ class DocumentPartyServiceImplTest {
   @Test
   @DisplayName("Test create DocumentParty with minimal party.")
   void testWithMinimalPartyInDocumentParty() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
     party.setAddressID(null);
 
     PartyContactDetailsTO minimalPartyContactDetails = new PartyContactDetailsTO();
@@ -279,8 +279,8 @@ class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-        documentPartyService.createDocumentPartiesByShippingInstructionID(
-          shippingInstructionId, Collections.singletonList(documentPartyTOWithMinParty)))
+        documentPartyService.createDocumentPartiesByShippingInstructionReference(
+          shippingInstructionReference, Collections.singletonList(documentPartyTOWithMinParty)))
       .assertNext(
         documentPartyTOS -> {
           verify(partyRepository).save(any());
@@ -291,7 +291,7 @@ class DocumentPartyServiceImplTest {
 
           verify(documentPartyRepository).save(argumentCaptor.capture());
           assertEquals(
-            shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+            shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
         })
       .verifyComplete();
   }
@@ -453,7 +453,7 @@ class DocumentPartyServiceImplTest {
   @DisplayName("Test fetch document parties by ID.")
   void testFetchDocumentPartiesByID() {
 
-    when(documentPartyRepository.findByShippingInstructionID(any()))
+    when(documentPartyRepository.findByShippingInstructionReference(any()))
         .thenReturn(Flux.just(documentParty));
 
     when(partyRepository.findByIdOrEmpty(any())).thenReturn(Mono.just(party));
@@ -470,7 +470,7 @@ class DocumentPartyServiceImplTest {
             documentPartyService.fetchDocumentPartiesByID(
                 UUID.randomUUID().toString(), ColumnReferenceType.SHIPPING_INSTRUCTION))
         .assertNext(dpTOs -> {
-            verify(documentPartyRepository).findByShippingInstructionID(any());
+            verify(documentPartyRepository).findByShippingInstructionReference(any());
             assertEquals(PartyFunction.DDS, dpTOs.get(0).getPartyFunction());
             assertEquals(List.of("Javastraat"), dpTOs.get(0).getDisplayedAddress());
             assertEquals("DCSA", dpTOs.get(0).getParty().getPartyName());

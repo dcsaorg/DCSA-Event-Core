@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface ShipmentService {
-  Mono<List<ShipmentTO>> findByShippingInstructionID(String id);
+  Mono<List<ShipmentTO>> findByShippingInstructionReference(String id);
 }

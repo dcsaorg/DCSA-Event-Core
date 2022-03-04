@@ -73,7 +73,7 @@ public class CargoItemCustomRepositoryImplTest {
 		Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
 		UUID cargoItemId = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
-		String shippingInstructionID = UUID.randomUUID().toString();
+		String shippingInstructionReference = UUID.randomUUID().toString();
 
 		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
 		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
@@ -83,7 +83,7 @@ public class CargoItemCustomRepositoryImplTest {
 		cargoItemWithCargoLineItem1.put("ci.weight_unit", "KGM");
 		cargoItemWithCargoLineItem1.put("ci.volume_unit", "CBM");
 		cargoItemWithCargoLineItem1.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionID);
+		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionReference);
 		cargoItemWithCargoLineItem1.put("ci.package_code", "123");
 		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
 		cargoItemWithCargoLineItem1.put("s.carrier_booking_reference", "CBR1");
@@ -100,7 +100,7 @@ public class CargoItemCustomRepositoryImplTest {
 		cargoItemWithCargoLineItem2.put("ci.weight_unit", "KGM");
 		cargoItemWithCargoLineItem2.put("ci.volume_unit", "CBM");
 		cargoItemWithCargoLineItem2.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem2.put("ci.shipping_instruction_id", shippingInstructionID);
+		cargoItemWithCargoLineItem2.put("ci.shipping_instruction_id", shippingInstructionReference);
 		cargoItemWithCargoLineItem2.put("ci.package_code", "123");
 		cargoItemWithCargoLineItem2.put("ci.shipment_equipment_id", shipmentEquipmentID);
 		cargoItemWithCargoLineItem1.put("s.carrier_booking_reference", "CBR1");
@@ -129,7 +129,7 @@ public class CargoItemCustomRepositoryImplTest {
 		Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
 		UUID cargoItemId = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
-		String shippingInstructionID = UUID.randomUUID().toString();
+		String shippingInstructionReference = UUID.randomUUID().toString();
 
 		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
 		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
@@ -139,7 +139,7 @@ public class CargoItemCustomRepositoryImplTest {
 		cargoItemWithCargoLineItem1.put("ci.weight_unit", "KGM");
 		cargoItemWithCargoLineItem1.put("ci.volume_unit", "CBM");
 		cargoItemWithCargoLineItem1.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionID);
+		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionReference);
 		cargoItemWithCargoLineItem1.put("ci.package_code", "123");
 		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
 
@@ -147,7 +147,7 @@ public class CargoItemCustomRepositoryImplTest {
 
 		CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult = cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
 		assertEquals(shipmentEquipmentID, cargoItemsResult.getShipmentEquipmentID());
-		assertEquals(shippingInstructionID, cargoItemsResult.getShippingInstructionID());
+		assertEquals(shippingInstructionReference, cargoItemsResult.getShippingInstructionReference());
 
 		//assertions on cargoLineItems
 		assertEquals(0, cargoItemsResult.getCargoLineItems().size());

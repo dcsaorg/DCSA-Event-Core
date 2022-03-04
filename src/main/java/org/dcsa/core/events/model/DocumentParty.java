@@ -17,7 +17,7 @@ public class DocumentParty {
   private String partyID;
 
   @Column("shipping_instruction_id")
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @Column("shipment_id")
   private UUID shipmentID;

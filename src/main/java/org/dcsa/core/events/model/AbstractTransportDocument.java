@@ -55,7 +55,7 @@ public abstract class AbstractTransportDocument extends AuditBase {
 
     @Column("shipping_instruction_id")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String shippingInstructionID;
+    private String shippingInstructionReference;
 
     @Column("declared_value_currency")
     @Size(max = 3)

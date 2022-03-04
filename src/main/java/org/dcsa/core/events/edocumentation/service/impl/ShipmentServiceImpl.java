@@ -44,9 +44,9 @@ class ShipmentServiceImpl implements ShipmentService {
   private final ShipmentTransportRepository shipmentTransportRepository;
 
   @Override
-  public Mono<List<ShipmentTO>> findByShippingInstructionID(String id) {
+  public Mono<List<ShipmentTO>> findByShippingInstructionReference(String shippingInstructionReference) {
     return shipmentRepository
-        .findByShippingInstructionID(id)
+        .findByShippingInstructionReference(shippingInstructionReference)
         .map(s -> Tuples.of(s, shipmentMapper.shipmentToDTO(s)))
         .flatMap(
             t -> {

@@ -35,8 +35,8 @@ public interface ShipmentEquipmentRepository extends ReactiveCrudRepository<Ship
           + "ON ci.shipment_equipment_id = se.id"
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = se.shipment_id "
-          + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID")
-  Flux<String> findEquipmentReferenceByShippingInstructionID(String shippingInstructionID);
+          + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR r.shipping_instruction_id = :shippingInstructionReference")
+  Flux<String> findEquipmentReferenceByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT se.equipment_reference FROM shipment_equipment se "
