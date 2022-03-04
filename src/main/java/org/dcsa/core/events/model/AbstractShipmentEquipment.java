@@ -17,6 +17,7 @@ public abstract class AbstractShipmentEquipment {
   @Column("cargo_gross_weight_unit")
   private WeightUnit cargoGrossWeightUnit;
 
+  @NotNull(message = "Is shipper owned is required.")
   @Column("is_shipper_owned")
   private Boolean isShipperOwned;
 }
