@@ -3,6 +3,7 @@ package org.dcsa.core.events.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
+import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.mappers.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
@@ -90,8 +91,7 @@ public class LocationServiceImpl implements LocationService {
     if (id == null) return Mono.empty();
     return locationRepository
         .findById(id)
-        .flatMap(this::getLocationTO)
-        .onErrorReturn(new LocationTO());
+        .flatMap(this::getLocationTO);
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
@@ -106,11 +106,11 @@ public class LocationServiceImpl implements LocationService {
                         addressService
                             .findByIdOrEmpty(location.getAddressID())
                             .map(Optional::of)
-                            .defaultIfEmpty(Optional.empty()),
+                            .defaultIfEmpty(Optional.of(new Address())),
                         facilityService
                             .findByIdOrEmpty(location.getFacilityID())
                             .map(Optional::of)
-                            .defaultIfEmpty(Optional.empty()))
+                            .defaultIfEmpty(Optional.of(new Facility())))
                     .flatMap(
                         t2 ->
                             Mono.just(
@@ -188,7 +188,13 @@ public class LocationServiceImpl implements LocationService {
         .flatMap(
             t2 ->
                 Mono.just(
-                    locationMapper.locationToDTO(location, t2.getT1().get(), t2.getT2().get())));
+                    locationMapper.locationToDTO(
+                        location,
+                        t2.getT1().isPresent()
+                            ? t2.getT1().get()
+                            : null, // if optional is empty no value is retrieved hence in that case
+                                    // we need to pass null
+                        t2.getT2().isPresent() ? t2.getT2().get() : null)));
   }
 
   private Mono<LocationTO> ensureUnLocationResolvable(LocationTO locationTO) {

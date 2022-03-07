@@ -40,7 +40,7 @@ class ShipmentEquipmentCustomRepositoryImplTest {
 				"shipment_equipment.id, shipment_equipment.equipment_reference, equipment.tare_weight, equipment.weight_unit " +
 			"FROM shipment_equipment " +
 			"JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference " +
-			"WHERE shipment_equipment.shipment_id = " + shipmentID;
+			"WHERE shipment_equipment.shipment_id = '" + shipmentID + "'";
 		Assertions.assertEquals(expectedQuery, executedQuery);
 	}
 

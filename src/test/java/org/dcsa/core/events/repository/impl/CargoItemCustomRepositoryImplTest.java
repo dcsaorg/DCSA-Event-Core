@@ -50,7 +50,7 @@ public class CargoItemCustomRepositoryImplTest {
 				"JOIN cargo_line_item ON cargo_line_item.cargo_item_id = cargo_item.id " +
 				"JOIN shipment_equipment ON cargo_item.shipment_equipment_id = shipment_equipment.id "+
 				"JOIN shipment ON shipment_equipment.shipment_id = shipment.id " +
-				"WHERE cargo_item.shipment_equipment_id = " + shipmentEquipmentID;
+				"WHERE cargo_item.shipment_equipment_id = '" + shipmentEquipmentID + "'";
 		Assertions.assertEquals(expectedQuery, executedQuery);
 	}
 
@@ -75,38 +75,38 @@ public class CargoItemCustomRepositoryImplTest {
 		UUID shipmentEquipmentID = UUID.randomUUID();
 		String shippingInstructionReference = UUID.randomUUID().toString();
 
-		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
-		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
-		cargoItemWithCargoLineItem1.put("ci.weight", 100F);
-		cargoItemWithCargoLineItem1.put("ci.volume", 300F);
-		cargoItemWithCargoLineItem1.put("ci.weight_unit", "KGM");
-		cargoItemWithCargoLineItem1.put("ci.volume_unit", "CBM");
-		cargoItemWithCargoLineItem1.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionReference);
-		cargoItemWithCargoLineItem1.put("ci.package_code", "123");
-		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
-		cargoItemWithCargoLineItem1.put("s.carrier_booking_reference", "CBR1");
-		cargoItemWithCargoLineItem1.put("cli.cargo_line_item_id", "1");
-		cargoItemWithCargoLineItem1.put("cli.cargo_item_id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("cli.shipping_marks", "shipping_marks");
+		cargoItemWithCargoLineItem1.put("id", cargoItemId);
+		cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
+		cargoItemWithCargoLineItem1.put("hs_code", "720711");
+		cargoItemWithCargoLineItem1.put("weight", 100F);
+		cargoItemWithCargoLineItem1.put("volume", 300F);
+		cargoItemWithCargoLineItem1.put("weight_unit", "KGM");
+		cargoItemWithCargoLineItem1.put("volume_unit", "CBM");
+		cargoItemWithCargoLineItem1.put("number_of_packages", 2);
+		cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
+		cargoItemWithCargoLineItem1.put("package_code", "123");
+		cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
+		cargoItemWithCargoLineItem1.put("carrier_booking_reference", "CBR1");
+		cargoItemWithCargoLineItem1.put("cargo_line_item_id", "1");
+		cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
+		cargoItemWithCargoLineItem1.put("shipping_marks", "shipping_marks");
 
 		Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
-		cargoItemWithCargoLineItem2.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem2.put("ci.description_of_goods", "description of goods");
-		cargoItemWithCargoLineItem2.put("ci.hs_code", "720711");
-		cargoItemWithCargoLineItem2.put("ci.weight", 100F);
-		cargoItemWithCargoLineItem2.put("ci.volume", 300F);
-		cargoItemWithCargoLineItem2.put("ci.weight_unit", "KGM");
-		cargoItemWithCargoLineItem2.put("ci.volume_unit", "CBM");
-		cargoItemWithCargoLineItem2.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem2.put("ci.shipping_instruction_id", shippingInstructionReference);
-		cargoItemWithCargoLineItem2.put("ci.package_code", "123");
-		cargoItemWithCargoLineItem2.put("ci.shipment_equipment_id", shipmentEquipmentID);
-		cargoItemWithCargoLineItem1.put("s.carrier_booking_reference", "CBR1");
-		cargoItemWithCargoLineItem2.put("cli.cargo_line_item_id", "2");
-		cargoItemWithCargoLineItem2.put("cli.cargo_item_id", cargoItemId);
-		cargoItemWithCargoLineItem2.put("cli.shipping_marks", "shipping_marks2");
+		cargoItemWithCargoLineItem2.put("id", cargoItemId);
+		cargoItemWithCargoLineItem2.put("description_of_goods", "description of goods");
+		cargoItemWithCargoLineItem2.put("hs_code", "720711");
+		cargoItemWithCargoLineItem2.put("weight", 100F);
+		cargoItemWithCargoLineItem2.put("volume", 300F);
+		cargoItemWithCargoLineItem2.put("weight_unit", "KGM");
+		cargoItemWithCargoLineItem2.put("volume_unit", "CBM");
+		cargoItemWithCargoLineItem2.put("number_of_packages", 2);
+		cargoItemWithCargoLineItem2.put("shipping_instruction_id", shippingInstructionReference);
+		cargoItemWithCargoLineItem2.put("package_code", "123");
+		cargoItemWithCargoLineItem2.put("shipment_equipment_id", shipmentEquipmentID);
+		cargoItemWithCargoLineItem1.put("carrier_booking_reference", "CBR1");
+		cargoItemWithCargoLineItem2.put("cargo_line_item_id", "2");
+		cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
+		cargoItemWithCargoLineItem2.put("shipping_marks", "shipping_marks2");
 
 		List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1, cargoItemWithCargoLineItem2);
 
@@ -131,17 +131,17 @@ public class CargoItemCustomRepositoryImplTest {
 		UUID shipmentEquipmentID = UUID.randomUUID();
 		String shippingInstructionReference = UUID.randomUUID().toString();
 
-		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
-		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
-		cargoItemWithCargoLineItem1.put("ci.weight", 100F);
-		cargoItemWithCargoLineItem1.put("ci.volume", 300F);
-		cargoItemWithCargoLineItem1.put("ci.weight_unit", "KGM");
-		cargoItemWithCargoLineItem1.put("ci.volume_unit", "CBM");
-		cargoItemWithCargoLineItem1.put("ci.number_of_packages", 2);
-		cargoItemWithCargoLineItem1.put("ci.shipping_instruction_id", shippingInstructionReference);
-		cargoItemWithCargoLineItem1.put("ci.package_code", "123");
-		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
+		cargoItemWithCargoLineItem1.put("id", cargoItemId);
+		cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
+		cargoItemWithCargoLineItem1.put("hs_code", "720711");
+		cargoItemWithCargoLineItem1.put("weight", 100F);
+		cargoItemWithCargoLineItem1.put("volume", 300F);
+		cargoItemWithCargoLineItem1.put("weight_unit", "KGM");
+		cargoItemWithCargoLineItem1.put("volume_unit", "CBM");
+		cargoItemWithCargoLineItem1.put("number_of_packages", 2);
+		cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
+		cargoItemWithCargoLineItem1.put("package_code", "123");
+		cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
 
 		List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1);
 
@@ -161,18 +161,18 @@ public class CargoItemCustomRepositoryImplTest {
 		UUID cargoItemId = UUID.randomUUID();
 		UUID shipmentEquipmentID = UUID.randomUUID();
 
-		cargoItemWithCargoLineItem1.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem1.put("ci.description_of_goods", "description of goods");
-		cargoItemWithCargoLineItem1.put("ci.hs_code", "720711");
-		cargoItemWithCargoLineItem1.put("ci.shipment_equipment_id", shipmentEquipmentID);
-		cargoItemWithCargoLineItem1.put("cli.cargo_item_id", cargoItemId);
+		cargoItemWithCargoLineItem1.put("id", cargoItemId);
+		cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
+		cargoItemWithCargoLineItem1.put("hs_code", "720711");
+		cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
+		cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
 
 		Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
-		cargoItemWithCargoLineItem2.put("ci.id", cargoItemId);
-		cargoItemWithCargoLineItem2.put("ci.description_of_goods", "description of goods");
-		cargoItemWithCargoLineItem2.put("ci.hs_code", "720711");
-		cargoItemWithCargoLineItem2.put("ci.shipment_equipment_id", shipmentEquipmentID);
-		cargoItemWithCargoLineItem2.put("cli.cargo_item_id", cargoItemId);
+		cargoItemWithCargoLineItem2.put("id", cargoItemId);
+		cargoItemWithCargoLineItem2.put("description_of_goods", "description of goods");
+		cargoItemWithCargoLineItem2.put("hs_code", "720711");
+		cargoItemWithCargoLineItem2.put("shipment_equipment_id", shipmentEquipmentID);
+		cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
 
 		List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1, cargoItemWithCargoLineItem2);
 

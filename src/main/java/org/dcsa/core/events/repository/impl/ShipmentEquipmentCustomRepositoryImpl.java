@@ -44,25 +44,38 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
         .where(
           Conditions.isEqual(
             queryColumnMap().get("shipmentId"),
-            SQL.literalOf(shipmentID)))
+            SQL.literalOf(shipmentID.toString())))
         .build();
 
-    RenderContextFactory factory=new RenderContextFactory(r2dbcDialect);
-    SqlRenderer sqlRenderer= SqlRenderer.create(factory.createRenderContext());
+    RenderContextFactory factory = new RenderContextFactory(r2dbcDialect);
+    SqlRenderer sqlRenderer = SqlRenderer.create(factory.createRenderContext());
     return client
-      .sql(sqlRenderer.render(selectJoin))
-      .map(
-        row->
-          new ShipmentEquipmentDetails(
-            row.get("seEquipmentReference",String.class),
-            row.get("cargoGrossWeight",Float.class),
-            row.get("cargoGrossWeightUnit", WeightUnit.class),
-            row.get("isoEquipmentCode",String.class),
-            row.get("tareWeight",Float.class),
-            row.get("weightUnit",String.class),
-            row.get("isShipperOwned",Boolean.class),
-            row.get("id", UUID.class)))
-      .all();
+        .sql(sqlRenderer.render(selectJoin))
+        .map(
+            row ->
+                new ShipmentEquipmentDetails(
+                    row.get(
+                        queryColumnMap().get("seEquipmentReference").getName().getReference(),
+                        String.class),
+                    row.get(
+                        queryColumnMap().get("cargoGrossWeight").getName().getReference(),
+                        Float.class),
+                    WeightUnit.valueOf(
+                        row.get(
+                            queryColumnMap().get("cargoGrossWeightUnit").getName().getReference(),
+                            String.class)),
+                    row.get(
+                        queryColumnMap().get("isoEquipmentCode").getName().getReference(),
+                        String.class),
+                    row.get(
+                        queryColumnMap().get("tareWeight").getName().getReference(), Float.class),
+                    row.get(
+                        queryColumnMap().get("weightUnit").getName().getReference(), String.class),
+                    row.get(
+                        queryColumnMap().get("isShipperOwned").getName().getReference(),
+                        Boolean.class),
+                    row.get(queryColumnMap().get("id").getName().getReference(), UUID.class)))
+        .all();
   }
 
   private Map<String, Column> queryColumnMap() {

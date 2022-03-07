@@ -59,7 +59,12 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                               cargoItemWithCargoLineItems ->
                                   referenceService
                                       .findByCargoItemID(cargoItemWithCargoLineItems.getId())
-                                      .mapNotNull(
+                                      .filter(
+                                          refs ->
+                                              (null != refs && !refs.isEmpty())) // mapNotNull was causing issues
+                                                                   // with the chain, random
+                                                                   // termination hence used a filter
+                                      .map(
                                           referenceTOS -> {
                                             CargoItemTO cargoItemTO =
                                                 cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
