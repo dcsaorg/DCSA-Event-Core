@@ -150,7 +150,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
           String.valueOf(cargoItemResult.get("s.carrier_booking_reference")));
     }
 
-    cargoItemWithCargoLineItems.setShippingInstructionID(
+    cargoItemWithCargoLineItems.setShippingInstructionReference(
         String.valueOf(cargoItemResult.get("ci.shipping_instruction_id")));
     cargoItemWithCargoLineItems.setPackageCode(
         String.valueOf(cargoItemResult.get("ci.package_code")));

@@ -35,12 +35,12 @@ public class ReferenceServiceImpl implements ReferenceService {
   }
 
   @Override
-  public Mono<List<ReferenceTO>> createReferencesByShippingInstructionIDAndTOs(
-      String shippingInstructionID, List<ReferenceTO> references) {
-    if (shippingInstructionID == null)
-      return Mono.error(new CreateException("ShippingInstructionID cannot be null"));
+  public Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndTOs(
+      String shippingInstructionReference, List<ReferenceTO> references) {
+    if (shippingInstructionReference == null)
+      return Mono.error(new CreateException("ShippingInstructionReference cannot be null"));
     return this.createReferencesByIDAndRefTOs(
-        shippingInstructionID, references, ImplementationType.SHIPPING_INSTRUCTION);
+        shippingInstructionReference, references, ImplementationType.SHIPPING_INSTRUCTION);
   }
 
   @Override
@@ -49,9 +49,9 @@ public class ReferenceServiceImpl implements ReferenceService {
   }
 
   @Override
-  public Mono<List<ReferenceTO>> findByShippingInstructionID(String shippingInstructionID) {
+  public Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference) {
     return referenceRepository
-        .findByShippingInstructionID(shippingInstructionID)
+        .findByShippingInstructionReference(shippingInstructionReference)
         .map(transformRefToRefTO)
         .collectList();
   }
@@ -64,14 +64,14 @@ public class ReferenceServiceImpl implements ReferenceService {
   }
 
   @Override
-  public Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionID(
-      List<ReferenceTO> references, String shippingInstructionID) {
+  public Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionReference(
+      List<ReferenceTO> references, String shippingInstructionReference) {
 
     return referenceRepository
-        .deleteByShippingInstructionID(shippingInstructionID)
+        .deleteByShippingInstructionReference(shippingInstructionReference)
         .then(
             createReferencesByIDAndRefTOs(
-                shippingInstructionID, references, ImplementationType.SHIPPING_INSTRUCTION));
+                shippingInstructionReference, references, ImplementationType.SHIPPING_INSTRUCTION));
   }
 
   @Override
@@ -97,7 +97,7 @@ public class ReferenceServiceImpl implements ReferenceService {
               if (impType == ImplementationType.BOOKING) {
                 reference.setBookingID((UUID) id);
               } else if (impType == ImplementationType.SHIPPING_INSTRUCTION) {
-                reference.setShippingInstructionID((String) id);
+                reference.setShippingInstructionReference((String) id);
               }
               reference.setReferenceType(r.getReferenceType());
               reference.setReferenceValue(r.getReferenceValue());

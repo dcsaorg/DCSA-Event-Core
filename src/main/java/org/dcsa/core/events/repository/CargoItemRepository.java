@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface CargoItemRepository extends ReactiveCrudRepository<CargoItem, UUID>, CargoItemCustomRepository {
 
-    Flux<CargoItem> findAllByShippingInstructionID(String shippingInstructionID);
+    Flux<CargoItem> findAllByShippingInstructionReference(String shippingInstructionReference);
     Mono<Void> deleteAllByIdIn(List<UUID> cargoItemIDs);
 
 }

@@ -25,7 +25,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Id
   @Size(max = 100)
   @Column("id")
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @EnumSubset(anyOf = EBL_DOCUMENT_STATUSES)

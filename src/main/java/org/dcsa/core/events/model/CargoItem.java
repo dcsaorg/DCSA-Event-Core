@@ -20,7 +20,7 @@ public class CargoItem extends AbstractCargoItem {
   @Id private UUID id;
 
   @Column("shipping_instruction_id")
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @Column("shipment_equipment_id")
   @NotNull

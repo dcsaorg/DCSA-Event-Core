@@ -37,8 +37,8 @@ public interface VoyageRepository extends ReactiveCrudRepository<Voyage, UUID> {
           " ON ci.shipment_equipment_id = se.id " +
           "LEFT JOIN reference r" +
           " ON r.shipment_id = st.shipment_id" +
-          "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR reference.shipping_instruction_id = :shippingInstructionID)")
-  Flux<String> findCarrierVoyageNumbersByShippingInstructionID(String shippingInstructionID);
+          "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR reference.shipping_instruction_id = :shippingInstructionReference)")
+  Flux<String> findCarrierVoyageNumbersByShippingInstructionReference(String shippingInstructionReference);
 
   @Query("SELECT DISTINCT v.carrier_voyage_number FROM voyage v " +
           "JOIN transport_call tc " +

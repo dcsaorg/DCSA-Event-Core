@@ -14,9 +14,9 @@ import java.util.UUID;
 public interface DocumentPartyRepository extends ReactiveCrudRepository<DocumentParty, UUID> {
   Flux<DocumentParty> findByBookingID(UUID bookingID);
 
-  Flux<DocumentParty> findByShippingInstructionID(String shippingInstructionID);
+  Flux<DocumentParty> findByShippingInstructionReference(String shippingInstructionReference);
 
   Mono<Void> deleteByBookingID(UUID bookingID);
 
-  Mono<Void> deleteByShippingInstructionID(String shippingInstructionID);
+  Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);
 }

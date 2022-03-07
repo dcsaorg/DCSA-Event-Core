@@ -18,8 +18,8 @@ public interface TransportDocumentRepository extends ExtendedRepository<Transpor
           + "WHERE s.carrier_booking_reference = :carrierBookingRef")
   Flux<String> findTransportDocumentReferencesByCarrierBookingRef(String carrierBookingRef);
 
-  Flux<TransportDocument> findDistinctTransportDocumentReferencesByShippingInstructionID(
-      String shippingInstructionID);
+  Flux<TransportDocument> findDistinctTransportDocumentReferencesByShippingInstructionReference(
+      String shippingInstructionReference);
 
   Flux<TransportDocument> findDistinctTransportDocumentReferencesByTransportDocumentReference(
       String transportDocumentReference);

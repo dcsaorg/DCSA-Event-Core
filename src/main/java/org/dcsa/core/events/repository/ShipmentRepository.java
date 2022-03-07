@@ -28,6 +28,6 @@ public interface ShipmentRepository
           + "JOIN shipment_equipment se ON se.shipment_id = s.id "
           + "JOIN cargo_item ci ON ci.shipment_equipment_id = se.id  "
           + "JOIN shipping_instruction si ON si.id = ci.shipping_instruction_id "
-          + "WHERE si.id = :shippingInstructionID")
-  Flux<Shipment> findByShippingInstructionID(String shippingInstructionID);
+          + "WHERE si.id = :shippingInstructionReference")
+  Flux<Shipment> findByShippingInstructionReference(String shippingInstructionReference);
 }

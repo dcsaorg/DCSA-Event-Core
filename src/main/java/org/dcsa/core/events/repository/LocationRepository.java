@@ -14,9 +14,9 @@ public interface LocationRepository extends ReactiveCrudRepository<Location, Str
     @Query("SELECT location.*"
             + "  FROM location"
             + "  JOIN shipping_instruction ON (location.id=shipping_instruction.invoice_payable_at)"
-            + " WHERE shipping_instruction.id = :shippingInstructionID"
+            + " WHERE shipping_instruction.id = :shippingInstructionReference"
     )
-    Mono<Location> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
+    Mono<Location> findPaymentLocationByShippingInstructionReference(String shippingInstructionReference);
 
     Mono<Location> findByAddressIDAndFacilityIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
             UUID addressID,

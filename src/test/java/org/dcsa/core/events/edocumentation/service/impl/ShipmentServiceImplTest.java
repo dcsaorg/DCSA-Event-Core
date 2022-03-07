@@ -398,10 +398,10 @@ class ShipmentServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test findByShippingInstructionID should return valid shipmentTO for valid ID.")
-  void findByShippingInstructionIDForValidID() {
+  @DisplayName("Test findByShippingInstructionReference should return valid shipmentTO for valid ID.")
+  void findByShippingInstructionReferenceForValidID() {
 
-    when(shipmentRepository.findByShippingInstructionID(any())).thenReturn(Flux.just(shipment));
+    when(shipmentRepository.findByShippingInstructionReference(any())).thenReturn(Flux.just(shipment));
 
     when(shipmentCutOffTimeRepository.findAllByShipmentID(any()))
         .thenReturn(Flux.just(shipmentCutOffTime));
@@ -418,7 +418,7 @@ class ShipmentServiceImplTest {
     when(locationService.fetchLocationByID(any())).thenReturn(Mono.just(locationTO));
     when(bookingService.fetchByBookingID(any())).thenReturn(Mono.empty());
 
-    StepVerifier.create(shipmentService.findByShippingInstructionID(UUID.randomUUID().toString()))
+    StepVerifier.create(shipmentService.findByShippingInstructionReference(UUID.randomUUID().toString()))
         .assertNext(
             result -> {
               assertEquals(
