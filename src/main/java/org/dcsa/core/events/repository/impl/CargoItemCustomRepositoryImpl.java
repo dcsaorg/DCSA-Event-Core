@@ -87,7 +87,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             .where(
                 Conditions.isEqual(
                     column("ci.shipment_equipment_id"),
-                    SQL.literalOf(shipmentEquipmentID)))
+                    SQL.literalOf(shipmentEquipmentID.toString())))
             .build();
 
     RenderContextFactory factory = new RenderContextFactory(r2dbcDialect);
@@ -97,8 +97,8 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
         .sql(sqlRenderer.render(selectJoin))
         .fetch()
         .all()
-        .bufferUntilChanged(resultSet -> resultSet.get("ci.id"))
-        .map(cargoItemResultSet -> mapResultSet(cargoItemResultSet));
+        .bufferUntilChanged(resultSet -> resultSet.get(column("ci.id").getName().getReference()))
+        .map(this::mapResultSet);
   }
 
   CargoItemWithCargoLineItems mapResultSet(List<Map<String, Object>> cargoItemResultSet) {
@@ -107,55 +107,80 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
         cargoItemResultSet.stream()
             .filter(
                 cargoLineItemResultSet ->
-                    Objects.nonNull(cargoLineItemResultSet.get("cli.cargo_item_id")))
+                    Objects.nonNull(
+                        cargoLineItemResultSet.get(
+                            column("cli.cargo_item_id").getName().getReference())))
             .map(
                 cargoLineItemResultSet -> {
                   CargoLineItem cargoLineItem = new CargoLineItem();
                   cargoLineItem.setCargoItemID(
-                      (UUID) cargoLineItemResultSet.get("cli.cargo_item_id"));
+                      (UUID)
+                          cargoLineItemResultSet.get(
+                              column("cli.cargo_item_id").getName().getReference()));
                   cargoLineItem.setCargoLineItemID(
-                      String.valueOf(cargoLineItemResultSet.get("cli.cargo_line_item_id")));
+                      String.valueOf(
+                          cargoLineItemResultSet.get(
+                              column("cli.cargo_line_item_id").getName().getReference())));
                   cargoLineItem.setShippingMarks(
-                      String.valueOf(cargoLineItemResultSet.get("cli.shipping_marks")));
+                      String.valueOf(
+                          cargoLineItemResultSet.get(
+                              column("cli.shipping_marks").getName().getReference())));
                   return cargoLineItem;
                 })
             .collect(Collectors.toList());
     CargoItemWithCargoLineItems cargoItemWithCargoLineItems = new CargoItemWithCargoLineItems();
     cargoItemWithCargoLineItems.setId(
-        UUID.fromString(String.valueOf(cargoItemResult.get("ci.id"))));
+        UUID.fromString(
+            String.valueOf(cargoItemResult.get(column("ci.id").getName().getReference()))));
     cargoItemWithCargoLineItems.setDescriptionOfGoods(
-        String.valueOf(cargoItemResult.get("ci.description_of_goods")));
-    cargoItemWithCargoLineItems.setHsCode(String.valueOf(cargoItemResult.get("ci.hs_code")));
-    cargoItemWithCargoLineItems.setWeight((Float) cargoItemResult.get("ci.weight"));
+        String.valueOf(
+            cargoItemResult.get(column("ci.description_of_goods").getName().getReference())));
+    cargoItemWithCargoLineItems.setHsCode(
+        String.valueOf(cargoItemResult.get(column("ci.hs_code").getName().getReference())));
+    cargoItemWithCargoLineItems.setWeight(
+        (Float) cargoItemResult.get(column("ci.weight").getName().getReference()));
 
-    if (Objects.nonNull(cargoItemResult.get("ci.weight_unit"))) {
+    if (Objects.nonNull(cargoItemResult.get(column("ci.weight_unit").getName().getReference()))) {
       cargoItemWithCargoLineItems.setWeightUnit(
-          WeightUnit.valueOf(String.valueOf(cargoItemResult.get("ci.weight_unit"))));
+          WeightUnit.valueOf(
+              String.valueOf(
+                  cargoItemResult.get(column("ci.weight_unit").getName().getReference()))));
     }
 
-    cargoItemWithCargoLineItems.setVolume((Float) cargoItemResult.get("ci.volume"));
+    cargoItemWithCargoLineItems.setVolume(
+        (Float) cargoItemResult.get(column("ci.volume").getName().getReference()));
 
-    if (Objects.nonNull(cargoItemResult.get("ci.volume_unit"))) {
+    if (Objects.nonNull(cargoItemResult.get(column("ci.volume_unit").getName().getReference()))) {
       cargoItemWithCargoLineItems.setVolumeUnit(
-          VolumeUnit.valueOf(String.valueOf(cargoItemResult.get("ci.volume_unit"))));
+          VolumeUnit.valueOf(
+              String.valueOf(
+                  cargoItemResult.get(column("ci.volume_unit").getName().getReference()))));
     }
 
-    if (Objects.nonNull(cargoItemResult.get("ci.number_of_packages"))) {
+    if (Objects.nonNull(
+        cargoItemResult.get(column("ci.number_of_packages").getName().getReference()))) {
       cargoItemWithCargoLineItems.setNumberOfPackages(
-          Integer.valueOf(String.valueOf(cargoItemResult.get("ci.number_of_packages"))));
+          Integer.valueOf(
+              String.valueOf(
+                  cargoItemResult.get(column("ci.number_of_packages").getName().getReference()))));
     }
 
-    if (Objects.nonNull(cargoItemResult.get("s.carrier_booking_reference"))) {
+    if (Objects.nonNull(
+        cargoItemResult.get(column("s.carrier_booking_reference").getName().getReference()))) {
       cargoItemWithCargoLineItems.setCarrierBookingReference(
-          String.valueOf(cargoItemResult.get("s.carrier_booking_reference")));
+          String.valueOf(
+              cargoItemResult.get(column("s.carrier_booking_reference").getName().getReference())));
     }
 
     cargoItemWithCargoLineItems.setShippingInstructionReference(
-        String.valueOf(cargoItemResult.get("ci.shipping_instruction_id")));
+        String.valueOf(
+            cargoItemResult.get(column("ci.shipping_instruction_id").getName().getReference())));
     cargoItemWithCargoLineItems.setPackageCode(
-        String.valueOf(cargoItemResult.get("ci.package_code")));
+        String.valueOf(cargoItemResult.get(column("ci.package_code").getName().getReference())));
     cargoItemWithCargoLineItems.setShipmentEquipmentID(
-        UUID.fromString(String.valueOf(cargoItemResult.get("ci.shipment_equipment_id"))));
+        UUID.fromString(
+            String.valueOf(
+                cargoItemResult.get(column("ci.shipment_equipment_id").getName().getReference()))));
     cargoItemWithCargoLineItems.setCargoLineItems(cargoLineItems);
 
     return cargoItemWithCargoLineItems;

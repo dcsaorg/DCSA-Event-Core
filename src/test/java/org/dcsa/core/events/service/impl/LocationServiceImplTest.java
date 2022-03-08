@@ -233,6 +233,8 @@ class LocationServiceImplTest {
     location.setFacilityID(null);
 
     when(locationRepository.findById(any(String.class))).thenReturn(Mono.just(location));
+    when(addressService.findByIdOrEmpty(any())).thenReturn(Mono.empty());
+    when(facilityService.findByIdOrEmpty(any())).thenReturn(Mono.empty());
 
     StepVerifier.create(locationService.fetchLocationByID(location.getId()))
         .assertNext(
