@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model.base;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,15 +28,18 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("id")
   private String shippingInstructionReference;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @EnumSubset(anyOf = EBL_DOCUMENT_STATUSES)
   @Column("document_status")
   private ShipmentEventTypeCode documentStatus;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Column("created_date_time")
   private OffsetDateTime shippingInstructionCreatedDateTime;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Column("updated_date_time")
   private OffsetDateTime shippingInstructionUpdatedDateTime;
