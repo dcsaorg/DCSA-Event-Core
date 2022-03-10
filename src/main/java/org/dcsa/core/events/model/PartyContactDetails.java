@@ -29,6 +29,10 @@ public class PartyContactDetails {
   @Column("phone")
   private String phone;
 
+  @Size(max = 100)
+  @Column("url")
+  private String url;
+
   public PartyContactDetailsTO toPartyTO() {
     PartyContactDetailsTO partyContactDetailsTO = new PartyContactDetailsTO();
     partyContactDetailsTO.setEmail(this.getEmail());
