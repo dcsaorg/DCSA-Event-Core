@@ -34,7 +34,7 @@ public enum ShipmentEventTypeCode {
     /**
      * The values allowed when used as a DocumentStatus in EBL.
      */
-    public final static String EBL_DOCUMENT_STATUSES = "RECE,PENU,PENC,DRFT,PENA,APPR,ISSU,SURR,VOID";
+    public final static String EBL_DOCUMENT_STATUSES = "RECE,PENU,DRFT,PENA,APPR,ISSU,SURR,VOID";
 
     private final String value;
 }
