@@ -53,6 +53,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                   shipmentEquipmentDetails.getCargoGrossWeightUnit());
               shipmentEquipmentTO.setCargoGrossWeight(
                   shipmentEquipmentDetails.getCargoGrossWeight());
+              shipmentEquipmentTO.setIsShipperOwned(shipmentEquipmentDetails.getIsShipperOwned());
               return Mono.when(
                       cargoItemRepository
                           .findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
