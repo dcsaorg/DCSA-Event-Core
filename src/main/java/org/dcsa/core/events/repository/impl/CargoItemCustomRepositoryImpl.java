@@ -24,37 +24,40 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
   private static final Table CARGO_ITEM_TABLE = Table.create("cargo_item");
   private static final Table CARGO_LINE_ITEM_TABLE = Table.create("cargo_line_item");
   private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
-  private static final Table SHIPMENT_TABLE = Table.create("shipment");
+  //  private static final Table SHIPMENT_TABLE = Table.create("shipment");
 
   // We need a LinkedHashMap because the test case relies on the order of values()
-  private static final Map<String, Column> QUERY_COLUMN_MAP = Collections.unmodifiableMap(new LinkedHashMap<>() {{
-    put("ci.id", Column.create("id", CARGO_ITEM_TABLE));
-    put(
-            "ci.description_of_goods", Column.create("description_of_goods", CARGO_ITEM_TABLE));
-    put("ci.hs_code", Column.create("hs_code", CARGO_ITEM_TABLE));
-    put("ci.weight", Column.create("weight", CARGO_ITEM_TABLE));
-    put("ci.volume", Column.create("volume", CARGO_ITEM_TABLE));
-    put("ci.weight_unit", Column.create("weight_unit", CARGO_ITEM_TABLE));
-    put("ci.volume_unit", Column.create("volume_unit", CARGO_ITEM_TABLE));
-    put(
-            "ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
-    put(
-            "ci.shipping_instruction_id", Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
-    put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
-    put(
-            "ci.shipment_equipment_id", Column.create("shipment_equipment_id", CARGO_ITEM_TABLE));
-    put("se.id", Column.create("id", SHIPMENT_EQUIPMENT_TABLE));
-    put("se.shipment_id", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
-    put("s.shipment_id", Column.create("id", SHIPMENT_TABLE));
-    put(
-            "s.carrier_booking_reference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
-    put(
-            "cli.cargo_line_item_id", Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
-    put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));
-    put(
-            "cli.shipping_marks", Column.create("shipping_marks", CARGO_LINE_ITEM_TABLE));
-    put("cli.id", Column.create("id", CARGO_LINE_ITEM_TABLE));
-  }});
+  private static final Map<String, Column> QUERY_COLUMN_MAP =
+      Collections.unmodifiableMap(
+          new LinkedHashMap<>() {
+            {
+              put("ci.id", Column.create("id", CARGO_ITEM_TABLE));
+              put(
+                  "ci.description_of_goods",
+                  Column.create("description_of_goods", CARGO_ITEM_TABLE));
+              put("ci.hs_code", Column.create("hs_code", CARGO_ITEM_TABLE));
+              put("ci.weight", Column.create("weight", CARGO_ITEM_TABLE));
+              put("ci.volume", Column.create("volume", CARGO_ITEM_TABLE));
+              put("ci.weight_unit", Column.create("weight_unit", CARGO_ITEM_TABLE));
+              put("ci.volume_unit", Column.create("volume_unit", CARGO_ITEM_TABLE));
+              put("ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
+              put(
+                  "ci.shipping_instruction_id",
+                  Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
+              put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
+              put(
+                  "ci.shipment_equipment_id",
+                  Column.create("shipment_equipment_id", CARGO_ITEM_TABLE));
+              put("se.id", Column.create("id", SHIPMENT_EQUIPMENT_TABLE));
+              put("se.shipment_id", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
+              put(
+                  "cli.cargo_line_item_id",
+                  Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
+              put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));
+              put("cli.shipping_marks", Column.create("shipping_marks", CARGO_LINE_ITEM_TABLE));
+              put("cli.id", Column.create("id", CARGO_LINE_ITEM_TABLE));
+            }
+          });
 
   @Override
   public Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
@@ -81,9 +84,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             .join(SHIPMENT_EQUIPMENT_TABLE)
             .on(column("ci.shipment_equipment_id"))
             .equals(column("se.id"))
-            .join(SHIPMENT_TABLE)
-            .on(column("se.shipment_id"))
-            .equals(column("s.shipment_id"))
             .where(
                 Conditions.isEqual(
                     column("ci.shipment_equipment_id"),
@@ -163,13 +163,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
           Integer.valueOf(
               String.valueOf(
                   cargoItemResult.get(column("ci.number_of_packages").getName().getReference()))));
-    }
-
-    if (Objects.nonNull(
-        cargoItemResult.get(column("s.carrier_booking_reference").getName().getReference()))) {
-      cargoItemWithCargoLineItems.setCarrierBookingReference(
-          String.valueOf(
-              cargoItemResult.get(column("s.carrier_booking_reference").getName().getReference())));
     }
 
     cargoItemWithCargoLineItems.setShippingInstructionReference(

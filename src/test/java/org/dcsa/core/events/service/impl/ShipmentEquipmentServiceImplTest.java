@@ -40,6 +40,7 @@ class ShipmentEquipmentServiceImplTest {
   @Mock ActiveReeferSettingsRepository activeReeferSettingsRepository;
   @Mock CargoItemRepository cargoItemRepository;
   @Mock CargoLineItemRepository cargoLineItemRepository;
+  @Mock ShipmentRepository shipmentRepository;
   @Mock ReferenceService referenceService;
 
   @Spy SealMapper sealMapper = Mappers.getMapper(SealMapper.class);
@@ -64,13 +65,17 @@ class ShipmentEquipmentServiceImplTest {
   ActiveReeferSettings activeReeferSettings;
   Equipment equipment;
   ShipmentEquipment shipmentEquipment;
+  Shipment shipment;
   ShipmentEquipmentTO shipmentEquipmentTO;
   ReferenceTO referenceTO;
 
   @BeforeEach
   void init() {
     initEntities(
-        UUID.randomUUID(), UUID.randomUUID(), "equipmentReference1", "shippingInstructionReference1");
+        UUID.randomUUID(),
+        UUID.randomUUID(),
+        "equipmentReference1",
+        "shippingInstructionReference1");
     initTOs();
   }
 
@@ -127,6 +132,10 @@ class ShipmentEquipmentServiceImplTest {
     cargoLineItem.setCargoItemID(cargoItem.getId());
     cargoLineItem.setCargoLineItemID("CargoLineItem");
     cargoLineItem.setShippingMarks("shippingMarks");
+
+    shipment = new Shipment();
+    shipment.setShipmentID(shipmentID);
+    shipment.setCarrierBookingReference("carrierBookingReference1");
   }
 
   private void initTOs() {
@@ -141,7 +150,6 @@ class ShipmentEquipmentServiceImplTest {
 
     CargoItemTO cargoItemTO = new CargoItemTO();
     cargoItemTO.setCargoLineItems(Collections.singletonList(cargoLineItemTO));
-    cargoItemTO.setCarrierBookingReference("carrierBookingReference1");
     cargoItemTO.setWeight(100F);
     cargoItemTO.setWeightUnit(WeightUnit.KGM);
     cargoItemTO.setVolume(400F);
@@ -173,6 +181,7 @@ class ShipmentEquipmentServiceImplTest {
     equipmentTO.setWeightUnit(WeightUnit.KGM);
 
     shipmentEquipmentTO = new ShipmentEquipmentTO();
+    shipmentEquipmentTO.setCarrierBookingReference("carrierBookingReference1");
     shipmentEquipmentTO.setCargoGrossWeight(120.0F);
     shipmentEquipmentTO.setCargoGrossWeightUnit(WeightUnit.KGM);
     shipmentEquipmentTO.setEquipment(equipmentTO);
@@ -588,6 +597,103 @@ class ShipmentEquipmentServiceImplTest {
               })
           .verifyComplete();
     }
+
+    @Test
+    @DisplayName(
+        "Test getCarrierBookingReferences with carrierBookingReference on ShippingInstruction")
+    void testGetCarrierBookingReferencesViaShippingInstruction() {
+      ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
+      shippingInstructionTO.setCarrierBookingReference("CBR");
+      List<String> carrierBookingReferences =
+          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+      assertEquals(1, carrierBookingReferences.size());
+      assertEquals("CBR", carrierBookingReferences.get(0));
+    }
+
+    @Test
+    @DisplayName(
+        "Test getCarrierBookingReferences with carrierBookingReference on ShipmentEquipment")
+    void testGetCarrierBookingReferencesViaShipmentEquipment() {
+      ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
+      ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
+      shipmentEquipmentTO.setCarrierBookingReference("CBR");
+      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+      List<String> carrierBookingReferences =
+          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+      assertEquals(1, carrierBookingReferences.size());
+      assertEquals("CBR", carrierBookingReferences.get(0));
+    }
+
+    @Test
+    @DisplayName(
+        "Test getCarrierBookingReferences with multiple carrierBookingReferences on ShipmentEquipment")
+    void testGetMultipleCarrierBookingReferencesViaShipmentEquipment() {
+      ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
+      ShipmentEquipmentTO shipmentEquipmentTO1 = new ShipmentEquipmentTO();
+      shipmentEquipmentTO1.setCarrierBookingReference("CBR1");
+      ShipmentEquipmentTO shipmentEquipmentTO2 = new ShipmentEquipmentTO();
+      shipmentEquipmentTO2.setCarrierBookingReference("CBR2");
+      shippingInstructionTO.setShipmentEquipments(
+          List.of(shipmentEquipmentTO1, shipmentEquipmentTO2));
+      List<String> carrierBookingReferences =
+          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+      assertEquals(2, carrierBookingReferences.size());
+      assertEquals("CBR1", carrierBookingReferences.get(0));
+      assertEquals("CBR2", carrierBookingReferences.get(1));
+    }
+
+    @Test
+    @DisplayName("Test getCarrierBookingReferences with no CarrierBookingReference set")
+    void testGetCarrierBookingReferencesNotSet() {
+      ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
+      ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
+      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+      List<String> carrierBookingReferences =
+          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+      assertEquals(0, carrierBookingReferences.size());
+    }
+
+    @Test
+    @DisplayName("Test addShipmentEquipmentToShippingInstruction")
+    void testAddShipmentEquipmentToShippingInstruction() {
+
+      UUID shipmentID = UUID.randomUUID();
+      String shippingInstructionReference = "shippingInstructionReference1";
+      UUID shipmentEquipmentID = UUID.randomUUID();
+      shipmentEquipment.setShipmentID(shipmentID);
+      shipmentEquipment.setId(shipmentEquipmentID);
+      cargoItem.setShippingInstructionReference(shippingInstructionReference);
+
+      when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
+
+      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
+      when(sealRepository.save(any())).thenReturn(Mono.just(seal));
+      when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
+      when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
+      when(cargoLineItemRepository.save(any())).thenReturn(Mono.just(cargoLineItem));
+      when(referenceService.createReferencesByShippingInstructionReferenceAndTOs(
+              eq(shippingInstructionReference), any()))
+          .thenReturn(Mono.just(List.of(referenceTO)));
+
+      ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
+      shippingInstructionTO.setShippingInstructionReference(shippingInstructionReference);
+      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+
+      StepVerifier.create(
+              shipmentEquipmentService.addShipmentEquipmentToShippingInstruction(
+                  List.of(shipmentEquipmentTO), shippingInstructionTO))
+          .assertNext(
+              shipmentEquipmentTOS -> {
+                assertEquals(
+                    shippingInstructionReference,
+                    shippingInstructionTO.getShippingInstructionReference());
+                assertEquals(
+                    "carrierBookingReference1",
+                    shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+              })
+          .verifyComplete();
+    }
   }
 
   @Nested
@@ -602,6 +708,7 @@ class ShipmentEquipmentServiceImplTest {
     void init() {
       shipmentEquipmentDetails =
           new ShipmentEquipmentCustomRepository.ShipmentEquipmentDetails(
+              "CBR1",
               equipment.getEquipmentReference(),
               shipmentEquipment.getCargoGrossWeight(),
               shipmentEquipment.getCargoGrossWeightUnit(),
@@ -622,8 +729,8 @@ class ShipmentEquipmentServiceImplTest {
       cargoItemWithCargoLineItems.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems.setVolumeUnit(cargoItem.getVolumeUnit());
-      cargoItemWithCargoLineItems.setShippingInstructionReference(cargoItem.getShippingInstructionReference());
-      cargoItemWithCargoLineItems.setCarrierBookingReference("CBR1");
+      cargoItemWithCargoLineItems.setShippingInstructionReference(
+          cargoItem.getShippingInstructionReference());
       cargoItemWithCargoLineItems.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems.setNumberOfPackages(2);
       cargoItemWithCargoLineItems.setWeight(cargoItem.getWeight());
@@ -637,8 +744,8 @@ class ShipmentEquipmentServiceImplTest {
       cargoItemWithCargoLineItems2.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems2.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems2.setVolumeUnit(cargoItem.getVolumeUnit());
-      cargoItemWithCargoLineItems2.setShippingInstructionReference(cargoItem.getShippingInstructionReference());
-      cargoItemWithCargoLineItems2.setCarrierBookingReference("CBR2");
+      cargoItemWithCargoLineItems2.setShippingInstructionReference(
+          cargoItem.getShippingInstructionReference());
       cargoItemWithCargoLineItems2.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems2.setNumberOfPackages(2);
       cargoItemWithCargoLineItems2.setWeight(cargoItem.getWeight());
@@ -677,13 +784,7 @@ class ShipmentEquipmentServiceImplTest {
                 assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
                 assertEquals(
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals(
-                    "CBR1",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(0)
-                        .getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
@@ -747,13 +848,7 @@ class ShipmentEquipmentServiceImplTest {
                 assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
                 assertEquals(
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals(
-                    "CBR1",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(0)
-                        .getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
@@ -812,13 +907,7 @@ class ShipmentEquipmentServiceImplTest {
                 assertTrue(shipmentEquipmentTOS.get(0).getSeals().isEmpty());
                 assertEquals(
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals(
-                    "CBR1",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(0)
-                        .getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
@@ -915,13 +1004,7 @@ class ShipmentEquipmentServiceImplTest {
                 assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
                 assertEquals(
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals(
-                    "CBR1",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(0)
-                        .getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
@@ -988,20 +1071,8 @@ class ShipmentEquipmentServiceImplTest {
                 assertEquals(
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
                 assertNull(shipmentEquipmentTOS.get(0).getCargoItems().get(1).getReferences());
-                assertEquals(
-                    "CBR1",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(0)
-                        .getCarrierBookingReference());
-                assertEquals(
-                    "CBR2",
-                    shipmentEquipmentTOS
-                        .get(0)
-                        .getCargoItems()
-                        .get(1)
-                        .getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());

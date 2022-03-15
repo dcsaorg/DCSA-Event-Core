@@ -12,8 +12,6 @@ import java.util.List;
 @Data
 public class CargoItemTO {
 
-	private String carrierBookingReference;
-
 	private List<CargoLineItemTO> cargoLineItems;
 
 	@NotNull(message = "Description of goods is required.")
