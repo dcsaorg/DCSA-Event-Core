@@ -9,11 +9,12 @@ import java.util.UUID;
 
 public interface ShipmentEquipmentCustomRepository {
 
-	Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(UUID shipmentID);
+  Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(UUID shipmentID);
 
 	@Getter
 	@AllArgsConstructor
 	class ShipmentEquipmentDetails{
+    private String carrierBookingReference;
 		private String equipmentReference;
 		private Float cargoGrossWeight;
 		private WeightUnit cargoGrossWeightUnit;
