@@ -1072,7 +1072,6 @@ class ShipmentEquipmentServiceImplTest {
                     1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
                 assertNull(shipmentEquipmentTOS.get(0).getCargoItems().get(1).getReferences());
                 assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
                     shipmentEquipment.getEquipmentReference(),
                     shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());

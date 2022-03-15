@@ -24,7 +24,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
   private static final Table CARGO_ITEM_TABLE = Table.create("cargo_item");
   private static final Table CARGO_LINE_ITEM_TABLE = Table.create("cargo_line_item");
   private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
-  //  private static final Table SHIPMENT_TABLE = Table.create("shipment");
 
   // We need a LinkedHashMap because the test case relies on the order of values()
   private static final Map<String, Column> QUERY_COLUMN_MAP =
