@@ -61,7 +61,7 @@ public class ShipmentCustomRepositoryImplTest {
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE booking.document_status = 'PENU' " +
-        "ORDER BY confirmation_datetime DESC LIMIT 10 OFFSET 0";
+        "ORDER BY shipment.confirmation_datetime DESC LIMIT 10 OFFSET 0";
     Assertions.assertEquals(expectedQuery, executedQuery);
   }
 
@@ -81,7 +81,7 @@ public class ShipmentCustomRepositoryImplTest {
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE booking.document_status = 'PENU' " +
-        "ORDER BY document_status DESC, confirmation_datetime ASC LIMIT 10 OFFSET 0";
+        "ORDER BY booking.document_status DESC, shipment.confirmation_datetime ASC LIMIT 10 OFFSET 0";
     Assertions.assertEquals(expectedQuery, executedQuery);
   }
 
@@ -101,7 +101,7 @@ public class ShipmentCustomRepositoryImplTest {
         "FROM shipment " +
         "JOIN booking ON shipment.booking_id = booking.id " +
         "WHERE NULL IS NULL " +
-        "ORDER BY document_status DESC, confirmation_datetime ASC LIMIT 10 OFFSET 0";
+        "ORDER BY booking.document_status DESC, shipment.confirmation_datetime ASC LIMIT 10 OFFSET 0";
     Assertions.assertEquals(expectedQuery, executedQuery);
   }
 }
