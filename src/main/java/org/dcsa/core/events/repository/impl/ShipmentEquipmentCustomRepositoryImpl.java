@@ -91,7 +91,7 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
     selectedColumns.put(
         "eEquipmentReference", Column.create("equipment_reference", EQUIPMENT_TABLE));
     selectedColumns.put("shipmentId", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
-    selectedColumns.put("sShipmentId", Column.create("shipment_id", SHIPMENT_TABLE));
+    selectedColumns.put("sShipmentId", Column.create("id", SHIPMENT_TABLE));
     selectedColumns.put(
         "carrierBookingReference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
     selectedColumns.put(
