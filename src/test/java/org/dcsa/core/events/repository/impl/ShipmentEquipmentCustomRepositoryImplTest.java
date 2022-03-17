@@ -37,11 +37,11 @@ class ShipmentEquipmentCustomRepositoryImplTest {
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
         "SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id, "
-            + "shipment_equipment.cargo_gross_weight, shipment.shipment_id, shipment_equipment.is_shipper_owned, "
+            + "shipment_equipment.cargo_gross_weight, shipment.id, shipment_equipment.is_shipper_owned, "
             + "equipment.iso_equipment_code, shipment_equipment.id, shipment_equipment.equipment_reference, "
             + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM shipment_equipment "
             + "JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference "
-            + "JOIN shipment ON shipment_equipment.shipment_id = shipment.shipment_id "
+            + "JOIN shipment ON shipment_equipment.shipment_id = shipment.id "
             + "WHERE shipment_equipment.shipment_id = '"
             + shipmentID
             + "'";
