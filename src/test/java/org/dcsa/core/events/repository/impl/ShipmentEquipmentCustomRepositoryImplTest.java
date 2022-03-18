@@ -18,31 +18,33 @@ import static org.mockito.Mockito.verify;
 @DisplayName("Tests for custom Shipment equipment repository implementation")
 class ShipmentEquipmentCustomRepositoryImplTest {
 
-	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
-	DatabaseClient client;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  DatabaseClient client;
 
-	@Spy R2dbcDialect r2dbcDialect = new PostgresDialect();
+  @Spy R2dbcDialect r2dbcDialect = new PostgresDialect();
 
-	@InjectMocks ShipmentEquipmentCustomRepositoryImpl shipmentEquipmentCustomRepository;
+  @InjectMocks ShipmentEquipmentCustomRepositoryImpl shipmentEquipmentCustomRepository;
 
-	@Test
-	@DisplayName("Test fetch all ShipmentEquipment with equipment for a shipmentID should generate correct query")
-	void testCargoItemCustomRepositoryQuery() {
-		ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
-		UUID shipmentID = UUID.randomUUID();
-		shipmentEquipmentCustomRepository.findShipmentEquipmentDetailsByShipmentID(shipmentID);
-		verify(client).sql(queryCaptor.capture());
-		String executedQuery = queryCaptor.getValue();
-		Assertions.assertNotNull(executedQuery);
-		String expectedQuery =
-			"SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id, " +
-				"shipment_equipment.cargo_gross_weight, shipment_equipment.is_shipper_owned, equipment.iso_equipment_code, " +
-				"shipment_equipment.id, shipment_equipment.equipment_reference, equipment.tare_weight, equipment.weight_unit " +
-			"FROM shipment_equipment " +
-			"JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference " +
-			"WHERE shipment_equipment.shipment_id = '" + shipmentID + "'";
-		Assertions.assertEquals(expectedQuery, executedQuery);
-	}
-
-
+  @Test
+  @DisplayName(
+      "Test fetch all ShipmentEquipment with equipment for a shipmentID should generate correct query")
+  void testCargoItemCustomRepositoryQuery() {
+    ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+    UUID shipmentID = UUID.randomUUID();
+    shipmentEquipmentCustomRepository.findShipmentEquipmentDetailsByShipmentID(shipmentID);
+    verify(client).sql(queryCaptor.capture());
+    String executedQuery = queryCaptor.getValue();
+    Assertions.assertNotNull(executedQuery);
+    String expectedQuery =
+        "SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id, "
+            + "shipment_equipment.cargo_gross_weight, shipment.id, shipment_equipment.is_shipper_owned, "
+            + "equipment.iso_equipment_code, shipment_equipment.id, shipment_equipment.equipment_reference, "
+            + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM shipment_equipment "
+            + "JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference "
+            + "JOIN shipment ON shipment_equipment.shipment_id = shipment.id "
+            + "WHERE shipment_equipment.shipment_id = '"
+            + shipmentID
+            + "'";
+    Assertions.assertEquals(expectedQuery, executedQuery);
+  }
 }

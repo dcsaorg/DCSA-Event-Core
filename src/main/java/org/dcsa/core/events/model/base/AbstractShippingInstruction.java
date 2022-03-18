@@ -88,4 +88,8 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Size(max = 250)
   @Column("displayed_name_for_place_of_delivery")
   private String displayedNameForPlaceOfDelivery;
+
+  @Size(max = 20)
+  @Column("amendment_to_transport_document")
+  private String amendmentToTransportDocument;
 }

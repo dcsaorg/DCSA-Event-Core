@@ -22,30 +22,32 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
 
   private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
   private static final Table EQUIPMENT_TABLE = Table.create("equipment");
+  private static final Table SHIPMENT_TABLE = Table.create("shipment");
 
   @Override
-  public Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(
-    UUID shipmentID) {
-    //creates the following query programmatically
-    //select se.id,se.shipment_id,se.equipment_reference,se.cargo_gross_weight,
-    //se.cargo_gross_weight_unit,se.is_shipper_owned,e.iso_equipment_code,e.tare_weight,
-    //e.weight_unit
-    //from dcsa_im_v3_0.shipment_equipment se
-    //join dcsa_im_v3_0.equipmente on e.equipment_reference=se.equipment_reference
-    //where se.equipment_reference=:equipment_reference
+  public Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(UUID shipmentID) {
+    // creates the following query programmatically
+    // select se.id,se.shipment_id,se.equipment_reference,se.cargo_gross_weight,
+    // se.cargo_gross_weight_unit,se.is_shipper_owned,e.iso_equipment_code,e.tare_weight,
+    // e.weight_unit
+    // from dcsa_im_v3_0.shipment_equipment se
+    // join dcsa_im_v3_0.equipmente on e.equipment_reference=se.equipment_reference
+    // where se.equipment_reference=:equipment_reference
 
-    Select selectJoin=
-      Select.builder()
-        .select(queryColumnMap().values())
-        .from(SHIPMENT_EQUIPMENT_TABLE)
-        .join(EQUIPMENT_TABLE)
-        .on(queryColumnMap().get("seEquipmentReference"))
-        .equals(queryColumnMap().get("eEquipmentReference"))
-        .where(
-          Conditions.isEqual(
-            queryColumnMap().get("shipmentId"),
-            SQL.literalOf(shipmentID.toString())))
-        .build();
+    Select selectJoin =
+        Select.builder()
+            .select(queryColumnMap().values())
+            .from(SHIPMENT_EQUIPMENT_TABLE)
+            .join(EQUIPMENT_TABLE)
+            .on(queryColumnMap().get("seEquipmentReference"))
+            .equals(queryColumnMap().get("eEquipmentReference"))
+            .join(SHIPMENT_TABLE)
+            .on(queryColumnMap().get("shipmentId"))
+            .equals(queryColumnMap().get("sShipmentId"))
+            .where(
+                Conditions.isEqual(
+                    queryColumnMap().get("shipmentId"), SQL.literalOf(shipmentID.toString())))
+            .build();
 
     RenderContextFactory factory = new RenderContextFactory(r2dbcDialect);
     SqlRenderer sqlRenderer = SqlRenderer.create(factory.createRenderContext());
@@ -54,6 +56,9 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
         .map(
             row ->
                 new ShipmentEquipmentDetails(
+                    row.get(
+                        queryColumnMap().get("carrierBookingReference").getName().getReference(),
+                        String.class),
                     row.get(
                         queryColumnMap().get("seEquipmentReference").getName().getReference(),
                         String.class),
@@ -86,6 +91,9 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
     selectedColumns.put(
         "eEquipmentReference", Column.create("equipment_reference", EQUIPMENT_TABLE));
     selectedColumns.put("shipmentId", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
+    selectedColumns.put("sShipmentId", Column.create("id", SHIPMENT_TABLE));
+    selectedColumns.put(
+        "carrierBookingReference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
     selectedColumns.put(
         "cargoGrossWeight", Column.create("cargo_gross_weight", SHIPMENT_EQUIPMENT_TABLE));
     selectedColumns.put(

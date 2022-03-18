@@ -45,6 +45,8 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
             shipmentEquipmentDetails -> {
               UUID shipmentEquipmentID = shipmentEquipmentDetails.getShipmentEquipmentID();
               ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
+              shipmentEquipmentTO.setCarrierBookingReference(
+                  shipmentEquipmentDetails.getCarrierBookingReference());
               shipmentEquipmentTO.setEquipment(
                   equipmentMapper.shipmentEquipmentDetailsToDTO(shipmentEquipmentDetails));
               shipmentEquipmentTO.setCargoGrossWeightUnit(
@@ -61,9 +63,11 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                                       .findByCargoItemID(cargoItemWithCargoLineItems.getId())
                                       .filter(
                                           refs ->
-                                              (null != refs && !refs.isEmpty())) // mapNotNull was causing issues
-                                                                   // with the chain, random
-                                                                   // termination hence used a filter
+                                              (null != refs
+                                                  && !refs
+                                                      .isEmpty())) // mapNotNull was causing issues
+                                      // with the chain, random
+                                      // termination hence used a filter
                                       .map(
                                           referenceTOS -> {
                                             CargoItemTO cargoItemTO =
@@ -96,7 +100,8 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   public Mono<List<ShipmentEquipmentTO>> resolveShipmentEquipmentsForShippingInstructionReference(
       List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
     return cargoItemRepository
-        .findAllByShippingInstructionReference(shippingInstructionTO.getShippingInstructionReference())
+        .findAllByShippingInstructionReference(
+            shippingInstructionTO.getShippingInstructionReference())
         .flatMap(
             cargoItems ->
                 Mono.when(
@@ -130,12 +135,17 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .flatMap(
             cargoItem -> cargoItemRepository.deleteById(cargoItem.getId()).thenReturn(cargoItem))
         .collectList()
-        .flatMap(ignored -> addShipmentEquipmentToShippingInstruction(shipmentEquipments, shippingInstructionTO));
+        .flatMap(
+            ignored ->
+                addShipmentEquipmentToShippingInstruction(
+                    shipmentEquipments, shippingInstructionTO));
   }
 
   @Override
   public Mono<List<ShipmentEquipmentTO>> createShipmentEquipment(
-      UUID shipmentID, String shippingInstructionReference, List<ShipmentEquipmentTO> shipmentEquipments) {
+      UUID shipmentID,
+      String shippingInstructionReference,
+      List<ShipmentEquipmentTO> shipmentEquipments) {
     if (Objects.isNull(shipmentEquipments) || shipmentEquipments.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
@@ -168,35 +178,39 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   public Mono<List<ShipmentEquipmentTO>> addShipmentEquipmentToShippingInstruction(
       List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
     if (shipmentEquipments == null) return Mono.empty();
-    String carrierBookingReference = getCarrierBookingReference(shippingInstructionTO);
-    // TODO: we have a known bug here that needs to be addressed.
-    //  carrierBookingReference can differ from each cargoItem.
-    return shipmentRepository
-        .findByCarrierBookingReference(carrierBookingReference)
-        .switchIfEmpty(
-            Mono.error(
-                ConcreteRequestErrorMessageException.invalidParameter(
-                    "No shipment found with carrierBookingReference: " + carrierBookingReference)))
+    List<String> carrierBookingReferences = getCarrierBookingReferences(shippingInstructionTO);
+
+    return Flux.fromIterable(carrierBookingReferences)
+        .flatMap(
+            carrierBookingReference ->
+                shipmentRepository
+                    .findByCarrierBookingReference(carrierBookingReference)
+                    .switchIfEmpty(
+                        Mono.error(
+                            ConcreteRequestErrorMessageException.invalidParameter(
+                                "No shipment found with carrierBookingReference: "
+                                    + carrierBookingReference))))
         .flatMap(
             shipment ->
                 createShipmentEquipment(
                     shipment.getShipmentID(),
                     shippingInstructionTO.getShippingInstructionReference(),
-                    shipmentEquipments));
+                    shipmentEquipments))
+        .flatMapIterable(shipmentEquipmentTOS -> shipmentEquipmentTOS)
+        .collectList();
   }
 
-  // TODO: fix once we know carrierBookingReference can be null (none on SI and no CargoItems)
-  //  https://dcsa.atlassian.net/browse/DDT-854
-  String getCarrierBookingReference(ShippingInstructionTO shippingInstructionTO) {
+  List<String> getCarrierBookingReferences(ShippingInstructionTO shippingInstructionTO) {
     if (shippingInstructionTO.getCarrierBookingReference() == null) {
-      List<CargoItemTO> cargoItems = new ArrayList<>();
+      List<String> carrierBookingReferences = new ArrayList<>();
       for (ShipmentEquipmentTO shipmentEquipmentTO :
           shippingInstructionTO.getShipmentEquipments()) {
-        cargoItems.addAll(shipmentEquipmentTO.getCargoItems());
+        carrierBookingReferences.add(shipmentEquipmentTO.getCarrierBookingReference());
       }
-      return cargoItems.get(0).getCarrierBookingReference();
+      carrierBookingReferences.removeAll(Collections.singleton(null));
+      return carrierBookingReferences;
     }
-    return shippingInstructionTO.getCarrierBookingReference();
+    return List.of(shippingInstructionTO.getCarrierBookingReference());
   }
 
   // Returns Flux of Tuples of shipmentEquipmentID and ShipmentEquipmentTO)
@@ -247,7 +261,9 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
-      UUID shipmentEquipmentID, String shippingInstructionReference, List<CargoItemTO> cargoItemTOs) {
+      UUID shipmentEquipmentID,
+      String shippingInstructionReference,
+      List<CargoItemTO> cargoItemTOs) {
     if (Objects.isNull(cargoItemTOs) || cargoItemTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }

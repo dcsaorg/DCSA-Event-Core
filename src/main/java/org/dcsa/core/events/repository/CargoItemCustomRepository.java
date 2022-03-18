@@ -12,13 +12,13 @@ import java.util.UUID;
 
 public interface CargoItemCustomRepository {
 
-	Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(UUID shipmentEquipmentID);
+  Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
+      UUID shipmentEquipmentID);
 
-	@Data
-	@ToString(callSuper = true)
-	@EqualsAndHashCode(callSuper = true)
-	class CargoItemWithCargoLineItems extends CargoItem {
-		String carrierBookingReference;
-		List<CargoLineItem> cargoLineItems;
-	}
+  @Data
+  @ToString(callSuper = true)
+  @EqualsAndHashCode(callSuper = true)
+  class CargoItemWithCargoLineItems extends CargoItem {
+    List<CargoLineItem> cargoLineItems;
+  }
 }

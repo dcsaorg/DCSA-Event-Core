@@ -17,6 +17,7 @@ import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.data.relational.core.sql.Join;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
 import org.springframework.data.relational.core.sql.Table;
+import org.springframework.data.relational.core.sql.TableLike;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -129,7 +130,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     @SneakyThrows({NoSuchFieldException.class})
     protected DBEntityAnalysis.DBEntityAnalysisBuilder<Event> prepareDBEntityAnalysis() {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
-        Table eventTable = builder.getPrimaryModelTable();
+        TableLike eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
         boolean includesShipmentEvents = false;
         boolean needsTransportCall = false;
@@ -205,7 +206,7 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .registerQueryFieldFromField("carrierServiceCode");
     }
 
-    private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, Table eventTable) throws NoSuchFieldException {
+    private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, TableLike eventTable) throws NoSuchFieldException {
         // FIXME - this is incorrect (should join with a table based on the value of documentTypeCode)
         String shipmentEventdocumentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
         Table shippingInstructionsTable = Table.create(SHIPPING_INSTRUCTION_TABLE_NAME);
