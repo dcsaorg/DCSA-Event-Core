@@ -10,7 +10,7 @@ import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
+public class EquipmentEventServiceImpl extends QueryServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
     private final EquipmentEventRepository equipmentEventRepository;
     private final EquipmentRepository equipmentRepository;
     private final TransportCallService transportCallService;
@@ -26,14 +26,13 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public EquipmentEventRepository getRepository() {
+    protected EquipmentEventRepository getRepository() {
         return equipmentEventRepository;
     }
 
-    //Overriding base method here, as it marks empty results as an error, meaning we can't use switchOnEmpty()
     @Override
     public Mono<EquipmentEvent> findById(UUID id) {
-        return getRepository().findById(id);
+        return equipmentEventRepository.findById(id);
     }
 
 
@@ -65,7 +64,7 @@ public class EquipmentEventServiceImpl extends ExtendedBaseServiceImpl<Equipment
 
     @Override
     public Mono<EquipmentEvent> create(EquipmentEvent equipmentEvent) {
-        return super.create(equipmentEvent).flatMap(
+        return equipmentEventRepository.save(equipmentEvent).flatMap(
                 ee -> {
                     UnmappedEvent unmappedEvent = new UnmappedEvent();
                     unmappedEvent.setNewRecord(true);

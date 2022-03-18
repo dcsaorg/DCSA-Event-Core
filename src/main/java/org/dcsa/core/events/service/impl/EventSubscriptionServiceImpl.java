@@ -11,33 +11,30 @@ import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.EventSubscriptionService;
 import org.dcsa.core.exception.CreateException;
+import org.dcsa.core.exception.DeleteException;
+import org.dcsa.core.exception.GetException;
 import org.dcsa.core.exception.UpdateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
-import org.dcsa.core.util.ValidationUtils;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
-    private static final List<String> EMPTY_SQL_LIST;
-
-    static {
-        EMPTY_SQL_LIST = new ArrayList<>();
-        // This is not guaranteed to be correct, but it will work "most of the time".
-        EMPTY_SQL_LIST.add("");
-    }
+public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
+    // This is not guaranteed to be correct, but it will work "most of the time".
+    private static final List<String> EMPTY_SQL_LIST = List.of("");
 
     private final EventSubscriptionRepository eventSubscriptionRepository;
     private final MessageServiceConfig messageServiceConfig;
     private final TransportCallRepository transportCallRepository;
-    private final ShipmentEventRepository shipmentEventRepository;
     private final VoyageRepository voyageRepository;
     private final ServiceRepository serviceRepository;
     private final TransportDocumentRepository transportDocumentRepository;
@@ -52,7 +49,19 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
     }
 
     @Override
-    protected Mono<EventSubscription> preCreateHook(EventSubscription eventSubscription) {
+    public Mono<EventSubscription> findById(UUID id) {
+        return eventSubscriptionRepository.findById(id)
+                .switchIfEmpty(Mono.error(new GetException("No EventSubscription with ID: " + id)));
+    }
+
+    @Override
+    public Mono<Void> deleteById(UUID subscriptionID) {
+        return eventSubscriptionRepository.deleteById(subscriptionID)
+                .switchIfEmpty(Mono.error(new DeleteException("No EventSubscription with ID: " + subscriptionID)));
+    }
+
+    @Override
+    public Mono<EventSubscription> create(EventSubscription eventSubscription) {
         byte[] secret = eventSubscription.getSecret();
         SignatureMethod signatureMethod;
         if (eventSubscription.getSignatureMethod() == null) {
@@ -89,19 +98,12 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
     }
 
     @Override
-    protected Mono<EventSubscription> preUpdateHook(EventSubscription original, EventSubscription update) {
-        return checkEventSubscription(update);
+    public Mono<EventSubscription> update(EventSubscription update) {
+        return checkEventSubscription(update)
+                .flatMap(eventSubscriptionRepository::save);
     }
 
     protected Mono<EventSubscription> checkEventSubscription(EventSubscription eventSubscription) {
-        String vessel = eventSubscription.getVesselIMONumber();
-        if (vessel != null){
-            try{
-                ValidationUtils.validateVesselIMONumber(vessel);
-            } catch (Exception e){
-                return Mono.error(new UpdateException(e.getLocalizedMessage()));
-            }
-        }
         // Ensure that the callback url at least looks valid.
         try {
             new URI(eventSubscription.getCallbackUrl());
@@ -250,39 +252,39 @@ public class EventSubscriptionServiceImpl extends ExtendedBaseServiceImpl<EventS
       case SHI:
         carrierBookingReferences =
             bookingRepository
-                .findCarrierBookingRefsByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierBookingRefsByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
             voyageRepository
-                .findCarrierVoyageNumbersByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierVoyageNumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         carrierServiceCodes =
             serviceRepository
-                .findCarrierServiceCodesByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCarrierServiceCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
 
         transportDocumentReferences =
             transportDocumentRepository
-                .findDistinctTransportDocumentReferencesByShippingInstructionID(
+                .findDistinctTransportDocumentReferencesByShippingInstructionReference(
                     shipmentEvent.getDocumentID())
                 .map(TransportDocument::getTransportDocumentReference)
                 .collectList();
 
         transportDocumentTypeCodes =
             transportDocumentTypeRepository
-                .findCodesByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         transportCallIDs =
             transportCallRepository
-                .findTransportCallIDByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findTransportCallIDByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         equipmentReferences =
             shipmentEquipmentRepository
-                .findEquipmentReferenceByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findEquipmentReferenceByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =
             transportRepository
-                .findVesselIMONumbersByShippingInstructionID(shipmentEvent.getDocumentID())
+                .findVesselIMONumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
 
         break;

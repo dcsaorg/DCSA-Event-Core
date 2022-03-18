@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.base.AbstractEventSubscription;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.model.enums.SignatureMethod;
+import org.dcsa.core.validator.ValidVesselIMONumber;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -28,6 +29,7 @@ public class EventSubscription extends AbstractEventSubscription implements Even
   @Column("carrier_voyage_number")
   private String carrierVoyageNumber;
 
+  @ValidVesselIMONumber
   @Column("vessel_imo_number")
   private String vesselIMONumber;
 

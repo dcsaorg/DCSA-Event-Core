@@ -3,22 +3,23 @@ package org.dcsa.core.events.repository;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface ReferenceRepository extends ExtendedRepository<Reference, UUID> {
+public interface ReferenceRepository extends ReactiveCrudRepository<Reference, UUID> {
 
   @Query(
       "SELECT reference.* "
           + "FROM reference "
-          + "WHERE shipping_instruction_id = :shippingInstructionID "
+          + "WHERE shipping_instruction_id = :shippingInstructionReference "
           + "OR shipment_id IN ( SELECT s.id from shipment s "
           + "JOIN shipment_equipment se ON s.id = se.shipment_id "
           + "JOIN cargo_item ci ON ci.shipment_equipment_id = se.id "
-          + "WHERE ci.shipping_instruction_id = :shippingInstructionID ) ")
-  Flux<Reference> findByShippingInstructionID(String shippingInstructionID);
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionReference ) ")
+  Flux<Reference> findByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT reference.* "
@@ -50,11 +51,16 @@ public interface ReferenceRepository extends ExtendedRepository<Reference, UUID>
           + "WHERE s.carrier_booking_reference = :carrierBookingReference "
           + "OR shipping_instruction_id IN ( SELECT si.id from shipping_instruction si "
           + "JOIN cargo_item ci ON ci.shipping_instruction_id = si.id "
-          + "JOIN shipment s ON ci.shipment_id = s.id "
+          + "JOIN shipment_equipment se ON s.id = se.shipment_id "
+          + "JOIN shipment s ON se.shipment_id = s.id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference)")
   Flux<Reference> findByCarrierBookingReference(String carrierBookingReference);
 
   Flux<Reference> findByBookingID(UUID bookingID);
 
+  Flux<Reference> findByCargoItemID(UUID cargoItemID);
+
   Mono<Void> deleteByBookingID(UUID bookingID);
+
+  Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);
 }

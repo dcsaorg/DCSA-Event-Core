@@ -1,8 +1,10 @@
 package org.dcsa.core.events.service.impl;
 
 import org.dcsa.core.events.model.*;
+import org.dcsa.core.events.model.enums.ColumnReferenceType;
 import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
 import org.dcsa.core.events.model.enums.PartyFunction;
+import org.dcsa.core.events.model.mapper.PartyMapper;
 import org.dcsa.core.events.model.transferobjects.DocumentPartyTO;
 import org.dcsa.core.events.model.transferobjects.PartyContactDetailsTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
@@ -12,9 +14,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,7 +37,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Test for DocumentPartyService implementation")
-public class DocumentPartyServiceImplTest {
+class DocumentPartyServiceImplTest {
 
   @Mock DocumentPartyRepository documentPartyRepository;
   @Mock DisplayedAddressRepository displayedAddressRepository;
@@ -42,6 +46,8 @@ public class DocumentPartyServiceImplTest {
   @Mock PartyContactDetailsRepository partyContactDetailsRepository;
 
   @Mock AddressService addressService;
+
+  @Spy PartyMapper partyMapper = Mappers.getMapper(PartyMapper.class);
 
   @InjectMocks DocumentPartyServiceImpl documentPartyService;
 
@@ -144,13 +150,10 @@ public class DocumentPartyServiceImplTest {
     documentParty.setBookingID(bookingID);
 
     when(partyRepository.save(any())).thenReturn(Mono.just(party));
-    when(partyContactDetailsRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(partyContactDetails));
-    when(partyIdentifyingCodeRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(partyIdentifyingCode));
+    when(partyContactDetailsRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(partyContactDetails));
+    when(partyIdentifyingCodeRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(partyIdentifyingCode));
     when(documentPartyRepository.save(any())).thenReturn(Mono.just(documentParty));
-    when(displayedAddressRepository.saveAll(any(Flux.class)))
-        .thenReturn(Flux.just(displayedAddress));
+    when(displayedAddressRepository.saveAll(any(Flux.class))).thenReturn(Flux.just(displayedAddress));
     when(addressService.ensureResolvable(any())).thenReturn(Mono.just(address));
 
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
@@ -173,10 +176,10 @@ public class DocumentPartyServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test create DocumentParty with shippingInstructionID")
-  void testWithShippingInstructionID() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+  @DisplayName("Test create DocumentParty with shippingInstructionReference")
+  void testWithShippingInstructionReference() {
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
 
     when(partyRepository.save(any())).thenReturn(Mono.just(party));
     when(partyContactDetailsRepository.saveAll(any(Flux.class)))
@@ -191,8 +194,8 @@ public class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-            documentPartyService.createDocumentPartiesByShippingInstructionID(
-                shippingInstructionId, documentParties))
+            documentPartyService.createDocumentPartiesByShippingInstructionReference(
+                shippingInstructionReference, documentParties))
         .assertNext(
             documentPartyTOS -> {
               verify(addressService).ensureResolvable(any());
@@ -204,16 +207,16 @@ public class DocumentPartyServiceImplTest {
 
               verify(documentPartyRepository).save(argumentCaptor.capture());
               assertEquals(
-                  shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+                  shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
             })
         .verifyComplete();
   }
 
   @Test
   @DisplayName("Test create DocumentParty withoutDisplayedAddress")
-  void testWithShippingInstructionIDWithoutDisplayedAddress() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+  void testWithShippingInstructionReferenceWithoutDisplayedAddress() {
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
     DocumentPartyTO documentPartyTOWithoutDisplayedAddress = new DocumentPartyTO();
     documentPartyTOWithoutDisplayedAddress.setParty(documentPartyTO.getParty());
     documentPartyTOWithoutDisplayedAddress.setPartyFunction(documentPartyTO.getPartyFunction());
@@ -231,8 +234,8 @@ public class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-        documentPartyService.createDocumentPartiesByShippingInstructionID(
-          shippingInstructionId, Collections.singletonList(documentPartyTOWithoutDisplayedAddress)))
+        documentPartyService.createDocumentPartiesByShippingInstructionReference(
+          shippingInstructionReference, Collections.singletonList(documentPartyTOWithoutDisplayedAddress)))
       .assertNext(
         documentPartyTOS -> {
           verify(addressService).ensureResolvable(any());
@@ -243,7 +246,7 @@ public class DocumentPartyServiceImplTest {
 
           verify(documentPartyRepository).save(argumentCaptor.capture());
           assertEquals(
-            shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+            shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
         })
       .verifyComplete();
   }
@@ -251,8 +254,8 @@ public class DocumentPartyServiceImplTest {
   @Test
   @DisplayName("Test create DocumentParty with minimal party.")
   void testWithMinimalPartyInDocumentParty() {
-    String shippingInstructionId = UUID.randomUUID().toString();
-    documentParty.setShippingInstructionID(shippingInstructionId);
+    String shippingInstructionReference = UUID.randomUUID().toString();
+    documentParty.setShippingInstructionReference(shippingInstructionReference);
     party.setAddressID(null);
 
     PartyContactDetailsTO minimalPartyContactDetails = new PartyContactDetailsTO();
@@ -276,8 +279,8 @@ public class DocumentPartyServiceImplTest {
     ArgumentCaptor<DocumentParty> argumentCaptor = ArgumentCaptor.forClass(DocumentParty.class);
 
     StepVerifier.create(
-        documentPartyService.createDocumentPartiesByShippingInstructionID(
-          shippingInstructionId, Collections.singletonList(documentPartyTOWithMinParty)))
+        documentPartyService.createDocumentPartiesByShippingInstructionReference(
+          shippingInstructionReference, Collections.singletonList(documentPartyTOWithMinParty)))
       .assertNext(
         documentPartyTOS -> {
           verify(partyRepository).save(any());
@@ -288,9 +291,191 @@ public class DocumentPartyServiceImplTest {
 
           verify(documentPartyRepository).save(argumentCaptor.capture());
           assertEquals(
-            shippingInstructionId, argumentCaptor.getValue().getShippingInstructionID());
+            shippingInstructionReference, argumentCaptor.getValue().getShippingInstructionReference());
         })
       .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch party contact details by party ID.")
+  void testFetchPartyContactDetailsByPartyID() {
+
+    when(partyContactDetailsRepository.findByPartyID(any()))
+        .thenReturn(Flux.just(partyContactDetails));
+
+    StepVerifier.create(documentPartyService.fetchPartyContactDetailsByPartyID(party.getId()))
+        .assertNext(
+            dpTOs -> {
+              verify(partyContactDetailsRepository).findByPartyID(any());
+              assertEquals("Peanut", dpTOs.get(0).getName());
+              assertEquals("peanut@jeff-fa-fa.com", dpTOs.get(0).getEmail());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch party contact details by party ID returns empty list.")
+  void testFetchPartyContactDetailsByPartyIDEmptyList() {
+
+    when(partyContactDetailsRepository.findByPartyID(any())).thenReturn(Flux.empty());
+
+    StepVerifier.create(documentPartyService.fetchPartyContactDetailsByPartyID(party.getId()))
+        .assertNext(
+            dpTOs -> {
+              verify(partyContactDetailsRepository).findByPartyID(any());
+              assertEquals(0, dpTOs.size());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch identifying codes by party ID.")
+  void testFetchIdentifyingCodesByPartyId() {
+
+    when(partyIdentifyingCodeRepository.findAllByPartyID(any()))
+        .thenReturn(Flux.just(partyIdentifyingCode));
+
+    StepVerifier.create(documentPartyService.fetchIdentifyingCodesByPartyID(party.getId()))
+        .assertNext(
+            idcTOs -> {
+              verify(partyIdentifyingCodeRepository).findAllByPartyID(any());
+              assertEquals("MSK", idcTOs.get(0).getPartyCode());
+              assertEquals("LCL", idcTOs.get(0).getCodeListName());
+              assertEquals(
+                  DCSAResponsibleAgencyCode.ISO, idcTOs.get(0).getDcsaResponsibleAgencyCode());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch identifying codes by party ID returns empty list.")
+  void testFetchIdentifyingCodesByPartyIdEmptyList() {
+
+    when(partyIdentifyingCodeRepository.findAllByPartyID(any())).thenReturn(Flux.empty());
+
+    StepVerifier.create(documentPartyService.fetchIdentifyingCodesByPartyID(party.getId()))
+        .assertNext(
+            idcTOs -> {
+              verify(partyIdentifyingCodeRepository).findAllByPartyID(any());
+              assertEquals(0, idcTOs.size());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch Display Address by Document ID.")
+  void testFetchDisplayAddressByDocumentID() {
+    when(displayedAddressRepository.findByDocumentPartyIDOrderByAddressLineNumber(any()))
+        .thenReturn(Flux.just(displayedAddress));
+
+    StepVerifier.create(documentPartyService.fetchDisplayAddressByDocumentID(documentParty.getId()))
+        .assertNext(
+            da -> {
+              verify(displayedAddressRepository)
+                  .findByDocumentPartyIDOrderByAddressLineNumber(any());
+              assertEquals("Javastraat", da.get(0));
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch Display Address by Document ID returns empty list.")
+  void testFetchDisplayAddressByDocumentIDEmptyList() {
+    when(displayedAddressRepository.findByDocumentPartyIDOrderByAddressLineNumber(any()))
+        .thenReturn(Flux.empty());
+
+    StepVerifier.create(documentPartyService.fetchDisplayAddressByDocumentID(documentParty.getId()))
+        .assertNext(
+            da -> {
+              verify(displayedAddressRepository)
+                  .findByDocumentPartyIDOrderByAddressLineNumber(any());
+              assertEquals(0, da.size());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch party by ID.")
+  void testFetchPartyByID() {
+
+    when(partyRepository.findByIdOrEmpty(any())).thenReturn(Mono.just(party));
+    when(addressService.findByIdOrEmpty(any())).thenReturn(Mono.just(address));
+    when(partyIdentifyingCodeRepository.findAllByPartyID(any()))
+        .thenReturn(Flux.just(partyIdentifyingCode));
+    when(partyContactDetailsRepository.findByPartyID(any()))
+        .thenReturn(Flux.just(partyContactDetails));
+
+    StepVerifier.create(documentPartyService.fetchPartyByID(party.getId()))
+        .assertNext(
+            pTO -> {
+              verify(partyRepository).findByIdOrEmpty(any());
+              verify(addressService).findByIdOrEmpty(any());
+              verify(partyIdentifyingCodeRepository).findAllByPartyID(any());
+              verify(partyContactDetailsRepository).findByPartyID(any());
+              assertEquals("DCSA", pTO.getPartyName());
+              assertEquals(1, pTO.getPartyContactDetails().size());
+              assertEquals(1, pTO.getIdentifyingCodes().size());
+              assertEquals("Denmark", pTO.getAddress().getCountry());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch party by null ID should return empty mono.")
+  void testFetchPartyByIDNull() {
+    StepVerifier.create(documentPartyService.fetchPartyByID(null))
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch party by ID should return empty mono if no parties linked to ID.")
+  void testFetchPartyByIDNoLinkedParties() {
+
+    when(partyRepository.findByIdOrEmpty(any())).thenReturn(Mono.empty());
+
+    StepVerifier.create(documentPartyService.fetchPartyByID(party.getId()))
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch document parties by ID should return empty mono for null ID.")
+  void testFetchDocumentPartiesByIDNull() {
+    StepVerifier.create(
+            documentPartyService.fetchDocumentPartiesByID(
+                null, ColumnReferenceType.SHIPPING_INSTRUCTION))
+        .expectNextCount(0)
+        .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test fetch document parties by ID.")
+  void testFetchDocumentPartiesByID() {
+
+    when(documentPartyRepository.findByShippingInstructionReference(any()))
+        .thenReturn(Flux.just(documentParty));
+
+    when(partyRepository.findByIdOrEmpty(any())).thenReturn(Mono.just(party));
+    when(addressService.findByIdOrEmpty(any())).thenReturn(Mono.just(address));
+    when(partyIdentifyingCodeRepository.findAllByPartyID(any()))
+        .thenReturn(Flux.just(partyIdentifyingCode));
+    when(partyContactDetailsRepository.findByPartyID(any()))
+        .thenReturn(Flux.just(partyContactDetails));
+
+    when(displayedAddressRepository.findByDocumentPartyIDOrderByAddressLineNumber(any()))
+        .thenReturn(Flux.just(displayedAddress));
+
+    StepVerifier.create(
+            documentPartyService.fetchDocumentPartiesByID(
+                UUID.randomUUID().toString(), ColumnReferenceType.SHIPPING_INSTRUCTION))
+        .assertNext(dpTOs -> {
+            verify(documentPartyRepository).findByShippingInstructionReference(any());
+            assertEquals(PartyFunction.DDS, dpTOs.get(0).getPartyFunction());
+            assertEquals(List.of("Javastraat"), dpTOs.get(0).getDisplayedAddress());
+            assertEquals("DCSA", dpTOs.get(0).getParty().getPartyName());
+        })
+        .verifyComplete();
   }
 
 }

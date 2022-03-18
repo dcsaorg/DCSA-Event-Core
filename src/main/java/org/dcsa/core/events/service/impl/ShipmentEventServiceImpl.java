@@ -8,7 +8,7 @@ import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.ShipmentEventService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,20 +19,19 @@ import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 @Service
-public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
+public class ShipmentEventServiceImpl extends QueryServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
     private final ShipmentEventRepository shipmentEventRepository;
     private final ReferenceRepository referenceRepository;
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public ShipmentEventRepository getRepository() {
+    protected ShipmentEventRepository getRepository() {
         return shipmentEventRepository;
     }
 
-    //Overriding base method here, as it marks empty results as an error, meaning we can't use switchOnEmpty()
     @Override
     public Mono<ShipmentEvent> findById(UUID id) {
-        return getRepository().findById(id);
+        return shipmentEventRepository.findById(id);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
                 return shipmentEventReferences
                         .apply(
                                 shipmentEvent,
-                                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
+                                referenceRepository.findByShippingInstructionReference(shipmentEvent.getDocumentID()))
                         .thenReturn(shipmentEvent);
             default:
                 return Mono.just(shipmentEvent);
@@ -73,7 +72,7 @@ public class ShipmentEventServiceImpl extends ExtendedBaseServiceImpl<ShipmentEv
 
     @Override
     public Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent) {
-        return super.create(shipmentEvent).flatMap(
+        return shipmentEventRepository.save(shipmentEvent).flatMap(
                 se -> {
                     UnmappedEvent unmappedEvent = new UnmappedEvent();
                     unmappedEvent.setNewRecord(true);

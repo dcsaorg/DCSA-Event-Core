@@ -1,9 +1,9 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Booking;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Pageable;
-import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
@@ -21,7 +21,8 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "JOIN cargo_item ci ON s.id = ci.shipment_id "
+          + "JOIN shipment_equipment se ON s.id = se.shipment_id "
+          + "JOIN cargo_item ci ON se.id = ci.shipment_equipment_id "
           + "JOIN shipping_instruction si ON ci.shipping_instruction_id = si.id "
           + "JOIN transport_document td ON si.id = td.shipping_instruction_id "
           + "WHERE td.transport_document_reference = :transportDocumentRef")
@@ -30,9 +31,10 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "JOIN cargo_item ci ON s.id = ci.shipment_id "
-          + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
-  Flux<String> findCarrierBookingRefsByShippingInstructionID(String shippingInstructionID);
+          + "JOIN shipment_equipment se ON s.id = se.shipment_id "
+          + "JOIN cargo_item ci ON se.id = ci.shipment_equipment_id "
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionReference")
+  Flux<String> findCarrierBookingRefsByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -62,5 +64,23 @@ public interface BookingRepository
   @Query(
       "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime where carrier_booking_request_reference = :carrierBookingRequestReference")
   Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
-          ShipmentEventTypeCode documentStatus, String carrierBookingRequestReference, OffsetDateTime updatedDateTime);
+      ShipmentEventTypeCode documentStatus,
+      String carrierBookingRequestReference,
+      OffsetDateTime updatedDateTime);
+
+    @Query(
+      "SELECT DISTINCT b.* FROM shipment s "
+          + "JOIN booking b ON b.id = s.booking_id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingReference")
+  Flux<Booking> findAllByCarrierBookingReference(String carrierBookingReference);
+
+  @Query(
+      "SELECT DISTINCT b.* FROM shipping_instruction si "
+          + "JOIN cargo_item ci ON ci.shipping_instruction_id = si.id "
+          + "JOIN shipment_equipment se ON se.id = ci.shipment_equipment_id "
+          + "JOIN shipment s ON s.id = se.shipment_id "
+          + "JOIN booking b ON b.id = s.booking_id "
+          + "WHERE si.id = :shippingInstructionReference")
+  Flux<Booking> findAllByShippingInstructionReference(String shippingInstructionReference);
+
 }

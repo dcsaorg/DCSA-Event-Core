@@ -6,11 +6,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.ReferenceTypeCode;
 import org.dcsa.core.model.AuditBase;
-import org.dcsa.core.model.GetId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Reference extends AuditBase implements GetId<UUID> {
+public class Reference extends AuditBase {
 
   @Id
   @Column("id")
@@ -26,14 +26,16 @@ public class Reference extends AuditBase implements GetId<UUID> {
   private UUID referenceID;
 
   @Column("reference_type_code")
+  @NotNull
   private ReferenceTypeCode referenceType;
 
   @Size(max = 100)
+  @NotNull
   private String referenceValue;
 
   @Column("shipping_instruction_id")
   @JsonIgnore
-  private String shippingInstructionID;
+  private String shippingInstructionReference;
 
   @Column("shipment_id")
   @JsonIgnore

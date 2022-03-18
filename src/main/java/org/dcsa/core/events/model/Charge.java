@@ -23,8 +23,8 @@ public class Charge {
   @Column("shipment_id")
   private UUID shipmentID;
 
-  @Column("charge_type_code")
-  private String chargeTypeCode;
+  @Column("charge_type")
+  private String chargeType;
 
   @Column("currency_amount")
   private Double currencyAmount;

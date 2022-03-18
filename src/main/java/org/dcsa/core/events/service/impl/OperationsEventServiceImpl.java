@@ -7,7 +7,7 @@ import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.*;
 import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<OperationsEventRepository, OperationsEvent, UUID> implements OperationsEventService {
+public class OperationsEventServiceImpl extends QueryServiceImpl<OperationsEventRepository, OperationsEvent, UUID> implements OperationsEventService {
 
     private final OperationsEventRepository operationsEventRepository;
     private final TransportCallTOService transportCallTOService;
@@ -26,8 +26,13 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
-    public OperationsEventRepository getRepository() {
+    protected OperationsEventRepository getRepository() {
         return operationsEventRepository;
+    }
+
+    @Override
+    public Mono<OperationsEvent> findById(UUID id) {
+        return operationsEventRepository.findById(id);
     }
 
     @Override
@@ -92,7 +97,7 @@ public class OperationsEventServiceImpl extends ExtendedBaseServiceImpl<Operatio
                   }
                   return Mono.just(oe);
               })
-              .flatMap(super::create)
+              .flatMap(operationsEventRepository::save)
               .flatMap(timestampDefinitionService::markOperationsEventAsTimestamp)
               .flatMap(
                       ope -> {

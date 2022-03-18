@@ -8,7 +8,7 @@ import org.dcsa.core.events.repository.UnmappedEventRepository;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.events.service.TransportEventService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<TransportEventRepository, TransportEvent, UUID> implements TransportEventService {
+public class TransportEventServiceImpl extends QueryServiceImpl<TransportEventRepository, TransportEvent, UUID> implements TransportEventService {
     private final TransportEventRepository transportEventRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
@@ -27,14 +27,13 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
     private boolean mapReferences;
 
     @Override
-    public TransportEventRepository getRepository() {
+    protected TransportEventRepository getRepository() {
         return transportEventRepository;
     }
 
-    //Overriding base method here, as it marks empty results as an error, meaning we can't use switchOnEmpty()
     @Override
     public Mono<TransportEvent> findById(UUID id) {
-        return getRepository().findById(id);
+        return transportEventRepository.findById(id);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class TransportEventServiceImpl extends ExtendedBaseServiceImpl<Transport
 
     @Override
     public Mono<TransportEvent> create(TransportEvent transportEvent) {
-        return super.create(transportEvent).flatMap(
+        return transportEventRepository.save(transportEvent).flatMap(
                 te -> {
                     UnmappedEvent unmappedEvent = new UnmappedEvent();
                     unmappedEvent.setNewRecord(true);

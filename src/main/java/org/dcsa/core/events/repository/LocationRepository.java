@@ -4,19 +4,19 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface LocationRepository extends ExtendedRepository<Location, String> {
+public interface LocationRepository extends ReactiveCrudRepository<Location, String> {
     @Query("SELECT location.*"
             + "  FROM location"
             + "  JOIN shipping_instruction ON (location.id=shipping_instruction.invoice_payable_at)"
-            + " WHERE shipping_instruction.id = :shippingInstructionID"
+            + " WHERE shipping_instruction.id = :shippingInstructionReference"
     )
-    Mono<Location> findPaymentLocationByShippingInstructionID(String shippingInstructionID);
+    Mono<Location> findPaymentLocationByShippingInstructionReference(String shippingInstructionReference);
 
     Mono<Location> findByAddressIDAndFacilityIDAndLocationNameAndLatitudeAndLongitudeAndUnLocationCode(
             UUID addressID,

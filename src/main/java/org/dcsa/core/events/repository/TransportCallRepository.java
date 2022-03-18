@@ -102,7 +102,7 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
           + "JOIN shipment s "
           + "ON s.id = st.shipment_id "
           + "WHERE s.carrier_booking_reference = :carrierBookingRef")
-  Flux<String> findTransportCallIDByShippingInstructionID(String shippingInstructionID);
+  Flux<String> findTransportCallIDByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT tc.id FROM transport_call tc "

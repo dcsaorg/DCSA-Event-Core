@@ -10,7 +10,6 @@ import org.dcsa.core.events.repository.PendingEventRepository;
 import org.dcsa.core.events.service.EventSubscriptionService;
 import org.dcsa.core.events.service.GenericEventService;
 import org.dcsa.core.events.service.PendingEventService;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -30,7 +29,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEventRepository, PendingMessage, UUID> implements PendingEventService {
+public class PendingEventServiceImpl implements PendingEventService {
 
     private static final int EVENTS_PER_BATCH_JOB = 10;
     // To make easier to do this with Flux which works on lists/arrays
@@ -57,11 +56,6 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
 
     @Value("${dcsa.pendingEventService.parallel:4}")
     private int parallel;
-
-    @Override
-    public PendingEventRepository getRepository() {
-        return pendingEventRepository;
-    }
 
     @Scheduled(
             cron = "${dcsa.pendingEventService.backgroundTasks.processUnmappedEventQueue.cronSchedule:45 */1 * * * *}"
@@ -97,7 +91,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                                                 return Mono.error(e);
                                             }
                                             return Mono.just(pendingMessage);
-                                        }).concatMap(this::create)
+                                        }).concatMap(pendingEventRepository::save)
                                         .count()
                                         .onErrorResume(ex -> {
                                             log.warn("Error processing event ID " + mappedEvent.getEventID(), ex);
@@ -169,7 +163,7 @@ public class PendingEventServiceImpl extends ExtendedBaseServiceImpl<PendingEven
                     }
                     return eventSubscriptionService.update(submissionResult.getEventSubscription())
                             .thenMany(Flux.fromIterable(submissionResult.getPendingMessages()))
-                            .concatMap(pendingEventRepository::insert)
+                            .concatMap(pendingEventRepository::save)
                             .then(Mono.just(submissionResult));
                 });
 

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
@@ -24,17 +25,21 @@ public class Seal extends AuditBase {
 
     @JsonIgnore
     @Column("shipment_equipment_id")
+    @NotNull
     private UUID shipmentEquipmentID;
 
     @Column("seal_number")
     @Size(max = 15)
+    @NotNull
     private String sealNumber;
 
-    @Column("seal_source")
+    @Column("seal_source_code")
     @Size(max = 5)
     private String sealSource;
 
-    @Column("seal_type")
+    @Column("seal_type_code")
     @Size(max = 5)
+    @NotNull
     private String sealType;
+
 }

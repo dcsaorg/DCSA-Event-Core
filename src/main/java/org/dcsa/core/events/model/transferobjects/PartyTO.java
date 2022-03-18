@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Party;
-import org.dcsa.core.events.model.SetId;
 import org.dcsa.core.events.model.base.AbstractParty;
 import org.dcsa.core.events.model.enums.DCSAResponsibleAgencyCode;
-import org.dcsa.core.events.util.Util;
 import org.dcsa.core.util.MappingUtils;
 
 import javax.validation.constraints.NotEmpty;
@@ -23,7 +21,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, String>, SetId<String> {
+public class PartyTO extends AbstractParty {
 
     private String nmftaCode;
 
@@ -34,23 +32,6 @@ public class PartyTO extends AbstractParty implements ModelReferencingTO<Party, 
     private List<PartyContactDetailsTO> partyContactDetails;
 
     private List<IdentifyingCode> identifyingCodes;
-
-    @Override
-    public boolean isSolelyReferenceToModel() {
-        return Util.containsOnlyID(this, PartyTO::new);
-    }
-
-    public boolean isEqualsToModel(Party other) {
-        return this.toParty().equals(other);
-    }
-
-    public Party toParty() {
-        Party party = MappingUtils.instanceFrom(this, Party::new, AbstractParty.class);
-        if (this.address != null) {
-            party.setAddressID(address.getId());
-        }
-        return party;
-    }
 
     public void adjustIdentifyingCodesIfNmftaIsPresent(){
         if (StringUtils.isNotEmpty(this.getNmftaCode())) {

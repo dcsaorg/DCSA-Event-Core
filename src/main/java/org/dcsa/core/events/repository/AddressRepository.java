@@ -1,13 +1,13 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Address;
-import org.dcsa.core.repository.ExtendedRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public interface AddressRepository extends ExtendedRepository<Address, UUID> {
+public interface AddressRepository extends ReactiveCrudRepository<Address, UUID> {
 
     Mono<Address> findByNameAndStreetAndStreetNumberAndFloorAndPostalCodeAndCityAndStateRegionAndCountry(
             String name,

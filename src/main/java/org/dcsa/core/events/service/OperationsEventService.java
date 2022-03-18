@@ -5,4 +5,6 @@ import reactor.core.publisher.Mono;
 
 public interface OperationsEventService extends EventService<OperationsEvent> {
     Mono<OperationsEvent> loadRelatedEntities(OperationsEvent event);
+
+    Mono<OperationsEvent> create(OperationsEvent operationsEvent);
 }

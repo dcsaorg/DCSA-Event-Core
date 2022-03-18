@@ -1,7 +1,7 @@
-package org.dcsa.core.events.repository;
+package org.dcsa.core.events.edocumentation.repository;
 
 import org.dcsa.core.events.model.ShipmentLocation;
-import org.dcsa.core.repository.ExtendedRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Repository
-public interface ShipmentLocationRepository extends ExtendedRepository<ShipmentLocation, UUID> {
+public interface ShipmentLocationRepository extends ReactiveCrudRepository<ShipmentLocation, UUID> {
   Flux<ShipmentLocation> findByBookingID(UUID bookingID);
   Flux<ShipmentLocation> findByShipmentID(UUID shipmentID);
   Mono<Void> deleteByBookingID(UUID bookingID);

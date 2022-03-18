@@ -3,10 +3,11 @@ package org.dcsa.core.events.repository;
 import org.dcsa.core.events.model.TransportDocumentType;
 import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 
 public interface TransportDocumentTypeRepository
-    extends ExtendedRepository<TransportDocumentType, String> {
+    extends ReactiveCrudRepository<TransportDocumentType, String> {
 
   @Query(
       "SELECT DISTINCT tdt.transport_document_type_code FROM transport_document_type tdt "
@@ -25,8 +26,8 @@ public interface TransportDocumentTypeRepository
       "SELECT DISTINCT tdt.transport_document_type_code FROM transport_document_type tdt "
           + "JOIN shipping_instruction si "
           + "ON si.transport_document_type = tdt.transport_document_type_code "
-          + "WHERE si.id = :shippingInstructionID")
-  Flux<String> findCodesByShippingInstructionID(String shippingInstructionID);
+          + "WHERE si.id = :shippingInstructionReference")
+  Flux<String> findCodesByShippingInstructionReference(String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT si.transport_document_type_code FROM shipping_instruction si "

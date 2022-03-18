@@ -10,7 +10,6 @@ import org.dcsa.core.events.service.EventSubscriptionTOService;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.UpdateException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
-import org.dcsa.core.service.impl.BaseServiceImpl;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +24,7 @@ public abstract class EventSubscriptionTOServiceImpl<
         T extends AbstractEventSubscription,
         S extends EventSubscriptionService,
         R extends EventSubscriptionRepository>
-    extends BaseServiceImpl<T, UUID> implements EventSubscriptionTOService<T> {
+    implements EventSubscriptionTOService<T> {
 
   public static final List<TransportDocumentTypeCode> ALL_TRANSPORT_DOCUMENT_TYPES =
       List.of(TransportDocumentTypeCode.values());
@@ -158,14 +157,11 @@ public abstract class EventSubscriptionTOServiceImpl<
   }
 
   @Override
-  public Flux<T> findAll() {
-    return mapManyD2TO(getService().findAll());
+  public Mono<T> findById(UUID id) {
+    return mapSingleD2TO(findShallowEventSubscriptionById(id));
   }
 
-  @Override
-  public Mono<T> findById(UUID id) {
-    return mapSingleD2TO(getService().findById(id));
-  }
+  protected abstract Mono<EventSubscription> findShallowEventSubscriptionById(UUID id);
 
   @Override
   public Flux<T> findAllExtended(ExtendedRequest<EventSubscription> extendedRequest) {
@@ -187,16 +183,6 @@ public abstract class EventSubscriptionTOServiceImpl<
   @Override
   public Mono<Void> deleteById(UUID id) {
     return getService().deleteById(id);
-  }
-
-  @Override
-  public Mono<Void> delete(T eventSubscriptionTO) {
-    return getService().deleteById(eventSubscriptionTO.getSubscriptionID());
-  }
-
-  @Override
-  public UUID getIdOfEntity(T entity) {
-    return entity.getSubscriptionID();
   }
 
   protected final Function<String, List<EventType>> stringToEventTypeList =

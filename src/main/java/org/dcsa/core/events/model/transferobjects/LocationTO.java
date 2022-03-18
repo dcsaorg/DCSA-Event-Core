@@ -80,19 +80,6 @@ public class LocationTO extends AbstractLocation {
         this.facility = facility;
     }
 
-    // Use ExtendedRequest + @ForeignKey instead
-    @Deprecated
-    public Location toLocation() {
-        Location location = MappingUtils.instanceFrom(this, Location::new, AbstractLocation.class);
-        if (this.address != null) {
-            location.setAddressID(this.address.getId());
-        }
-        if (this.facility != null) {
-            location.setFacilityID(facility.getFacilityID());
-        }
-        return location;
-    }
-
     @JsonIgnore
     public boolean isNullLocation() {
         return this.equals(NULL_LOCATION_WITH_NULL_ADDRESS_AND_FACILITY) || this.equals(NULL_LOCATION);

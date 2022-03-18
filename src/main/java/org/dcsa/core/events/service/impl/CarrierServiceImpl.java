@@ -1,13 +1,15 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
-import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import org.dcsa.core.events.model.Carrier;
+import org.dcsa.core.events.model.enums.CarrierCodeListProvider;
 import org.dcsa.core.events.repository.CarrierRepository;
 import org.dcsa.core.events.service.CarrierService;
+import org.dcsa.core.exception.CreateException;
+import org.dcsa.core.extendedrequest.ExtendedRequest;
+import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -16,12 +18,12 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Service
-public class CarrierServiceImpl extends ExtendedBaseServiceImpl<CarrierRepository, Carrier, UUID> implements CarrierService {
+public class CarrierServiceImpl extends QueryServiceImpl<CarrierRepository, Carrier, UUID> implements CarrierService {
 
     private final CarrierRepository carrierRepository;
 
     @Override
-    public CarrierRepository getRepository() {
+    protected CarrierRepository getRepository() {
         return carrierRepository;
     }
 

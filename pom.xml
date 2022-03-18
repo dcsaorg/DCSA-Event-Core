@@ -5,9 +5,10 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.5.6</version>
+		<version>2.6.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>org.dcsa</groupId>
 	<artifactId>dcsa_event_core</artifactId>
 	<version>${revision}${sha1}${changelist}</version>
@@ -17,12 +18,14 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<dcsa.version>0.8.26</dcsa.version>
+		<dcsa.version>0.8.30</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
-		<revision>0.0.53</revision>
+		<revision>0.0.58</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
+		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+		<org.lombok.version>1.18.22</org.lombok.version>
 	</properties>
 
 	<dependencies>
@@ -33,40 +36,40 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-		<repository>
-			<id>spring-libs-milestone</id>
-			<name>Spring Milestone Maven Repository</name>
-			<url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
-		</repository>
-		<repository>
-			<id>github</id>
-			<name>GitHub dcsaorg Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Core</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</pluginRepository>
-	</pluginRepositories>
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub OWNER Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Event-Core</url>
-		</repository>
-	</distributionManagement>
-
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${org.mapstruct.version}</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>0.2.0</version>
+						</path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${org.lombok.version}</version>
+						</path>
+						<!-- other annotation processors -->
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<compilerArg>
+							-Amapstruct.defaultComponentModel=spring
+						</compilerArg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -82,5 +85,24 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>github</id>
+			<name>GitHub dcsaorg Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Core</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub OWNER Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Event-Core</url>
+		</repository>
+	</distributionManagement>
 
 </project>
