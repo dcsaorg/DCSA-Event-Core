@@ -21,7 +21,7 @@ public class ShipmentEquipmentTO extends AbstractShipmentEquipment {
 
 	@Valid
 	@NotNull(message = "Equipment is required.")
-	EquipmentTO equipment;
+	private EquipmentTO equipment;
 
 	@Valid
 	@NotEmpty
