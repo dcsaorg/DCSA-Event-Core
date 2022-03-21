@@ -57,29 +57,29 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
             row ->
                 new ShipmentEquipmentDetails(
                     row.get(
-                        queryColumnMap().get("carrierBookingReference").getName().getReference(),
+                        queryColumnMap().get("carrierBookingReference").getReferenceName().getReference(),
                         String.class),
                     row.get(
-                        queryColumnMap().get("seEquipmentReference").getName().getReference(),
+                        queryColumnMap().get("seEquipmentReference").getReferenceName().getReference(),
                         String.class),
                     row.get(
-                        queryColumnMap().get("cargoGrossWeight").getName().getReference(),
+                        queryColumnMap().get("cargoGrossWeight").getReferenceName().getReference(),
                         Float.class),
                     WeightUnit.valueOf(
                         row.get(
-                            queryColumnMap().get("cargoGrossWeightUnit").getName().getReference(),
+                            queryColumnMap().get("cargoGrossWeightUnit").getReferenceName().getReference(),
                             String.class)),
                     row.get(
-                        queryColumnMap().get("isoEquipmentCode").getName().getReference(),
+                        queryColumnMap().get("isoEquipmentCode").getReferenceName().getReference(),
                         String.class),
                     row.get(
-                        queryColumnMap().get("tareWeight").getName().getReference(), Float.class),
+                        queryColumnMap().get("tareWeight").getReferenceName().getReference(), Float.class),
                     row.get(
-                        queryColumnMap().get("weightUnit").getName().getReference(), String.class),
+                        queryColumnMap().get("weightUnit").getReferenceName().getReference(), String.class),
                     row.get(
-                        queryColumnMap().get("isShipperOwned").getName().getReference(),
+                        queryColumnMap().get("isShipperOwned").getReferenceName().getReference(),
                         Boolean.class),
-                    row.get(queryColumnMap().get("id").getName().getReference(), UUID.class)))
+                    row.get(queryColumnMap().get("id").getReferenceName().getReference(), UUID.class)))
         .all();
   }
 
@@ -90,8 +90,8 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
         "seEquipmentReference", Column.create("equipment_reference", SHIPMENT_EQUIPMENT_TABLE));
     selectedColumns.put(
         "eEquipmentReference", Column.create("equipment_reference", EQUIPMENT_TABLE));
-    selectedColumns.put("shipmentId", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
-    selectedColumns.put("sShipmentId", Column.create("id", SHIPMENT_TABLE));
+    selectedColumns.put("shipmentId", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE).as("shipmentId"));
+    selectedColumns.put("sShipmentId", Column.create("id", SHIPMENT_TABLE).as("sShipmentId"));
     selectedColumns.put(
         "carrierBookingReference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
     selectedColumns.put(
