@@ -86,7 +86,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             .where(
                 Conditions.isEqual(
                     column("ci.shipment_equipment_id"),
-                    SQL.literalOf(shipmentEquipmentID.toString())))
+                     SQL.literalOf(shipmentEquipmentID.toString())))
             .build();
 
     RenderContextFactory factory = new RenderContextFactory(r2dbcDialect);
