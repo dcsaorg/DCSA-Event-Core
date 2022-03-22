@@ -18,10 +18,10 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<dcsa.version>0.8.30</dcsa.version>
+		<dcsa.version>0.8.31</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
-		<revision>0.0.58</revision>
+		<revision>0.0.59</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
