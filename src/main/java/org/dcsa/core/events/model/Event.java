@@ -53,9 +53,6 @@ public class Event extends AuditBase implements Persistable<UUID> {
     @Column("event_classifier_code")
     private EventClassifierCode eventClassifierCode;
 
-    @Column("carrier_booking_reference")
-    private String carrierBookingReference;
-
     @Transient
     @JsonIgnore
     private boolean isNewRecord;
@@ -71,4 +68,11 @@ public class Event extends AuditBase implements Persistable<UUID> {
     public boolean isNew() {
         return this.isNewRecord || this.getId() == null;
     }
+
+    // DB internal field - we declare it so Spring will not be confused by it
+    // (e.g. on INSERT / SELECT).
+    @Transient
+    @JsonIgnore
+    @Column("link_type")
+    private String linkType;
 }
