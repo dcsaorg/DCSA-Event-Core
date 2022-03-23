@@ -11,12 +11,12 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface ValueAddedServiceRequestMapper {
 
-  @Mapping(source = "valueAddedServiceCode", target = "valueAddedServiceCode")
+  @Mapping(source = "valueAddedServiceRequestTO.valueAddedServiceCode", target = "valueAddedServiceCode")
   @Mapping(source = "bookingID", target = "bookingID")
   ValueAddedServiceRequest dtoToValueAddedServiceRequestWithBookingID(
       ValueAddedServiceRequestTO valueAddedServiceRequestTO, UUID bookingID);
 
-  @Mapping(source = "valueAddedServiceCode", target = "valueAddedServiceCode")
+  @Mapping(source = "valueAddedServiceRequestTO.valueAddedServiceCode", target = "valueAddedServiceCode")
   @Mapping(source = "shippingInstructionID", target = "shippingInstructionID")
   ValueAddedServiceRequest dtoToValueAddedServiceRequestWithShippingInstructionID(
       ValueAddedServiceRequestTO valueAddedServiceRequestTO,
