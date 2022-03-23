@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Repository
@@ -14,7 +15,9 @@ public interface ValueAddedServiceRequestRepository
 
   Flux<ValueAddedServiceRequest> findByBookingID(UUID bookingID);
 
-  Flux<ValueAddedServiceRequest> findByShippingInstructionID(UUID shippingInstructionID);
+  // TODO: use shippingInstructionId when implemented
+  Flux<ValueAddedServiceRequest> findByShippingInstructionID(
+      @Size(max = 100) String shippingInstructionID);
 
   Mono<Void> deleteByBookingID(UUID bookingID);
 }
