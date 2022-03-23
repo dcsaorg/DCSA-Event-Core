@@ -17,6 +17,9 @@ public class ValueAddedServiceRequest {
   @Column("booking_id")
   private UUID bookingID;
 
+  @Column("shipping_instruction_id")
+  private UUID shippingInstructionID;
+
   @Column("value_added_service_code")
   private ValueAddedServiceCode valueAddedServiceCode;
 }

@@ -14,5 +14,7 @@ public interface ValueAddedServiceRequestRepository
 
   Flux<ValueAddedServiceRequest> findByBookingID(UUID bookingID);
 
+  Flux<ValueAddedServiceRequest> findByShippingInstructionID(UUID shippingInstructionID);
+
   Mono<Void> deleteByBookingID(UUID bookingID);
 }

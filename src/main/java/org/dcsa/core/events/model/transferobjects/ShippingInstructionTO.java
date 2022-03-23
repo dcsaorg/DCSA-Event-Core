@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentTO;
+import org.dcsa.core.events.edocumentation.model.transferobject.ValueAddedServiceRequestTO;
 import org.dcsa.core.events.model.base.AbstractShippingInstruction;
 
 import javax.validation.Valid;
@@ -29,6 +30,8 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
   private List<ShipmentEquipmentTO> shipmentEquipments;
 
   @Valid private List<DocumentPartyTO> documentParties;
+
+  @Valid private List<ValueAddedServiceRequestTO> valueAddedServiceRequests;
 
   @Valid private List<ReferenceTO> references;
 
