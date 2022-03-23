@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Data
@@ -17,8 +18,10 @@ public class ValueAddedServiceRequest {
   @Column("booking_id")
   private UUID bookingID;
 
+  // TODO: use shippingInstructionId when implemented
+  @Size(max = 100)
   @Column("shipping_instruction_id")
-  private UUID shippingInstructionID;
+  private String shippingInstructionID;
 
   @Column("value_added_service_code")
   private ValueAddedServiceCode valueAddedServiceCode;
