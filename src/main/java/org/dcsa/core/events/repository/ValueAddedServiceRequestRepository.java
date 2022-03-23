@@ -20,4 +20,7 @@ public interface ValueAddedServiceRequestRepository
       @Size(max = 100) String shippingInstructionID);
 
   Mono<Void> deleteByBookingID(UUID bookingID);
+
+  // TODO: use shippingInstructionId when implemented
+  Mono<Void> deleteByShippingInstructionID(@Size(max = 100) String shippingInstructionID);
 }
