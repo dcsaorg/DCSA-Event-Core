@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public interface CargoItemCustomRepository {
 
-  Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-      UUID shipmentEquipmentID);
+  Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+      UUID utilizedTransportEquipmentID);
 
   @Data
   @ToString(callSuper = true)

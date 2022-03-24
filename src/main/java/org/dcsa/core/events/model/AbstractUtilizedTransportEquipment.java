@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import javax.validation.constraints.NotNull;
 
 @Data
-public abstract class AbstractShipmentEquipment {
+public abstract class AbstractUtilizedTransportEquipment {
 
   @NotNull(message = "Cargo gross weight is required.")
   @Column("cargo_gross_weight")

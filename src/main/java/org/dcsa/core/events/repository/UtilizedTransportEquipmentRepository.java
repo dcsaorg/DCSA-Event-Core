@@ -1,26 +1,18 @@
 package org.dcsa.core.events.repository;
 
-import org.dcsa.core.events.model.ShipmentEquipment;
+import org.dcsa.core.events.model.UtilizedTransportEquipment;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface ShipmentEquipmentRepository extends ReactiveCrudRepository<ShipmentEquipment, UUID>, ShipmentEquipmentCustomRepository {
+public interface UtilizedTransportEquipmentRepository extends ReactiveCrudRepository<UtilizedTransportEquipment, UUID>, UtilizedTransportEquipmentCustomRepository {
 
-  Mono<Void> deleteShipmentEquipmentByShipmentID(UUID shipmentID);
+  Mono<Void> deleteUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 
-  Mono<ShipmentEquipment> findShipmentEquipmentByShipmentID(UUID shipmentID);
-
-  Flux<ShipmentEquipment> findAllByShipmentIDIn(List<UUID> shipmentIDs);
-
-  Mono<ShipmentEquipment> findByEquipmentReference(String equipmentReference);
-
-  Mono<Void> deleteByEquipmentReferenceInAndShipmentIDIn(
-      List<String> equipmentReferences, List<UUID> shipmentIDs);
+  Mono<UtilizedTransportEquipment> findUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 
   @Query(
       "SELECT DISTINCT se.equipment_reference FROM shipment_equipment se "

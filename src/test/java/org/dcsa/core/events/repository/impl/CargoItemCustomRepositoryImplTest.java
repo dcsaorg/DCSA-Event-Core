@@ -32,12 +32,12 @@ public class CargoItemCustomRepositoryImplTest {
 
   @Test
   @DisplayName(
-      "Test fetch all cargo items with cargolineitems for a shipmentEquipmentID should generate correct query")
+      "Test fetch all cargo items with cargolineitems for a utilizedTransportEquipmentID should generate correct query")
   void testCargoItemCustomRepositoryQuery() {
     ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
-    UUID shipmentEquipmentID = UUID.randomUUID();
-    cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-        shipmentEquipmentID);
+    UUID utilizedTransportEquipmentID = UUID.randomUUID();
+    cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+        utilizedTransportEquipmentID);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
@@ -52,19 +52,19 @@ public class CargoItemCustomRepositoryImplTest {
             + "JOIN cargo_line_item ON cargo_line_item.cargo_item_id = cargo_item.id "
             + "JOIN shipment_equipment ON cargo_item.shipment_equipment_id = shipment_equipment.id "
             + "WHERE cargo_item.shipment_equipment_id = '"
-            + shipmentEquipmentID
+            + utilizedTransportEquipmentID
             + "'";
     Assertions.assertEquals(expectedQuery, executedQuery);
   }
 
   @Test
-  @DisplayName("Test fetch cargo items without shipmentEquipment Should fail")
-  void testCargoItemCustomRepositoryQueryWithoutShipmentEquipmentID() {
+  @DisplayName("Test fetch cargo items without utilizedTransportEquipment should fail")
+  void testCargoItemCustomRepositoryQueryWithoutUtilizedTransportEquipmentID() {
     Exception exception =
         assertThrows(
             NullPointerException.class,
             () -> {
-              cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
+              cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
                   null);
             });
 
@@ -80,7 +80,7 @@ public class CargoItemCustomRepositoryImplTest {
   void testMapResultSetWithAllFieldsPresent() {
     Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
     UUID cargoItemId = UUID.randomUUID();
-    UUID shipmentEquipmentID = UUID.randomUUID();
+    UUID utilizedTransportEquipmentID = UUID.randomUUID();
     String shippingInstructionReference = UUID.randomUUID().toString();
 
     cargoItemWithCargoLineItem1.put("id", cargoItemId);
@@ -93,7 +93,7 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
     cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
     cargoItemWithCargoLineItem1.put("package_code", "123");
-    cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
+    cargoItemWithCargoLineItem1.put("shipment_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem1.put("cargo_line_item_id", "1");
     cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
     cargoItemWithCargoLineItem1.put("shipping_marks", "shipping_marks");
@@ -109,7 +109,7 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem2.put("number_of_packages", 2);
     cargoItemWithCargoLineItem2.put("shipping_instruction_id", shippingInstructionReference);
     cargoItemWithCargoLineItem2.put("package_code", "123");
-    cargoItemWithCargoLineItem2.put("shipment_equipment_id", shipmentEquipmentID);
+    cargoItemWithCargoLineItem2.put("shipment_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem2.put("cargo_line_item_id", "2");
     cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
     cargoItemWithCargoLineItem2.put("shipping_marks", "shipping_marks2");
@@ -119,7 +119,7 @@ public class CargoItemCustomRepositoryImplTest {
 
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult =
         cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
-    assertEquals(shipmentEquipmentID, cargoItemsResult.getShipmentEquipmentID());
+    assertEquals(utilizedTransportEquipmentID, cargoItemsResult.getUtilizedTransportEquipmentID());
 
     // assertions on cargoLineItems
     assertEquals(2, cargoItemsResult.getCargoLineItems().size());
@@ -136,7 +136,7 @@ public class CargoItemCustomRepositoryImplTest {
   void testMapResultSetWithoutCargoLineItems() {
     Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
     UUID cargoItemId = UUID.randomUUID();
-    UUID shipmentEquipmentID = UUID.randomUUID();
+    UUID utilizedTransportEquipmentID = UUID.randomUUID();
     String shippingInstructionReference = UUID.randomUUID().toString();
 
     cargoItemWithCargoLineItem1.put("id", cargoItemId);
@@ -149,13 +149,13 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
     cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
     cargoItemWithCargoLineItem1.put("package_code", "123");
-    cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
+    cargoItemWithCargoLineItem1.put("shipment_equipment_id", utilizedTransportEquipmentID);
 
     List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1);
 
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult =
         cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
-    assertEquals(shipmentEquipmentID, cargoItemsResult.getShipmentEquipmentID());
+    assertEquals(utilizedTransportEquipmentID, cargoItemsResult.getUtilizedTransportEquipmentID());
     assertEquals(shippingInstructionReference, cargoItemsResult.getShippingInstructionReference());
 
     // assertions on cargoLineItems
@@ -168,19 +168,19 @@ public class CargoItemCustomRepositoryImplTest {
   void testMapResultSetWithOnlyMandatoryFieldsPresent() {
     Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
     UUID cargoItemId = UUID.randomUUID();
-    UUID shipmentEquipmentID = UUID.randomUUID();
+    UUID utilizedTransportEquipmentID = UUID.randomUUID();
 
     cargoItemWithCargoLineItem1.put("id", cargoItemId);
     cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
     cargoItemWithCargoLineItem1.put("hs_code", "720711");
-    cargoItemWithCargoLineItem1.put("shipment_equipment_id", shipmentEquipmentID);
+    cargoItemWithCargoLineItem1.put("shipment_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
 
     Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
     cargoItemWithCargoLineItem2.put("id", cargoItemId);
     cargoItemWithCargoLineItem2.put("description_of_goods", "description of goods");
     cargoItemWithCargoLineItem2.put("hs_code", "720711");
-    cargoItemWithCargoLineItem2.put("shipment_equipment_id", shipmentEquipmentID);
+    cargoItemWithCargoLineItem2.put("shipment_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
 
     List<Map<String, Object>> cargoItemWithCargoLineItems =
@@ -188,7 +188,7 @@ public class CargoItemCustomRepositoryImplTest {
 
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult =
         cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
-    assertEquals(shipmentEquipmentID, cargoItemsResult.getShipmentEquipmentID());
+    assertEquals(utilizedTransportEquipmentID, cargoItemsResult.getUtilizedTransportEquipmentID());
 
     // assertions on cargoLineItems
     assertEquals(2, cargoItemsResult.getCargoLineItems().size());
