@@ -71,7 +71,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     //		join dcsa_im_v3_0.cargo_line_item cli on cli.cargo_item_id = ci.id
     //		where ci.shipment_equipment_id = :shipmentEquipmentID;
 
-    Objects.requireNonNull(utilizedTransportEquipmentID, "ShipmentEquiment must not be null");
+    Objects.requireNonNull(utilizedTransportEquipmentID, "utilizedTransportEquipmentID must not be null");
 
     Select selectJoin =
         Select.builder()
