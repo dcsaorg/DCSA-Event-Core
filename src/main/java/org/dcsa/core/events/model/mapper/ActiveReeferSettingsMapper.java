@@ -12,7 +12,7 @@ public interface ActiveReeferSettingsMapper {
 
 	ActiveReeferSettingsTO activeReeferSettingsToDTO(ActiveReeferSettings activeReeferSettings);
 
-	@Mapping(source = "shipmentEquipmentID", target = "shipmentEquipmentID")
+	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
 	@Mapping(source = "isNewRecord", target = "newRecord")
-	ActiveReeferSettings dtoToActiveReeferSettings(ActiveReeferSettingsTO activeReeferSettingsTO, UUID shipmentEquipmentID, Boolean isNewRecord);
+	ActiveReeferSettings dtoToActiveReeferSettings(ActiveReeferSettingsTO activeReeferSettingsTO, UUID utilizedTransportEquipmentID, Boolean isNewRecord);
 }

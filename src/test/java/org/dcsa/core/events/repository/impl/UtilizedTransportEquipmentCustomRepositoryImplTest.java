@@ -16,22 +16,23 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Tests for custom Shipment equipment repository implementation")
-class ShipmentEquipmentCustomRepositoryImplTest {
+class UtilizedTransportEquipmentCustomRepositoryImplTest {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   DatabaseClient client;
 
   @Spy R2dbcDialect r2dbcDialect = new PostgresDialect();
 
-  @InjectMocks ShipmentEquipmentCustomRepositoryImpl shipmentEquipmentCustomRepository;
+  @InjectMocks
+  UtilizedTransportEquipmentCustomRepositoryImpl utilizedTransportEquipmentRepository;
 
   @Test
   @DisplayName(
-      "Test fetch all ShipmentEquipment with equipment for a shipmentID should generate correct query")
+      "Test fetch all UtilizedTransportEquipment with equipment for a shipmentID should generate correct query")
   void testCargoItemCustomRepositoryQuery() {
     ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
     UUID shipmentID = UUID.randomUUID();
-    shipmentEquipmentCustomRepository.findShipmentEquipmentDetailsByShipmentID(shipmentID);
+    utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);

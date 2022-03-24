@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface SealRepository extends ReactiveCrudRepository<Seal, UUID> {
-    Mono<Void> deleteAllByShipmentEquipmentID(UUID shipmentEquipmentID);
-    Flux<Seal> findAllByShipmentEquipmentID(UUID shipmentEquipmentID);
+    Mono<Void> deleteAllByUtilizedTransportEquipmentID(UUID utilizedTransportEquipmentID);
+    Flux<Seal> findAllByUtilizedTransportEquipmentID(UUID utilizedTransportEquipmentID);
 }

@@ -24,6 +24,6 @@ public class CargoItem extends AbstractCargoItem {
 
   @Column("shipment_equipment_id")
   @NotNull
-  protected UUID shipmentEquipmentID;
+  protected UUID utilizedTransportEquipmentID;
 
 }

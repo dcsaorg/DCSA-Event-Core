@@ -12,6 +12,6 @@ public interface SealMapper {
 
 	SealTO sealToDTO(Seal seal);
 
-	@Mapping(source = "shipmentEquipmentID", target = "shipmentEquipmentID")
-	Seal dtoToSeal(SealTO sealTO, UUID shipmentEquipmentID);
+	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
+	Seal dtoToSeal(SealTO sealTO, UUID utilizedTransportEquipmentID);
 }

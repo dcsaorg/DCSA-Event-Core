@@ -59,8 +59,8 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
           });
 
   @Override
-  public Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-      UUID shipmentEquipmentID) {
+  public Flux<CargoItemWithCargoLineItems> findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+      UUID utilizedTransportEquipmentID) {
 
     //	Programmatically creates the below query:
     //		SELECT ci.id, ci.description_of_goods, ci.hs_code, ci.weight, ci.volume,
@@ -71,7 +71,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     //		join dcsa_im_v3_0.cargo_line_item cli on cli.cargo_item_id = ci.id
     //		where ci.shipment_equipment_id = :shipmentEquipmentID;
 
-    Objects.requireNonNull(shipmentEquipmentID, "ShipmentEquiment must not be null");
+    Objects.requireNonNull(utilizedTransportEquipmentID, "ShipmentEquiment must not be null");
 
     Select selectJoin =
         Select.builder()
@@ -86,7 +86,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             .where(
                 Conditions.isEqual(
                     column("ci.shipment_equipment_id"),
-                     SQL.literalOf(shipmentEquipmentID.toString())))
+                     SQL.literalOf(utilizedTransportEquipmentID.toString())))
             .build();
 
     RenderContextFactory factory = new RenderContextFactory(r2dbcDialect);
@@ -169,7 +169,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             cargoItemResult.get(column("ci.shipping_instruction_id").getName().getReference())));
     cargoItemWithCargoLineItems.setPackageCode(
         String.valueOf(cargoItemResult.get(column("ci.package_code").getName().getReference())));
-    cargoItemWithCargoLineItems.setShipmentEquipmentID(
+    cargoItemWithCargoLineItems.setUtilizedTransportEquipmentID(
         UUID.fromString(
             String.valueOf(
                 cargoItemResult.get(column("ci.shipment_equipment_id").getName().getReference()))));

@@ -31,10 +31,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Test for ShipmentEquipmentService implementation")
-class ShipmentEquipmentServiceImplTest {
+@DisplayName("Test for UtilizedTransportEquipmentService implementation")
+class UtilizedTransportEquipmentServiceImplTest {
 
-  @Mock ShipmentEquipmentRepository shipmentEquipmentRepository;
+  @Mock
+  UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   @Mock EquipmentRepository equipmentRepository;
   @Mock SealRepository sealRepository;
   @Mock ActiveReeferSettingsRepository activeReeferSettingsRepository;
@@ -54,19 +55,20 @@ class ShipmentEquipmentServiceImplTest {
   @Spy EquipmentMapper equipmentMapper = Mappers.getMapper(EquipmentMapper.class);
 
   @Spy
-  ShipmentEquipmentMapper shipmentEquipmentMapper =
-      Mappers.getMapper(ShipmentEquipmentMapper.class);
+  UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper =
+      Mappers.getMapper(UtilizedTransportEquipmentMapper.class);
 
-  @InjectMocks ShipmentEquipmentServiceImpl shipmentEquipmentService;
+  @InjectMocks
+  UtilizedTransportEquipmentServiceImpl utilizedTransportEquipmentService;
 
   CargoLineItem cargoLineItem;
   CargoItem cargoItem;
   Seal seal;
   ActiveReeferSettings activeReeferSettings;
   Equipment equipment;
-  ShipmentEquipment shipmentEquipment;
+  UtilizedTransportEquipment utilizedTransportEquipment;
   Shipment shipment;
-  ShipmentEquipmentTO shipmentEquipmentTO;
+  UtilizedTransportEquipmentTO utilizedTransportEquipmentTO;
   ReferenceTO referenceTO;
 
   @BeforeEach
@@ -81,16 +83,16 @@ class ShipmentEquipmentServiceImplTest {
 
   private void initEntities(
       UUID shipmentID,
-      UUID shipmentEquipmentId,
+      UUID utilizedTransportEquipmentID,
       String equipmentReference,
       String shippingInstructionReference) {
-    shipmentEquipment = new ShipmentEquipment();
-    shipmentEquipment.setId(shipmentEquipmentId);
-    shipmentEquipment.setCargoGrossWeight(120.0F);
-    shipmentEquipment.setCargoGrossWeightUnit(WeightUnit.KGM);
-    shipmentEquipment.setShipmentID(shipmentID);
-    shipmentEquipment.setEquipmentReference(equipmentReference);
-    shipmentEquipment.setIsShipperOwned(true);
+    utilizedTransportEquipment = new UtilizedTransportEquipment();
+    utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
+    utilizedTransportEquipment.setCargoGrossWeight(120.0F);
+    utilizedTransportEquipment.setCargoGrossWeightUnit(WeightUnit.KGM);
+    utilizedTransportEquipment.setShipmentID(shipmentID);
+    utilizedTransportEquipment.setEquipmentReference(equipmentReference);
+    utilizedTransportEquipment.setIsShipperOwned(true);
 
     equipment = new Equipment();
     equipment.setEquipmentReference(equipmentReference);
@@ -99,7 +101,7 @@ class ShipmentEquipmentServiceImplTest {
     equipment.setTareWeight(120F);
 
     activeReeferSettings = new ActiveReeferSettings();
-    activeReeferSettings.setShipmentEquipmentID(shipmentEquipmentId);
+    activeReeferSettings.setUtilizedTransportEquipmentID(utilizedTransportEquipmentID);
     activeReeferSettings.setVentilationMax(10F);
     activeReeferSettings.setVentilationMin(5F);
     activeReeferSettings.setTemperatureUnit(TemperatureUnit.CEL);
@@ -110,14 +112,14 @@ class ShipmentEquipmentServiceImplTest {
 
     seal = new Seal();
     seal.setId(UUID.randomUUID());
-    seal.setShipmentEquipmentID(shipmentEquipmentId);
+    seal.setUtilizedTransportEquipmentID(utilizedTransportEquipmentID);
     seal.setSealType("BLT");
     seal.setSealSource("CAR");
     seal.setSealNumber("1");
 
     cargoItem = new CargoItem();
     cargoItem.setId(UUID.randomUUID());
-    cargoItem.setShipmentEquipmentID(shipmentEquipmentId);
+    cargoItem.setUtilizedTransportEquipmentID(utilizedTransportEquipmentID);
     cargoItem.setShippingInstructionReference(shippingInstructionReference);
     cargoItem.setPackageCode("ABC");
     cargoItem.setHsCode("testHSCode");
@@ -180,32 +182,32 @@ class ShipmentEquipmentServiceImplTest {
     equipmentTO.setTareWeight(120F);
     equipmentTO.setWeightUnit(WeightUnit.KGM);
 
-    shipmentEquipmentTO = new ShipmentEquipmentTO();
-    shipmentEquipmentTO.setCarrierBookingReference("carrierBookingReference1");
-    shipmentEquipmentTO.setCargoGrossWeight(120.0F);
-    shipmentEquipmentTO.setCargoGrossWeightUnit(WeightUnit.KGM);
-    shipmentEquipmentTO.setEquipment(equipmentTO);
-    shipmentEquipmentTO.setSeals(Collections.singletonList(sealTO));
-    shipmentEquipmentTO.setCargoItems(Collections.singletonList(cargoItemTO));
-    shipmentEquipmentTO.setActiveReeferSettings(activeReeferSettingsTO);
+    utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
+    utilizedTransportEquipmentTO.setCarrierBookingReference("carrierBookingReference1");
+    utilizedTransportEquipmentTO.setCargoGrossWeight(120.0F);
+    utilizedTransportEquipmentTO.setCargoGrossWeightUnit(WeightUnit.KGM);
+    utilizedTransportEquipmentTO.setEquipment(equipmentTO);
+    utilizedTransportEquipmentTO.setSeals(Collections.singletonList(sealTO));
+    utilizedTransportEquipmentTO.setCargoItems(Collections.singletonList(cargoItemTO));
+    utilizedTransportEquipmentTO.setActiveReeferSettings(activeReeferSettingsTO);
   }
 
   @Nested
   @DisplayName(
-      "Tests for the method createShipmentEquipment(#shipmentID, #shippingInstructionReference, #shipmentEquipments)")
-  class testCreateShipmentEquipment {
+      "Tests for the method createUtilizedTransportEquipment(#shipmentID, #shippingInstructionReference, #utilizedTransportEquipments)")
+  class testCreateUtilizedTransportEquipment {
 
     @Test
-    @DisplayName("Test create ShipmentEquipment")
-    void testCreateShipmentEquipmentService() {
+    @DisplayName("Test create UtilizedTransportEquipment")
+    void testCreateUtilizedTransportEquipmentService() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
@@ -215,20 +217,20 @@ class ShipmentEquipmentServiceImplTest {
               eq(shippingInstructionReference), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
@@ -238,31 +240,31 @@ class ShipmentEquipmentServiceImplTest {
                 verify(referenceService)
                     .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
-    @DisplayName("Test create ShipmentEquipment without ActiveReeferSettings")
-    void testCreateShipmentEquipmentWithoutActiveReeferSettings() {
+    @DisplayName("Test create UtilizedTransportEquipment without ActiveReeferSettings")
+    void testCreateUtilizedTransportEquipmentWithoutActiveReeferSettings() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
-      shipmentEquipmentTO.setActiveReeferSettings(null);
+      utilizedTransportEquipmentTO.setActiveReeferSettings(null);
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
@@ -271,18 +273,18 @@ class ShipmentEquipmentServiceImplTest {
               eq(shippingInstructionReference), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository, never()).save(any());
@@ -291,28 +293,28 @@ class ShipmentEquipmentServiceImplTest {
                 verify(referenceService)
                     .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
-    @DisplayName("Test create ShipmentEquipment without Seals")
-    void testCreateShipmentEquipmentWithoutSeals() {
+    @DisplayName("Test create UtilizedTransportEquipment without Seals")
+    void testCreateUtilizedTransportEquipmentWithoutSeals() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
-      shipmentEquipmentTO.setSeals(null);
+      utilizedTransportEquipmentTO.setSeals(null);
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
@@ -321,19 +323,19 @@ class ShipmentEquipmentServiceImplTest {
               eq(shippingInstructionReference), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+            utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository, never()).save(any());
                 verify(activeReeferSettingsRepository)
@@ -343,45 +345,45 @@ class ShipmentEquipmentServiceImplTest {
                 verify(referenceService)
                     .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
-    @DisplayName("Test create shipmentEquipment without CargoItems")
-    void testCreateShipmentEquipmentWithoutCargoItems() {
+    @DisplayName("Test create utilizedTransportEquipment without CargoItems")
+    void testCreateUtilizedTransportEquipmentWithoutCargoItems() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
-      shipmentEquipmentTO.setCargoItems(null);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
+      utilizedTransportEquipmentTO.setCargoItems(null);
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
@@ -389,49 +391,49 @@ class ShipmentEquipmentServiceImplTest {
                 verify(cargoItemRepository, never()).save(any());
                 verify(cargoLineItemRepository, never()).save(any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
-    @DisplayName("Test create shipmentEquipment without CargoLineItems")
-    void testCreateShipmentEquipmentWithoutCargoLineItems() {
+    @DisplayName("Test create utilizedTransportEquipment without CargoLineItems")
+    void testCreateUtilizedTransportEquipmentWithoutCargoLineItems() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
-      shipmentEquipmentTO
+      utilizedTransportEquipmentTO
           .getCargoItems()
           .forEach(cargoItemTO -> cargoItemTO.setCargoLineItems(null));
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
@@ -439,35 +441,35 @@ class ShipmentEquipmentServiceImplTest {
                 verify(cargoItemRepository).save(argumentCaptorCargoItem.capture());
                 verify(cargoLineItemRepository, never()).save(any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
-    @DisplayName("Test create ShipmentEquipment with multiple seals")
-    void testCreateShipmentEquipmentServiceWithMultipleSeals() {
+    @DisplayName("Test create UtilizedTransportEquipment with multiple seals")
+    void testCreateUtilizedTransportEquipmentServiceWithMultipleSeals() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
 
-      SealTO sealTO = shipmentEquipmentTO.getSeals().get(0);
-      SealTO additionalSealTO = shipmentEquipmentTO.getSeals().get(0);
+      SealTO sealTO = utilizedTransportEquipmentTO.getSeals().get(0);
+      SealTO additionalSealTO = utilizedTransportEquipmentTO.getSeals().get(0);
       List<SealTO> sealTOList = List.of(sealTO, additionalSealTO);
-      shipmentEquipmentTO.setSeals(sealTOList);
+      utilizedTransportEquipmentTO.setSeals(sealTOList);
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
@@ -477,20 +479,20 @@ class ShipmentEquipmentServiceImplTest {
               eq(shippingInstructionReference), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository, times(2)).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
@@ -500,28 +502,28 @@ class ShipmentEquipmentServiceImplTest {
                 verify(referenceService)
                     .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
 
     @Test
     @DisplayName(
-        "Test create ShipmentEquipment with multiple cargoItems and multiple cargoLineItems")
-    void testCreateShipmentEquipmentServiceWithCargoItems() {
+        "Test create UtilizedTransportEquipment with multiple cargoItems and multiple cargoLineItems")
+    void testCreateUtilizedTransportEquipmentServiceWithCargoItems() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
 
       CargoLineItemTO cargoLineItemTO1 = new CargoLineItemTO();
@@ -550,9 +552,9 @@ class ShipmentEquipmentServiceImplTest {
       cargoItemTO2.setPackageCode("def");
       cargoItemTO2.setCargoLineItems(List.of(cargoLineItemTO1));
 
-      shipmentEquipmentTO.setCargoItems(List.of(cargoItemTO1, cargoItemTO2));
+      utilizedTransportEquipmentTO.setCargoItems(List.of(cargoItemTO1, cargoItemTO2));
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
@@ -562,20 +564,20 @@ class ShipmentEquipmentServiceImplTest {
               eq(shippingInstructionReference), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
-      ArgumentCaptor<ShipmentEquipment> argumentCaptorShipmentEquipment =
-          ArgumentCaptor.forClass(ShipmentEquipment.class);
+      ArgumentCaptor<UtilizedTransportEquipment> argumentCaptorUtilizedTransportEquipment =
+          ArgumentCaptor.forClass(UtilizedTransportEquipment.class);
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       ArgumentCaptor<ActiveReeferSettings> argumentCaptorActiveReeferSettings =
           ArgumentCaptor.forClass(ActiveReeferSettings.class);
       ArgumentCaptor<Seal> argumentCaptorSeal = ArgumentCaptor.forClass(Seal.class);
       StepVerifier.create(
-              shipmentEquipmentService.createShipmentEquipment(
+              utilizedTransportEquipmentService.createUtilizedTransportEquipment(
                   shipmentID,
                   shippingInstructionReference,
-                  Collections.singletonList(shipmentEquipmentTO)))
+                  Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                verify(shipmentEquipmentRepository).save(argumentCaptorShipmentEquipment.capture());
+              utilizedTransportEquipmentTOS -> {
+                verify(utilizedTransportEquipmentRepository).save(argumentCaptorUtilizedTransportEquipment.capture());
                 verify(equipmentRepository).save(any());
                 verify(sealRepository).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
@@ -585,15 +587,15 @@ class ShipmentEquipmentServiceImplTest {
                 verify(referenceService, times(2))
                     .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
                 assertEquals(
-                    shipmentID, argumentCaptorShipmentEquipment.getValue().getShipmentID());
+                    shipmentID, argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     shippingInstructionReference,
                     argumentCaptorCargoItem.getValue().getShippingInstructionReference());
                 assertEquals(
-                    shipmentEquipmentID,
-                    argumentCaptorActiveReeferSettings.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID,
+                    argumentCaptorActiveReeferSettings.getValue().getUtilizedTransportEquipmentID());
                 assertEquals(
-                    shipmentEquipmentID, argumentCaptorSeal.getValue().getShipmentEquipmentID());
+                    utilizedTransportEquipmentID, argumentCaptorSeal.getValue().getUtilizedTransportEquipmentID());
               })
           .verifyComplete();
     }
@@ -605,38 +607,38 @@ class ShipmentEquipmentServiceImplTest {
       ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
       shippingInstructionTO.setCarrierBookingReference("CBR");
       List<String> carrierBookingReferences =
-          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+          utilizedTransportEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
       assertEquals(1, carrierBookingReferences.size());
       assertEquals("CBR", carrierBookingReferences.get(0));
     }
 
     @Test
     @DisplayName(
-        "Test getCarrierBookingReferences with carrierBookingReference on ShipmentEquipment")
-    void testGetCarrierBookingReferencesViaShipmentEquipment() {
+        "Test getCarrierBookingReferences with carrierBookingReference on UtilizedTransportEquipment")
+    void testGetCarrierBookingReferencesViaUtilizedTransportEquipment() {
       ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
-      ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
-      shipmentEquipmentTO.setCarrierBookingReference("CBR");
-      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+      UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
+      utilizedTransportEquipmentTO.setCarrierBookingReference("CBR");
+      shippingInstructionTO.setUtilizedTransportEquipments(List.of(utilizedTransportEquipmentTO));
       List<String> carrierBookingReferences =
-          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+          utilizedTransportEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
       assertEquals(1, carrierBookingReferences.size());
       assertEquals("CBR", carrierBookingReferences.get(0));
     }
 
     @Test
     @DisplayName(
-        "Test getCarrierBookingReferences with multiple carrierBookingReferences on ShipmentEquipment")
-    void testGetMultipleCarrierBookingReferencesViaShipmentEquipment() {
+        "Test getCarrierBookingReferences with multiple carrierBookingReferences on UtilizedTransportEquipment")
+    void testGetMultipleCarrierBookingReferencesViaUtilizedTransportEquipment() {
       ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
-      ShipmentEquipmentTO shipmentEquipmentTO1 = new ShipmentEquipmentTO();
-      shipmentEquipmentTO1.setCarrierBookingReference("CBR1");
-      ShipmentEquipmentTO shipmentEquipmentTO2 = new ShipmentEquipmentTO();
-      shipmentEquipmentTO2.setCarrierBookingReference("CBR2");
-      shippingInstructionTO.setShipmentEquipments(
-          List.of(shipmentEquipmentTO1, shipmentEquipmentTO2));
+      UtilizedTransportEquipmentTO utilizedTransportEquipmentTO1 = new UtilizedTransportEquipmentTO();
+      utilizedTransportEquipmentTO1.setCarrierBookingReference("CBR1");
+      UtilizedTransportEquipmentTO utilizedTransportEquipmentTO2 = new UtilizedTransportEquipmentTO();
+      utilizedTransportEquipmentTO2.setCarrierBookingReference("CBR2");
+      shippingInstructionTO.setUtilizedTransportEquipments(
+          List.of(utilizedTransportEquipmentTO1, utilizedTransportEquipmentTO2));
       List<String> carrierBookingReferences =
-          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+          utilizedTransportEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
       assertEquals(2, carrierBookingReferences.size());
       assertEquals("CBR1", carrierBookingReferences.get(0));
       assertEquals("CBR2", carrierBookingReferences.get(1));
@@ -646,27 +648,26 @@ class ShipmentEquipmentServiceImplTest {
     @DisplayName("Test getCarrierBookingReferences with no CarrierBookingReference set")
     void testGetCarrierBookingReferencesNotSet() {
       ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
-      ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
-      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+      UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
+      shippingInstructionTO.setUtilizedTransportEquipments(List.of(utilizedTransportEquipmentTO));
       List<String> carrierBookingReferences =
-          shipmentEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
+          utilizedTransportEquipmentService.getCarrierBookingReferences(shippingInstructionTO);
       assertEquals(0, carrierBookingReferences.size());
     }
 
     @Test
-    @DisplayName("Test addShipmentEquipmentToShippingInstruction")
-    void testAddShipmentEquipmentToShippingInstruction() {
-
+    @DisplayName("Test addUtilizedTransportEquipmentToShippingInstruction")
+    void testAddUtilizedTransportEquipmentToShippingInstruction() {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
-      UUID shipmentEquipmentID = UUID.randomUUID();
-      shipmentEquipment.setShipmentID(shipmentID);
-      shipmentEquipment.setId(shipmentEquipmentID);
+      UUID utilizedTransportEquipmentID = UUID.randomUUID();
+      utilizedTransportEquipment.setShipmentID(shipmentID);
+      utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionReference(shippingInstructionReference);
 
       when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
 
-      when(shipmentEquipmentRepository.save(any())).thenReturn(Mono.just(shipmentEquipment));
+      when(utilizedTransportEquipmentRepository.save(any())).thenReturn(Mono.just(utilizedTransportEquipment));
       when(equipmentRepository.save(eq(equipment))).thenReturn(Mono.just(equipment));
       when(sealRepository.save(any())).thenReturn(Mono.just(seal));
       when(activeReeferSettingsRepository.save(any())).thenReturn(Mono.just(activeReeferSettings));
@@ -678,45 +679,45 @@ class ShipmentEquipmentServiceImplTest {
 
       ShippingInstructionTO shippingInstructionTO = new ShippingInstructionTO();
       shippingInstructionTO.setShippingInstructionReference(shippingInstructionReference);
-      shippingInstructionTO.setShipmentEquipments(List.of(shipmentEquipmentTO));
+      shippingInstructionTO.setUtilizedTransportEquipments(List.of(utilizedTransportEquipmentTO));
 
       StepVerifier.create(
-              shipmentEquipmentService.addShipmentEquipmentToShippingInstruction(
-                  List.of(shipmentEquipmentTO), shippingInstructionTO))
+              utilizedTransportEquipmentService.addUtilizedTransportEquipmentToShippingInstruction(
+                  List.of(utilizedTransportEquipmentTO), shippingInstructionTO))
           .assertNext(
-              shipmentEquipmentTOS -> {
+              utilizedTransportEquipmentTOS -> {
                 assertEquals(
                     shippingInstructionReference,
                     shippingInstructionTO.getShippingInstructionReference());
                 assertEquals(
                     "carrierBookingReference1",
-                    shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    utilizedTransportEquipmentTOS.get(0).getCarrierBookingReference());
               })
           .verifyComplete();
     }
   }
 
   @Nested
-  @DisplayName("Tests for the method findShipmentEquipmentByShipmentID(#shipmentID)")
-  class testFindShipmentEquipment {
+  @DisplayName("Tests for the method findUtilizedTransportEquipmentByShipmentID(#shipmentID)")
+  class testFindUtilizedTransportEquipment {
 
-    ShipmentEquipmentCustomRepository.ShipmentEquipmentDetails shipmentEquipmentDetails;
+    UtilizedTransportEquipmentCustomRepository.UtilizedTransportEquipmentDetails utilizedTransportEquipmentDetails;
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems;
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems2;
 
     @BeforeEach
     void init() {
-      shipmentEquipmentDetails =
-          new ShipmentEquipmentCustomRepository.ShipmentEquipmentDetails(
+      utilizedTransportEquipmentDetails =
+          new UtilizedTransportEquipmentCustomRepository.UtilizedTransportEquipmentDetails(
               "CBR1",
               equipment.getEquipmentReference(),
-              shipmentEquipment.getCargoGrossWeight(),
-              shipmentEquipment.getCargoGrossWeightUnit(),
+              utilizedTransportEquipment.getCargoGrossWeight(),
+              utilizedTransportEquipment.getCargoGrossWeightUnit(),
               equipment.getIsoEquipmentCode(),
               equipment.getTareWeight(),
               equipment.getWeightUnit(),
-              shipmentEquipment.getIsShipperOwned(),
-              shipmentEquipment.getId());
+              utilizedTransportEquipment.getIsShipperOwned(),
+              utilizedTransportEquipment.getId());
 
       cargoLineItem = new CargoLineItem();
       cargoLineItem.setCargoItemID(cargoItem.getId());
@@ -725,7 +726,7 @@ class ShipmentEquipmentServiceImplTest {
 
       cargoItemWithCargoLineItems = new CargoItemCustomRepository.CargoItemWithCargoLineItems();
       cargoItemWithCargoLineItems.setCargoLineItems(List.of(cargoLineItem));
-      cargoItemWithCargoLineItems.setShipmentEquipmentID(shipmentEquipment.getId());
+      cargoItemWithCargoLineItems.setUtilizedTransportEquipmentID(utilizedTransportEquipment.getId());
       cargoItemWithCargoLineItems.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems.setVolumeUnit(cargoItem.getVolumeUnit());
@@ -740,7 +741,7 @@ class ShipmentEquipmentServiceImplTest {
       cargoItemWithCargoLineItems.setId(cargoItem.getId());
 
       cargoItemWithCargoLineItems2 = new CargoItemCustomRepository.CargoItemWithCargoLineItems();
-      cargoItemWithCargoLineItems2.setShipmentEquipmentID(shipmentEquipment.getId());
+      cargoItemWithCargoLineItems2.setUtilizedTransportEquipmentID(utilizedTransportEquipment.getId());
       cargoItemWithCargoLineItems2.setPackageCode(cargoItem.getPackageCode());
       cargoItemWithCargoLineItems2.setVolume(cargoItem.getVolume());
       cargoItemWithCargoLineItems2.setVolumeUnit(cargoItem.getVolumeUnit());
@@ -757,46 +758,46 @@ class ShipmentEquipmentServiceImplTest {
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment with all underlying objects should return full shipmentEquipment")
-    void testFindShipmentEquipment() {
+        "Test find UtilizedTransportEquipment with all underlying objects should return full utilizedTransportEquipment")
+    void testFindUtilizedTransportEquipment() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(cargoItemWithCargoLineItems));
       when(referenceService.findByCargoItemID(eq(cargoItem.getId())))
           .thenReturn(Mono.just(List.of(referenceTO)));
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(seal));
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.just(activeReeferSettings));
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(1, shipmentEquipmentTOS.size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getCargoItems().size());
+              utilizedTransportEquipmentTO -> {
+                assertEquals(1, utilizedTransportEquipmentTO.size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getCargoItems().size());
                 assertEquals(
                     1,
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getCargoLineItems().size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getCargoLineItems().size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getSeals().size());
                 assertEquals(
-                    1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    1, utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getReferences().size());
+                assertEquals("CBR1", utilizedTransportEquipmentTO.get(0).getCarrierBookingReference());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTO.get(0).getEquipment().getEquipmentReference());
                 assertEquals(
                     activeReeferSettings.getHumidityMax(),
-                    shipmentEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
+                    utilizedTransportEquipmentTO.get(0).getActiveReeferSettings().getHumidityMax());
                 assertEquals(
                     seal.getSealSource(),
-                    shipmentEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
+                    utilizedTransportEquipmentTO.get(0).getSeals().get(0).getSealSource().name());
                 assertEquals(
                     referenceTO.getReferenceValue(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -805,10 +806,10 @@ class ShipmentEquipmentServiceImplTest {
                         .getReferenceValue());
                 assertEquals(
                     cargoItem.getHsCode(),
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getHsCode());
                 assertEquals(
                     cargoLineItem.getShippingMarks(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -821,44 +822,44 @@ class ShipmentEquipmentServiceImplTest {
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment without active Reefersettings should return shipmentEquipment without active reefer settings")
-    void testFindShipmentEquipmentWithoutActiveReeferSettings() {
+        "Test find UtilizedTransportEquipment without active Reefersettings should return utilizedTransportEquipment without active reefer settings")
+    void testFindUtilizedTransportEquipmentWithoutActiveReeferSettings() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(cargoItemWithCargoLineItems));
       when(referenceService.findByCargoItemID(eq(cargoItem.getId())))
           .thenReturn(Mono.just(List.of(referenceTO)));
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(seal));
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.empty());
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(1, shipmentEquipmentTOS.size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getCargoItems().size());
+              utilizedTransportEquipmentTO -> {
+                assertEquals(1, utilizedTransportEquipmentTO.size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getCargoItems().size());
                 assertEquals(
                     1,
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getCargoLineItems().size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getCargoLineItems().size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getSeals().size());
                 assertEquals(
-                    1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    1, utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getReferences().size());
+                assertEquals("CBR1", utilizedTransportEquipmentTO.get(0).getCarrierBookingReference());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
-                assertNull(shipmentEquipmentTOS.get(0).getActiveReeferSettings());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTO.get(0).getEquipment().getEquipmentReference());
+                assertNull(utilizedTransportEquipmentTO.get(0).getActiveReeferSettings());
                 assertEquals(
                     seal.getSealSource(),
-                    shipmentEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
+                    utilizedTransportEquipmentTO.get(0).getSeals().get(0).getSealSource().name());
                 assertEquals(
                     referenceTO.getReferenceValue(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -867,10 +868,10 @@ class ShipmentEquipmentServiceImplTest {
                         .getReferenceValue());
                 assertEquals(
                     cargoItem.getHsCode(),
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getHsCode());
                 assertEquals(
                     cargoLineItem.getShippingMarks(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -883,40 +884,40 @@ class ShipmentEquipmentServiceImplTest {
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment without Seals should return shipmentEquipment without seals")
-    void testFindShipmentEquipmentWithoutSeals() {
+        "Test find UtilizedTransportEquipment without Seals should return utilizedTransportEquipment without seals")
+    void testFindUtilizedTransportEquipmentWithoutSeals() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(cargoItemWithCargoLineItems));
       when(referenceService.findByCargoItemID(eq(cargoItem.getId())))
           .thenReturn(Mono.just(List.of(referenceTO)));
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.empty());
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.just(activeReeferSettings));
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(1, shipmentEquipmentTOS.size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getCargoItems().size());
-                assertTrue(shipmentEquipmentTOS.get(0).getSeals().isEmpty());
+              utilizedTransportEquipmentTO -> {
+                assertEquals(1, utilizedTransportEquipmentTO.size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getCargoItems().size());
+                assertTrue(utilizedTransportEquipmentTO.get(0).getSeals().isEmpty());
                 assertEquals(
-                    1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    1, utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getReferences().size());
+                assertEquals("CBR1", utilizedTransportEquipmentTO.get(0).getCarrierBookingReference());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTO.get(0).getEquipment().getEquipmentReference());
                 assertEquals(
                     activeReeferSettings.getHumidityMax(),
-                    shipmentEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
+                    utilizedTransportEquipmentTO.get(0).getActiveReeferSettings().getHumidityMax());
                 assertEquals(
                     referenceTO.getReferenceValue(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -925,10 +926,10 @@ class ShipmentEquipmentServiceImplTest {
                         .getReferenceValue());
                 assertEquals(
                     cargoItem.getHsCode(),
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getHsCode());
                 assertEquals(
                     cargoLineItem.getShippingMarks(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -941,82 +942,82 @@ class ShipmentEquipmentServiceImplTest {
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment without CargoItems underlying objects should return shipmentEquipment without Cargoitems")
-    void testFindShipmentEquipmentWithoutCargoItems() {
+        "Test find UtilizedTransportEquipment without CargoItems underlying objects should return utilizedTransportEquipment without Cargoitems")
+    void testFindUtilizedTransportEquipmentthoutCargoItems() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.empty());
       verify(referenceService, never()).findByCargoItemID(any());
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(seal));
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.just(activeReeferSettings));
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(1, shipmentEquipmentTOS.size());
-                assertTrue(shipmentEquipmentTOS.get(0).getCargoItems().isEmpty());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
+              utilizedTransportEquipmentTO -> {
+                assertEquals(1, utilizedTransportEquipmentTO.size());
+                assertTrue(utilizedTransportEquipmentTO.get(0).getCargoItems().isEmpty());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getSeals().size());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTO.get(0).getEquipment().getEquipmentReference());
                 assertEquals(
                     activeReeferSettings.getHumidityMax(),
-                    shipmentEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
+                    utilizedTransportEquipmentTO.get(0).getActiveReeferSettings().getHumidityMax());
                 assertEquals(
                     seal.getSealSource(),
-                    shipmentEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
+                    utilizedTransportEquipmentTO.get(0).getSeals().get(0).getSealSource().name());
               })
           .verifyComplete();
     }
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment with multiple results should return all shipmentEquipments")
-    void testFindShipmentEquipmentMultipleResults() {
+        "Test find UtilizedTransportEquipment with multiple results should return all utilizedTransportEquipment")
+    void testFindUtilizedTransportEquipmentMultipleResults() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails, shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails, utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(cargoItemWithCargoLineItems));
       when(referenceService.findByCargoItemID(eq(cargoItem.getId())))
           .thenReturn(Mono.just(List.of(referenceTO)));
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(seal));
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.just(activeReeferSettings));
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(2, shipmentEquipmentTOS.size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getCargoItems().size());
+              utilizedTransportEquipmentTO -> {
+                assertEquals(2, utilizedTransportEquipmentTO.size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getCargoItems().size());
                 assertEquals(
                     1,
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getCargoLineItems().size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getCargoLineItems().size());
+                assertEquals(1, utilizedTransportEquipmentTO.get(0).getSeals().size());
                 assertEquals(
-                    1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    1, utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getReferences().size());
+                assertEquals("CBR1", utilizedTransportEquipmentTO.get(0).getCarrierBookingReference());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTO.get(0).getEquipment().getEquipmentReference());
                 assertEquals(
                     activeReeferSettings.getHumidityMax(),
-                    shipmentEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
+                    utilizedTransportEquipmentTO.get(0).getActiveReeferSettings().getHumidityMax());
                 assertEquals(
                     seal.getSealSource(),
-                    shipmentEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
+                    utilizedTransportEquipmentTO.get(0).getSeals().get(0).getSealSource().name());
                 assertEquals(
                     referenceTO.getReferenceValue(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -1025,10 +1026,10 @@ class ShipmentEquipmentServiceImplTest {
                         .getReferenceValue());
                 assertEquals(
                     cargoItem.getHsCode(),
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
+                    utilizedTransportEquipmentTO.get(0).getCargoItems().get(0).getHsCode());
                 assertEquals(
                     cargoLineItem.getShippingMarks(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTO
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -1041,49 +1042,49 @@ class ShipmentEquipmentServiceImplTest {
 
     @Test
     @DisplayName(
-        "Test find ShipmentEquipment with multiple CargoItems should return shipmentEquipment with multiple cargoItems")
-    void testFindShipmentEquipmentWithMultipleCargoItems() {
+        "Test find UtilizedTransportEquipment with multiple CargoItems should return utilizedTransportEquipment with multiple cargoItems")
+    void testFindUtilizedTransportEquipmentWithMultipleCargoItems() {
       UUID shipmentID = UUID.randomUUID();
 
-      when(shipmentEquipmentRepository.findShipmentEquipmentDetailsByShipmentID(eq(shipmentID)))
-          .thenReturn(Flux.just(shipmentEquipmentDetails));
-      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-              eq(shipmentEquipment.getId())))
+      when(utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(eq(shipmentID)))
+          .thenReturn(Flux.just(utilizedTransportEquipmentDetails));
+      when(cargoItemRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+              eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(cargoItemWithCargoLineItems, cargoItemWithCargoLineItems2));
       when(referenceService.findByCargoItemID(eq(cargoItem.getId())))
           .thenReturn(Mono.just(List.of(referenceTO)));
       when(referenceService.findByCargoItemID(eq(cargoItemWithCargoLineItems2.getId())))
           .thenReturn(Mono.empty());
-      when(sealRepository.findAllByShipmentEquipmentID(eq(shipmentEquipment.getId())))
+      when(sealRepository.findAllByUtilizedTransportEquipmentID(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Flux.just(seal));
-      when(activeReeferSettingsRepository.findById(eq(shipmentEquipment.getId())))
+      when(activeReeferSettingsRepository.findById(eq(utilizedTransportEquipment.getId())))
           .thenReturn(Mono.just(activeReeferSettings));
 
-      StepVerifier.create(shipmentEquipmentService.findShipmentEquipmentByShipmentID(shipmentID))
+      StepVerifier.create(utilizedTransportEquipmentService.findUtilizedTransportEquipmentByShipmentID(shipmentID))
           .assertNext(
-              shipmentEquipmentTOS -> {
-                assertEquals(1, shipmentEquipmentTOS.size());
-                assertEquals(2, shipmentEquipmentTOS.get(0).getCargoItems().size());
+              utilizedTransportEquipmentTOS -> {
+                assertEquals(1, utilizedTransportEquipmentTOS.size());
+                assertEquals(2, utilizedTransportEquipmentTOS.get(0).getCargoItems().size());
                 assertEquals(
                     1,
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getCargoLineItems().size());
-                assertEquals(1, shipmentEquipmentTOS.get(0).getSeals().size());
+                    utilizedTransportEquipmentTOS.get(0).getCargoItems().get(0).getCargoLineItems().size());
+                assertEquals(1, utilizedTransportEquipmentTOS.get(0).getSeals().size());
                 assertEquals(
-                    1, shipmentEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
-                assertNull(shipmentEquipmentTOS.get(0).getCargoItems().get(1).getReferences());
-                assertEquals("CBR1", shipmentEquipmentTOS.get(0).getCarrierBookingReference());
+                    1, utilizedTransportEquipmentTOS.get(0).getCargoItems().get(0).getReferences().size());
+                assertNull(utilizedTransportEquipmentTOS.get(0).getCargoItems().get(1).getReferences());
+                assertEquals("CBR1", utilizedTransportEquipmentTOS.get(0).getCarrierBookingReference());
                 assertEquals(
-                    shipmentEquipment.getEquipmentReference(),
-                    shipmentEquipmentTOS.get(0).getEquipment().getEquipmentReference());
+                    utilizedTransportEquipment.getEquipmentReference(),
+                    utilizedTransportEquipmentTOS.get(0).getEquipment().getEquipmentReference());
                 assertEquals(
                     activeReeferSettings.getHumidityMax(),
-                    shipmentEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
+                    utilizedTransportEquipmentTOS.get(0).getActiveReeferSettings().getHumidityMax());
                 assertEquals(
                     seal.getSealSource(),
-                    shipmentEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
+                    utilizedTransportEquipmentTOS.get(0).getSeals().get(0).getSealSource().name());
                 assertEquals(
                     referenceTO.getReferenceValue(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTOS
                         .get(0)
                         .getCargoItems()
                         .get(0)
@@ -1092,10 +1093,10 @@ class ShipmentEquipmentServiceImplTest {
                         .getReferenceValue());
                 assertEquals(
                     cargoItem.getHsCode(),
-                    shipmentEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
+                    utilizedTransportEquipmentTOS.get(0).getCargoItems().get(0).getHsCode());
                 assertEquals(
                     cargoLineItem.getShippingMarks(),
-                    shipmentEquipmentTOS
+                    utilizedTransportEquipmentTOS
                         .get(0)
                         .getCargoItems()
                         .get(0)

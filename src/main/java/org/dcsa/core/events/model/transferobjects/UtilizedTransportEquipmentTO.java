@@ -3,7 +3,7 @@ package org.dcsa.core.events.model.transferobjects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.AbstractShipmentEquipment;
+import org.dcsa.core.events.model.AbstractUtilizedTransportEquipment;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ShipmentEquipmentTO extends AbstractShipmentEquipment {
+public class UtilizedTransportEquipmentTO extends AbstractUtilizedTransportEquipment {
 
   @Size(max = 35)
   private String carrierBookingReference;

@@ -2,7 +2,7 @@ package org.dcsa.core.events.repository.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.enums.WeightUnit;
-import org.dcsa.core.events.repository.ShipmentEquipmentCustomRepository;
+import org.dcsa.core.events.repository.UtilizedTransportEquipmentCustomRepository;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import org.springframework.data.relational.core.dialect.RenderContextFactory;
 import org.springframework.data.relational.core.sql.*;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentCustomRepository {
+public class UtilizedTransportEquipmentCustomRepositoryImpl implements UtilizedTransportEquipmentCustomRepository {
 
   private final R2dbcDialect r2dbcDialect;
   private final DatabaseClient client;
@@ -25,7 +25,7 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
   private static final Table SHIPMENT_TABLE = Table.create("shipment");
 
   @Override
-  public Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(UUID shipmentID) {
+  public Flux<UtilizedTransportEquipmentDetails> findUtilizedTransportEquipmentDetailsByShipmentID(UUID shipmentID) {
     // creates the following query programmatically
     // select se.id,se.shipment_id,se.equipment_reference,se.cargo_gross_weight,
     // se.cargo_gross_weight_unit,se.is_shipper_owned,e.iso_equipment_code,e.tare_weight,
@@ -55,7 +55,7 @@ public class ShipmentEquipmentCustomRepositoryImpl implements ShipmentEquipmentC
         .sql(sqlRenderer.render(selectJoin))
         .map(
             row ->
-                new ShipmentEquipmentDetails(
+                new UtilizedTransportEquipmentDetails(
                     row.get(
                         queryColumnMap().get("carrierBookingReference").getReferenceName().getReference(),
                         String.class),
