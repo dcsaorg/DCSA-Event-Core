@@ -18,8 +18,7 @@ public enum LocationType {
   RTP("Requested transshipment port"),
   FCD("Full container drop-off location"),
   ECP("Empty container pick-up date and time"),
-  IPA("IPA Invoice payable at"),
-  FDE("Final destination");
+  IPA("IPA Invoice payable at");
 
   private final String value;
 
