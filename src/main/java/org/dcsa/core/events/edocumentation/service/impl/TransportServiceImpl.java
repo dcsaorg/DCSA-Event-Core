@@ -94,7 +94,7 @@ public class TransportServiceImpl implements TransportService {
         .switchIfEmpty(
             Mono.error(
                 ConcreteRequestErrorMessageException.notFound(
-                    "C not find a Transport event")))
+                    "Can not find a Transport event")))
         .flatMap(
             x ->
                 Mono.zip(
