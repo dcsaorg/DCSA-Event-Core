@@ -54,6 +54,8 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                   utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
               utilizedTransportEquipmentTO.setCargoGrossWeight(
                   utilizedTransportEquipmentDetails.getCargoGrossWeight());
+              utilizedTransportEquipmentTO.setIsShipperOwned(
+                utilizedTransportEquipmentDetails.getIsShipperOwned());
               return Mono.when(
                       cargoItemRepository
                           .findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
