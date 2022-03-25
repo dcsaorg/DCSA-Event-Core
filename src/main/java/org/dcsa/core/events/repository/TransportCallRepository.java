@@ -25,18 +25,18 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
 
     @Query("SELECT DISTINCT transport_document.transport_document_reference from transport_document transport_document"
             + " JOIN cargo_item cargo_item ON cargo_item.shipping_instruction_id = transport_document.shipping_instruction_id"
-            + " JOIN shipment_equipment shipment_equipment ON shipment_equipment.id = cargo_item.shipment_equipment_id"
-            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = shipment_equipment.shipment_id"
+            + " JOIN utilized_transport_equipment utilized_transport_equipment ON utilized_transport_equipment.id = cargo_item.utilized_transport_equipment_id"
+            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = utilized_transport_equipment.shipment_id"
             + " JOIN transport transport ON transport.id = shipment_transport.transport_id"
             + " WHERE transport.load_transport_call_id = :transportCallID"
             + " OR transport.discharge_transport_call_id = :transportCallID")
     Flux<String> findTransportDocumentReferencesByTransportCallID(String transportCallID);
 
     @Query("SELECT DISTINCT seal.* FROM seal"
-            + " JOIN shipment_equipment shipment_equipment ON shipment_equipment.id = seal.shipment_equipment_id"
-            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = shipment_equipment.shipment_id"
+            + " JOIN utilized_transport_equipment utilized_transport_equipment ON utilized_transport_equipment.id = seal.utilized_transport_equipment_id"
+            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = utilized_transport_equipment.shipment_id"
             + " JOIN transport transport ON transport.id = shipment_transport.transport_id"
-            + " WHERE shipment_equipment.equipment_reference = :equipmentReference"
+            + " WHERE utilized_transport_equipment.equipment_reference = :equipmentReference"
             + " AND (transport.load_transport_call_id = :transportCallID OR transport.discharge_transport_call_id = :transportCallID)")
     Flux<Seal> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference);
 

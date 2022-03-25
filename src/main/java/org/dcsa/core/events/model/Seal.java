@@ -24,7 +24,7 @@ public class Seal extends AuditBase {
     private UUID id;
 
     @JsonIgnore
-    @Column("shipment_equipment_id")
+    @Column("utilized_transport_equipment_id")
     @NotNull
     private UUID utilizedTransportEquipmentID;
 

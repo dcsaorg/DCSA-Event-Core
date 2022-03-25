@@ -20,26 +20,26 @@ public class UtilizedTransportEquipmentCustomRepositoryImpl implements UtilizedT
   private final R2dbcDialect r2dbcDialect;
   private final DatabaseClient client;
 
-  private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
+  private static final Table UTILIZED_TRANSPORT_EQUIPMENT_TABLE = Table.create("utilized_transport_equipment");
   private static final Table EQUIPMENT_TABLE = Table.create("equipment");
   private static final Table SHIPMENT_TABLE = Table.create("shipment");
 
   @Override
   public Flux<UtilizedTransportEquipmentDetails> findUtilizedTransportEquipmentDetailsByShipmentID(UUID shipmentID) {
     // creates the following query programmatically
-    // select se.id,se.shipment_id,se.equipment_reference,se.cargo_gross_weight,
-    // se.cargo_gross_weight_unit,se.is_shipper_owned,e.iso_equipment_code,e.tare_weight,
+    // select ute.id,se.shipment_id,ute.equipment_reference,ute.cargo_gross_weight,
+    // ute.cargo_gross_weight_unit,ute.is_shipper_owned,e.iso_equipment_code,e.tare_weight,
     // e.weight_unit
-    // from dcsa_im_v3_0.shipment_equipment se
-    // join dcsa_im_v3_0.equipmente on e.equipment_reference=se.equipment_reference
-    // where se.equipment_reference=:equipment_reference
+    // from dcsa_im_v3_0.utilized_transport_equipment ute
+    // join dcsa_im_v3_0.equipment e on e.equipment_reference=ute.equipment_reference
+    // where ute.equipment_reference=:equipment_reference
 
     Select selectJoin =
         Select.builder()
             .select(queryColumnMap().values())
-            .from(SHIPMENT_EQUIPMENT_TABLE)
+            .from(UTILIZED_TRANSPORT_EQUIPMENT_TABLE)
             .join(EQUIPMENT_TABLE)
-            .on(queryColumnMap().get("seEquipmentReference"))
+            .on(queryColumnMap().get("uteEquipmentReference"))
             .equals(queryColumnMap().get("eEquipmentReference"))
             .join(SHIPMENT_TABLE)
             .on(queryColumnMap().get("shipmentId"))
@@ -60,7 +60,7 @@ public class UtilizedTransportEquipmentCustomRepositoryImpl implements UtilizedT
                         queryColumnMap().get("carrierBookingReference").getReferenceName().getReference(),
                         String.class),
                     row.get(
-                        queryColumnMap().get("seEquipmentReference").getReferenceName().getReference(),
+                        queryColumnMap().get("uteEquipmentReference").getReferenceName().getReference(),
                         String.class),
                     row.get(
                         queryColumnMap().get("cargoGrossWeight").getReferenceName().getReference(),
@@ -85,21 +85,21 @@ public class UtilizedTransportEquipmentCustomRepositoryImpl implements UtilizedT
 
   private Map<String, Column> queryColumnMap() {
     Map<String, Column> selectedColumns = new HashMap<>();
-    selectedColumns.put("id", Column.create("id", SHIPMENT_EQUIPMENT_TABLE));
+    selectedColumns.put("id", Column.create("id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
     selectedColumns.put(
-        "seEquipmentReference", Column.create("equipment_reference", SHIPMENT_EQUIPMENT_TABLE));
+        "uteEquipmentReference", Column.create("equipment_reference", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
     selectedColumns.put(
         "eEquipmentReference", Column.create("equipment_reference", EQUIPMENT_TABLE));
-    selectedColumns.put("shipmentId", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE).as("shipmentId"));
+    selectedColumns.put("shipmentId", Column.create("shipment_id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE).as("shipmentId"));
     selectedColumns.put("sShipmentId", Column.create("id", SHIPMENT_TABLE).as("sShipmentId"));
     selectedColumns.put(
         "carrierBookingReference", Column.create("carrier_booking_reference", SHIPMENT_TABLE));
     selectedColumns.put(
-        "cargoGrossWeight", Column.create("cargo_gross_weight", SHIPMENT_EQUIPMENT_TABLE));
+        "cargoGrossWeight", Column.create("cargo_gross_weight", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
     selectedColumns.put(
-        "cargoGrossWeightUnit", Column.create("cargo_gross_weight_unit", SHIPMENT_EQUIPMENT_TABLE));
+        "cargoGrossWeightUnit", Column.create("cargo_gross_weight_unit", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
     selectedColumns.put(
-        "isShipperOwned", Column.create("is_shipper_owned", SHIPMENT_EQUIPMENT_TABLE));
+        "isShipperOwned", Column.create("is_shipper_owned", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
     selectedColumns.put("isoEquipmentCode", Column.create("iso_equipment_code", EQUIPMENT_TABLE));
     selectedColumns.put("tareWeight", Column.create("tare_weight", EQUIPMENT_TABLE));
     selectedColumns.put("weightUnit", Column.create("weight_unit", EQUIPMENT_TABLE));
