@@ -1,6 +1,7 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
+import org.dcsa.core.events.model.enums.CargoGrossVolume;
 import org.dcsa.core.events.model.enums.CargoGrossWeight;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -31,6 +32,15 @@ public class Commodity {
 
   @Column("cargo_gross_weight_unit")
   private CargoGrossWeight cargoGrossWeightUnit;
+
+  @Column("cargo_gross_volume")
+  private int cargoGrossVolume;
+
+  @Column("cargo_gross_volume_unit")
+  private CargoGrossVolume cargoGrossVolumeUnit;
+
+  @Column("number_of_packages")
+  private int numberOfPackages;
 
   @Column("export_license_issue_date")
   private LocalDate exportLicenseIssueDate;
