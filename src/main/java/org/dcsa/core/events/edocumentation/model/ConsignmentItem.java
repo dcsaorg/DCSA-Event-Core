@@ -1,8 +1,8 @@
 package org.dcsa.core.events.edocumentation.model;
 
 import lombok.Data;
-import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO;
-import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO.VolumeUnit;
+import org.dcsa.core.events.model.enums.VolumeUnit;
+import org.dcsa.core.events.model.enums.WeightUnit;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -30,7 +30,7 @@ public class ConsignmentItem {
   @NotNull
   @Size(max = 100)
   @Column("shipping_instruction_id")
-  private String shippingInstructionReference;
+  private String shippingInstructionID;
 
   @NotNull
   @Column("weight")
@@ -38,7 +38,7 @@ public class ConsignmentItem {
 
   @NotNull
   @Column("weight_unit")
-  private ConsignmentItemTO.WeightUnit weightUnit;
+  private WeightUnit weightUnit;
 
   @Column("volume")
   private Double volume;
@@ -48,5 +48,5 @@ public class ConsignmentItem {
 
   @NotNull
   @Column("shipment_id")
-  private UUID shipmentId;
+  private UUID shipmentID;
 }
