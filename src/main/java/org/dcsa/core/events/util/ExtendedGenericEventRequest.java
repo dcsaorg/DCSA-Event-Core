@@ -51,20 +51,25 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "shipping_instruction_id";
     private static final String TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME = "transport_document_reference";
 
-    private static final TableLike EVENT_CARRIER_BOOKING_REFERENCE_TABLE = Table.create("event_carrier_booking_reference");
+    private static final TableLike EVENT_CARRIER_BOOKING_REFERENCE_TABLE = Table.create("event_shipment");
     private static final String DOCUMENT_ID_COLUMN = "document_id";
     private static final String LINK_TYPE_COLUMN = "link_type";
 
+    private static final String SHIPMENT_TABLE_ID_COLUMN = "id";
+    private static final String EVENT_SHIPMENT_SHIPMENT_TABLE_ID_COLUMN = "shipment_id";
+
     private static final String TRANSPORT_CALL_ID_COLUMN = "transport_call_id";
-    private static final String CARRIER_BOOKING_REFERENCE_COLUMN = "carrier_booking_reference";
     private static final String CARRIER_BOOKING_REFERENCE_JSON_NAME = "carrierBookingReference";
     private static final String BOOKING_REFERENCE_JSON_NAME = "bookingReference";
+    private static final String CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME = "carrierBookingRequestReference";
 
     private static final Set<String> JSON_FIELDS_REQUIRING_DISTINCT = Set.of(
             TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
             TRANSPORT_DOCUMENT_ID_JSON_NAME,
             TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,
-            VESSEL_IMO_NUMBER_JSON_NAME
+            VESSEL_IMO_NUMBER_JSON_NAME,
+            CARRIER_BOOKING_REFERENCE_JSON_NAME,
+            CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME
     );
 
     private static final String EVENT_TYPE_FIELD_NAME;
@@ -184,8 +189,14 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
           .or()
           .onEquals(LINK_TYPE_COLUMN, LINK_TYPE_COLUMN)
           .and().onEqualsThen(DOCUMENT_ID_COLUMN, DOCUMENT_ID_COLUMN)
-          .registerQueryField(SqlIdentifier.unquoted(CARRIER_BOOKING_REFERENCE_COLUMN), CARRIER_BOOKING_REFERENCE_JSON_NAME, String.class)
-          .registerQueryFieldAlias(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME);
+          .chainJoin(Shipment.class)
+          // Since the LHS is a Table (and not a class) we cannot use onFieldEqualsThen
+          .onEqualsThen(EVENT_SHIPMENT_SHIPMENT_TABLE_ID_COLUMN, SHIPMENT_TABLE_ID_COLUMN)
+          .registerQueryFieldFromFieldThen(CARRIER_BOOKING_REFERENCE_JSON_NAME)
+          .registerQueryFieldAliasThen(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME)
+          .chainJoin(Booking.class)
+          .onFieldEqualsThen("bookingID", "id")
+          .registerQueryFieldFromField(CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME);
     }
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder) {
