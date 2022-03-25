@@ -23,7 +23,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
 
   private static final Table CARGO_ITEM_TABLE = Table.create("cargo_item");
   private static final Table CARGO_LINE_ITEM_TABLE = Table.create("cargo_line_item");
-  private static final Table SHIPMENT_EQUIPMENT_TABLE = Table.create("shipment_equipment");
+  private static final Table UTILIZED_TRANSPORT_EQUIPMENT_TABLE = Table.create("utilized_transport_equipment");
 
   // We need a LinkedHashMap because the test case relies on the order of values()
   private static final Map<String, Column> QUERY_COLUMN_MAP =
@@ -45,10 +45,10 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
                   Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
               put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
               put(
-                  "ci.shipment_equipment_id",
-                  Column.create("shipment_equipment_id", CARGO_ITEM_TABLE));
-              put("se.id", Column.create("id", SHIPMENT_EQUIPMENT_TABLE));
-              put("se.shipment_id", Column.create("shipment_id", SHIPMENT_EQUIPMENT_TABLE));
+                  "ci.utilized_transport_equipment_id",
+                  Column.create("utilized_transport_equipment_id", CARGO_ITEM_TABLE));
+              put("ute.id", Column.create("id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
+              put("ute.shipment_id", Column.create("shipment_id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
               put(
                   "cli.cargo_line_item_id",
                   Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
@@ -65,11 +65,11 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     //	Programmatically creates the below query:
     //		SELECT ci.id, ci.description_of_goods, ci.hs_code, ci.weight, ci.volume,
     // ci.weight_unit, ci.volume_unit, ci.number_of_packages, ci.shipping_instruction_id,
-    //		ci.package_code, ci.shipment_equipment_id, cli.cargo_line_item_id, cli.shipping_marks,
+    //		ci.package_code, ci.utilized_transport_equipment_id, cli.cargo_line_item_id, cli.shipping_marks,
     // cli.id
     //		FROM dcsa_im_v3_0.cargo_item ci
     //		join dcsa_im_v3_0.cargo_line_item cli on cli.cargo_item_id = ci.id
-    //		where ci.shipment_equipment_id = :shipmentEquipmentID;
+    //		where ci.utilized_transport_equipment_id = :shipmentEquipmentID;
 
     Objects.requireNonNull(utilizedTransportEquipmentID, "utilizedTransportEquipmentID must not be null");
 
@@ -80,12 +80,12 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
             .join(CARGO_LINE_ITEM_TABLE)
             .on(column("cli.cargo_item_id"))
             .equals(column("ci.id"))
-            .join(SHIPMENT_EQUIPMENT_TABLE)
-            .on(column("ci.shipment_equipment_id"))
-            .equals(column("se.id"))
+            .join(UTILIZED_TRANSPORT_EQUIPMENT_TABLE)
+            .on(column("ci.utilized_transport_equipment_id"))
+            .equals(column("ute.id"))
             .where(
                 Conditions.isEqual(
-                    column("ci.shipment_equipment_id"),
+                    column("ci.utilized_transport_equipment_id"),
                      SQL.literalOf(utilizedTransportEquipmentID.toString())))
             .build();
 
@@ -172,7 +172,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     cargoItemWithCargoLineItems.setUtilizedTransportEquipmentID(
         UUID.fromString(
             String.valueOf(
-                cargoItemResult.get(column("ci.shipment_equipment_id").getName().getReference()))));
+                cargoItemResult.get(column("ci.utilized_transport_equipment_id").getName().getReference()))));
     cargoItemWithCargoLineItems.setCargoLineItems(cargoLineItems);
 
     return cargoItemWithCargoLineItems;

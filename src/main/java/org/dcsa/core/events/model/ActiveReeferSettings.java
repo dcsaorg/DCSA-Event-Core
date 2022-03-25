@@ -19,7 +19,7 @@ public class ActiveReeferSettings implements Persistable<UUID> {
 
     @Id
     /* We do not show this in JSON as it is an internal detail */
-    @Column("shipment_equipment_id")
+    @Column("utilized_transport_equipment_id")
     private UUID utilizedTransportEquipmentID;
 
     @Transient

@@ -37,13 +37,13 @@ class UtilizedTransportEquipmentCustomRepositoryImplTest {
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
-        "SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id AS shipmentId, "
-            + "shipment_equipment.cargo_gross_weight, shipment.id AS sShipmentId, shipment_equipment.is_shipper_owned, "
-            + "equipment.iso_equipment_code, shipment_equipment.id, shipment_equipment.equipment_reference, "
-            + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM shipment_equipment "
-            + "JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference "
-            + "JOIN shipment ON shipment_equipment.shipment_id = shipment.id "
-            + "WHERE shipment_equipment.shipment_id = '"
+        "SELECT equipment.equipment_reference, utilized_transport_equipment.cargo_gross_weight_unit, utilized_transport_equipment.shipment_id AS shipmentId, "
+            + "utilized_transport_equipment.cargo_gross_weight, shipment.id AS sShipmentId, utilized_transport_equipment.is_shipper_owned, "
+            + "equipment.iso_equipment_code, utilized_transport_equipment.id, utilized_transport_equipment.equipment_reference, "
+            + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM utilized_transport_equipment "
+            + "JOIN equipment ON utilized_transport_equipment.equipment_reference = equipment.equipment_reference "
+            + "JOIN shipment ON utilized_transport_equipment.shipment_id = shipment.id "
+            + "WHERE utilized_transport_equipment.shipment_id = '"
             + shipmentID
             + "'";
     Assertions.assertEquals(expectedQuery, executedQuery);

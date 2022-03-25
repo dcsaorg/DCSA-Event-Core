@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 
-@Table("shipment_equipment")
+@Table("utilized_transport_equipment")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

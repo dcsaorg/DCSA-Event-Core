@@ -21,8 +21,8 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "JOIN shipment_equipment se ON s.id = se.shipment_id "
-          + "JOIN cargo_item ci ON se.id = ci.shipment_equipment_id "
+          + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
+          + "JOIN cargo_item ci ON ute.id = ci.utilized_transport_equipment_id "
           + "JOIN shipping_instruction si ON ci.shipping_instruction_id = si.id "
           + "JOIN transport_document td ON si.id = td.shipping_instruction_id "
           + "WHERE td.transport_document_reference = :transportDocumentRef")
@@ -31,8 +31,8 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
           + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "JOIN shipment_equipment se ON s.id = se.shipment_id "
-          + "JOIN cargo_item ci ON se.id = ci.shipment_equipment_id "
+          + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
+          + "JOIN cargo_item ci ON ute.id = ci.utilized_transport_equipment_id "
           + "WHERE ci.shipping_instruction_id = :shippingInstructionReference")
   Flux<String> findCarrierBookingRefsByShippingInstructionReference(String shippingInstructionReference);
 
@@ -77,8 +77,8 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.* FROM shipping_instruction si "
           + "JOIN cargo_item ci ON ci.shipping_instruction_id = si.id "
-          + "JOIN shipment_equipment se ON se.id = ci.shipment_equipment_id "
-          + "JOIN shipment s ON s.id = se.shipment_id "
+          + "JOIN utilized_transport_equipment ute ON ute.id = ci.utilized_transport_equipment_id "
+          + "JOIN shipment s ON s.id = ute.shipment_id "
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE si.id = :shippingInstructionReference")
   Flux<Booking> findAllByShippingInstructionReference(String shippingInstructionReference);

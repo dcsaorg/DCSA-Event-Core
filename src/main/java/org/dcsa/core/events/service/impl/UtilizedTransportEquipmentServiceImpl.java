@@ -214,7 +214,7 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
     return List.of(shippingInstructionTO.getCarrierBookingReference());
   }
 
-  // Returns Flux of Tuples of utilizedTransportEquipmentID and ShipmentEquipmentTO
+  // Returns Flux of Tuples of utilizedTransportEquipmentID and UtilizedEquipmentTO
   private Flux<Tuple2<UUID, UtilizedTransportEquipmentTO>> saveUtilizedTransportEquipment(
       UUID shipmentID, List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOList) {
 
