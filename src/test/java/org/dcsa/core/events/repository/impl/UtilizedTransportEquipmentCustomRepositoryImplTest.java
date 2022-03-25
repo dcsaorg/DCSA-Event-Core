@@ -16,28 +16,29 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Tests for custom Shipment equipment repository implementation")
-class ShipmentEquipmentCustomRepositoryImplTest {
+class UtilizedTransportEquipmentCustomRepositoryImplTest {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   DatabaseClient client;
 
   @Spy R2dbcDialect r2dbcDialect = new PostgresDialect();
 
-  @InjectMocks ShipmentEquipmentCustomRepositoryImpl shipmentEquipmentCustomRepository;
+  @InjectMocks
+  UtilizedTransportEquipmentCustomRepositoryImpl utilizedTransportEquipmentRepository;
 
   @Test
   @DisplayName(
-      "Test fetch all ShipmentEquipment with equipment for a shipmentID should generate correct query")
+      "Test fetch all UtilizedTransportEquipment with equipment for a shipmentID should generate correct query")
   void testCargoItemCustomRepositoryQuery() {
     ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
     UUID shipmentID = UUID.randomUUID();
-    shipmentEquipmentCustomRepository.findShipmentEquipmentDetailsByShipmentID(shipmentID);
+    utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
-        "SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id, "
-            + "shipment_equipment.cargo_gross_weight, shipment.id, shipment_equipment.is_shipper_owned, "
+        "SELECT equipment.equipment_reference, shipment_equipment.cargo_gross_weight_unit, shipment_equipment.shipment_id AS shipmentId, "
+            + "shipment_equipment.cargo_gross_weight, shipment.id AS sShipmentId, shipment_equipment.is_shipper_owned, "
             + "equipment.iso_equipment_code, shipment_equipment.id, shipment_equipment.equipment_reference, "
             + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM shipment_equipment "
             + "JOIN equipment ON shipment_equipment.equipment_reference = equipment.equipment_reference "

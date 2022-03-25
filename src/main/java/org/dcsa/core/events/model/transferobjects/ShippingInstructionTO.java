@@ -23,10 +23,9 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
 
   private LocationTO placeOfIssue;
 
-  @JsonProperty("utilizedTransportEquipments")
   @Valid
   @NotEmpty
-  private List<ShipmentEquipmentTO> shipmentEquipments;
+  private List<UtilizedTransportEquipmentTO> utilizedTransportEquipments;
 
   @Valid private List<DocumentPartyTO> documentParties;
 
@@ -37,21 +36,21 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
   private List<ShipmentTO> shipments;
 
   /**
-   * Pull the carrierBookingReference from shipmentEquipments into the ShippingInstruction if
+   * Pull the carrierBookingReference from utilizedTransportEquipments into the ShippingInstruction if
    * possible
    *
-   * <p>If the ShipmentEquipments all have the same carrierBookingReference, the value is moved up
-   * to this ShippingInstruction and cleared from the ShipmentEquipments.
+   * <p>If the UtilizedTransportEquipments all have the same carrierBookingReference, the value is moved up
+   * to this ShippingInstruction and cleared from the UtilizedTransportEquipments.
    *
    * <p>This is useful on output to "prettify" the resulting ShippingInstruction to avoid
-   * unnecessary "per ShipmentEquipment" carrier booking references. The method is idempotent.
+   * unnecessary "per UtilizedTransportEquipment" carrier booking references. The method is idempotent.
    *
    * <p>This is more or less the logical opposite of {@link
-   * #pushCarrierBookingReferenceIntoShipmentEquipmentIfNecessary()}.
+   * #pushCarrierBookingReferenceIntoUtilizedTransportEquipmentIfNecessary()}.
    *
    * @throws IllegalStateException If the ShippingInstruction already has a carrierBookingReference
    *     and it is not exactly the same as it would get after this call.
-   * @throws NullPointerException If one or more ShipmentEquipmentTO had a null
+   * @throws NullPointerException If one or more UtilizedTransportEquipmentTO had a null
    *     carrierBookingReference AND one or more of them had a non-null carrierBookingReference.
    *     (I.e. either they all must have a carrierBookingReference or none of them can have one).
    */
@@ -60,12 +59,12 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
 
     String actualCentralBookingReference = this.getCarrierBookingReference();
     String possibleCentralBookingReference =
-        shipmentEquipments.isEmpty()
+        utilizedTransportEquipments.isEmpty()
             ? null
-            : shipmentEquipments.get(0).getCarrierBookingReference();
+            : utilizedTransportEquipments.get(0).getCarrierBookingReference();
     Boolean allNull = null;
-    for (ShipmentEquipmentTO shipmentEquipmentTO : shipmentEquipments) {
-      String cargoBookingReference = shipmentEquipmentTO.getCarrierBookingReference();
+    for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO : utilizedTransportEquipments) {
+      String cargoBookingReference = utilizedTransportEquipmentTO.getCarrierBookingReference();
       if (cargoBookingReference == null) {
         if (allNull == Boolean.FALSE) {
           throw new NullPointerException(
@@ -95,48 +94,48 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
     }
     if (possibleCentralBookingReference != null) {
       // Hoist up the booking reference to the SI since it is the same on all items.
-      for (ShipmentEquipmentTO shipmentEquipmentTO : shipmentEquipments) {
-        shipmentEquipmentTO.setCarrierBookingReference(null);
+      for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO : utilizedTransportEquipments) {
+        utilizedTransportEquipmentTO.setCarrierBookingReference(null);
       }
       this.setCarrierBookingReference(possibleCentralBookingReference);
     }
   }
 
   /**
-   * Pushes the carrierBookingReference to shipmentEquipment and clears it if it is not null
+   * Pushes the carrierBookingReference to utilizedTransportEquipment and clears it if it is not null
    *
    * <p>This is useful on input to "normalize" the ShippingInstruction so the code can always assume
-   * that the booking reference will appear on the ShipmentEquipment. The method is idempotent.
+   * that the booking reference will appear on the UtilizedTransportEquipment. The method is idempotent.
    *
    * <p>This is more or less the logical opposite of {@link
    * #hoistCarrierBookingReferenceIfPossible()}.
    *
-   * @throws IllegalStateException If the ShippingInstruction and one of its ShipmentEquipment both
+   * @throws IllegalStateException If the ShippingInstruction and one of its UtilizedTransportEquipment both
    *     have a non-null carrierBookingReference.
    */
   @JsonIgnore
-  public void pushCarrierBookingReferenceIntoShipmentEquipmentIfNecessary() {
-    if (this.carrierBookingReference != null && this.shipmentEquipments == null) return;
+  public void pushCarrierBookingReferenceIntoUtilizedTransportEquipmentIfNecessary() {
+    if (this.carrierBookingReference != null && this.utilizedTransportEquipments == null) return;
 
     if (this.carrierBookingReference == null
-        && (this.shipmentEquipments == null
-            || this.shipmentEquipments.stream()
+        && (this.utilizedTransportEquipments == null
+            || this.utilizedTransportEquipments.stream()
                 .allMatch(
-                    shipmentEquipmentTO ->
-                        shipmentEquipmentTO.getCarrierBookingReference() == null))) {
+                    utilizedTransportEquipmentTO ->
+                        utilizedTransportEquipmentTO.getCarrierBookingReference() == null))) {
       throw new IllegalStateException(
-          "CarrierBookingReference needs to be defined on either ShippingInstruction or ShipmentEquipmentTO level.");
+          "CarrierBookingReference needs to be defined on either ShippingInstruction or UtilizedTransportEquipment level.");
     }
 
     String centralBookingReference = this.getCarrierBookingReference();
     if (centralBookingReference != null) {
-      for (ShipmentEquipmentTO shipmentEquipmentTO : this.shipmentEquipments) {
-        String ShipmentEquipmentBookingReference = shipmentEquipmentTO.getCarrierBookingReference();
-        if (ShipmentEquipmentBookingReference != null) {
+      for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO : this.utilizedTransportEquipments) {
+        String utilizedTransportEquipmentBookingReference = utilizedTransportEquipmentTO.getCarrierBookingReference();
+        if (utilizedTransportEquipmentBookingReference != null) {
           throw new IllegalStateException(
-              "CarrierBookingReference defined on both ShippingInstruction and ShipmentEquipmentTO level.");
+              "CarrierBookingReference defined on both ShippingInstruction and UtilizedTransportEquipment level.");
         }
-        shipmentEquipmentTO.setCarrierBookingReference(centralBookingReference);
+        utilizedTransportEquipmentTO.setCarrierBookingReference(centralBookingReference);
       }
       this.setCarrierBookingReference(null);
     }

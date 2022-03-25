@@ -43,11 +43,6 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME = "transportDocumentTypeCode";
     private static final String VESSEL_IMO_NUMBER_JSON_NAME = "vesselIMONumber";
 
-    private static final String SHIPMENT_TABLE_NAME = "shipment";
-    private static final String SHIPMENT_TABLE_ID_COLUMN_NAME = "id";
-    private static final String SHIPMENT_CARRIER_BOOKING_REFERENCE_JSON_NAME = "carrierBookingReference";
-    private static final String SHIPMENT_BOOKING_REFERENCE_JSON_NAME = "bookingReference";
-
     private static final String SHIPPING_INSTRUCTION_TABLE_NAME = "shipping_instruction";
     private static final String SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME = "transport_document_type";
     private static final String SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "id";
@@ -55,6 +50,15 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
     private static final String TRANSPORT_DOCUMENT_TABLE_NAME = "transport_document";
     private static final String TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "shipping_instruction_id";
     private static final String TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME = "transport_document_reference";
+
+    private static final TableLike EVENT_CARRIER_BOOKING_REFERENCE_TABLE = Table.create("event_carrier_booking_reference");
+    private static final String DOCUMENT_ID_COLUMN = "document_id";
+    private static final String LINK_TYPE_COLUMN = "link_type";
+
+    private static final String TRANSPORT_CALL_ID_COLUMN = "transport_call_id";
+    private static final String CARRIER_BOOKING_REFERENCE_COLUMN = "carrier_booking_reference";
+    private static final String CARRIER_BOOKING_REFERENCE_JSON_NAME = "carrierBookingReference";
+    private static final String BOOKING_REFERENCE_JSON_NAME = "bookingReference";
 
     private static final Set<String> JSON_FIELDS_REQUIRING_DISTINCT = Set.of(
             TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
@@ -163,7 +167,6 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             }
         }
 
-        builder.registerQueryFieldAlias(SHIPMENT_CARRIER_BOOKING_REFERENCE_JSON_NAME, SHIPMENT_BOOKING_REFERENCE_JSON_NAME);
 
         if (includesShipmentEvents) {
             builder = queryParametersForShipmentEvents(builder, eventTable);
@@ -171,7 +174,18 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         if (needsTransportCall) {
             builder = queryParameterForTransportCall(builder);
         }
-        return builder;
+        return builder.onTable(Event.class)
+          .chainJoin(EVENT_CARRIER_BOOKING_REFERENCE_TABLE)
+          // This complex join is read as:
+          //   (X AND Y) OR (X AND Z)
+          // (because of how the underlying API works)
+          .onEquals(LINK_TYPE_COLUMN, LINK_TYPE_COLUMN)
+          .and().onEquals(TRANSPORT_CALL_ID_COLUMN, TRANSPORT_CALL_ID_COLUMN)
+          .or()
+          .onEquals(LINK_TYPE_COLUMN, LINK_TYPE_COLUMN)
+          .and().onEqualsThen(DOCUMENT_ID_COLUMN, DOCUMENT_ID_COLUMN)
+          .registerQueryField(SqlIdentifier.unquoted(CARRIER_BOOKING_REFERENCE_COLUMN), CARRIER_BOOKING_REFERENCE_JSON_NAME, String.class)
+          .registerQueryFieldAlias(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME);
     }
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder) {

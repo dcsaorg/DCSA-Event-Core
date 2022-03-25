@@ -1,7 +1,6 @@
 package org.dcsa.core.events.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class ShipmentEquipment extends AbstractShipmentEquipment {
+public class UtilizedTransportEquipment extends AbstractUtilizedTransportEquipment {
 
   @Id
   @JsonIgnore

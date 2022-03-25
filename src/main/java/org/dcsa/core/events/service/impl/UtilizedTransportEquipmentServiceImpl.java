@@ -6,7 +6,7 @@ import org.dcsa.core.events.model.mapper.*;
 import org.dcsa.core.events.model.transferobjects.*;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.ReferenceService;
-import org.dcsa.core.events.service.ShipmentEquipmentService;
+import org.dcsa.core.events.service.UtilizedTransportEquipmentService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -14,13 +14,14 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
+public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportEquipmentService {
 
-  private final ShipmentEquipmentRepository shipmentEquipmentRepository;
+  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   private final EquipmentRepository equipmentRepository;
   private final SealRepository sealRepository;
   private final ActiveReeferSettingsRepository activeReeferSettingsRepository;
@@ -35,29 +36,28 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   private final CargoItemMapper cargoItemMapper;
   private final ActiveReeferSettingsMapper activeReeferSettingsMapper;
   private final EquipmentMapper equipmentMapper;
-  private final ShipmentEquipmentMapper shipmentEquipmentMapper;
+  private final UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
 
   @Override
-  public Mono<List<ShipmentEquipmentTO>> findShipmentEquipmentByShipmentID(UUID shipmentID) {
-    return shipmentEquipmentRepository
-        .findShipmentEquipmentDetailsByShipmentID(shipmentID)
+  public Mono<List<UtilizedTransportEquipmentTO>> findUtilizedTransportEquipmentByShipmentID(UUID shipmentID) {
+    return utilizedTransportEquipmentRepository
+        .findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID)
         .flatMap(
-            shipmentEquipmentDetails -> {
-              UUID shipmentEquipmentID = shipmentEquipmentDetails.getShipmentEquipmentID();
-              ShipmentEquipmentTO shipmentEquipmentTO = new ShipmentEquipmentTO();
-              shipmentEquipmentTO.setCarrierBookingReference(
-                  shipmentEquipmentDetails.getCarrierBookingReference());
-              shipmentEquipmentTO.setEquipment(
-                  equipmentMapper.shipmentEquipmentDetailsToDTO(shipmentEquipmentDetails));
-              shipmentEquipmentTO.setCargoGrossWeightUnit(
-                  shipmentEquipmentDetails.getCargoGrossWeightUnit());
-              shipmentEquipmentTO.setCargoGrossWeight(
-                  shipmentEquipmentDetails.getCargoGrossWeight());
-              shipmentEquipmentTO.setIsShipperOwned(shipmentEquipmentDetails.getIsShipperOwned());
+            utilizedTransportEquipmentDetails -> {
+              UUID utilizedTransportEquipmentID = utilizedTransportEquipmentDetails.getUtilizedTransportEquipmentID();
+              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
+              utilizedTransportEquipmentTO.setCarrierBookingReference(
+                  utilizedTransportEquipmentDetails.getCarrierBookingReference());
+              utilizedTransportEquipmentTO.setEquipment(
+                  equipmentMapper.utilizedTransportEquipmentDetailsToDTO(utilizedTransportEquipmentDetails));
+              utilizedTransportEquipmentTO.setCargoGrossWeightUnit(
+                  utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
+              utilizedTransportEquipmentTO.setCargoGrossWeight(
+                  utilizedTransportEquipmentDetails.getCargoGrossWeight());
               return Mono.when(
                       cargoItemRepository
-                          .findAllCargoItemsAndCargoLineItemsByShipmentEquipmentID(
-                              shipmentEquipmentID)
+                          .findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
+                              utilizedTransportEquipmentID)
                           .flatMap(
                               cargoItemWithCargoLineItems ->
                                   referenceService
@@ -82,51 +82,51 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                                               cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
                                                   cargoItemWithCargoLineItems))))
                           .collectList()
-                          .doOnNext(shipmentEquipmentTO::setCargoItems),
+                          .doOnNext(utilizedTransportEquipmentTO::setCargoItems),
                       activeReeferSettingsRepository
-                          .findById(shipmentEquipmentID)
+                          .findById(utilizedTransportEquipmentID)
                           .map(activeReeferSettingsMapper::activeReeferSettingsToDTO)
-                          .doOnNext(shipmentEquipmentTO::setActiveReeferSettings),
+                          .doOnNext(utilizedTransportEquipmentTO::setActiveReeferSettings),
                       sealRepository
-                          .findAllByShipmentEquipmentID(shipmentEquipmentID)
+                          .findAllByUtilizedTransportEquipmentID(utilizedTransportEquipmentID)
                           .map(sealMapper::sealToDTO)
                           .collectList()
-                          .doOnNext(shipmentEquipmentTO::setSeals))
-                  .thenReturn(shipmentEquipmentTO);
+                          .doOnNext(utilizedTransportEquipmentTO::setSeals))
+                  .thenReturn(utilizedTransportEquipmentTO);
             })
         .collectList();
   }
 
   @Override
-  public Mono<List<ShipmentEquipmentTO>> resolveShipmentEquipmentsForShippingInstructionReference(
-      List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
+  public Mono<List<UtilizedTransportEquipmentTO>> resolveUtilizedTransportEquipmentsForShippingInstructionReference(
+    List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs, ShippingInstructionTO shippingInstructionTO) {
     return cargoItemRepository
         .findAllByShippingInstructionReference(
             shippingInstructionTO.getShippingInstructionReference())
         .flatMap(
             cargoItems ->
                 Mono.when(
-                        sealRepository.deleteAllByShipmentEquipmentID(
-                            cargoItems.getShipmentEquipmentID()),
-                        activeReeferSettingsRepository.deleteByShipmentEquipmentID(
-                            cargoItems.getShipmentEquipmentID()))
+                        sealRepository.deleteAllByUtilizedTransportEquipmentID(
+                            cargoItems.getUtilizedTransportEquipmentID()),
+                        activeReeferSettingsRepository.deleteByUtilizedTransportEquipmentID(
+                            cargoItems.getUtilizedTransportEquipmentID()))
                     .thenReturn(cargoItems))
         .flatMap(
             cargoItem ->
-                shipmentEquipmentRepository
-                    .findShipmentEquipmentByShipmentID(cargoItem.getShipmentEquipmentID())
+                utilizedTransportEquipmentRepository
+                    .findUtilizedTransportEquipmentByShipmentID(cargoItem.getUtilizedTransportEquipmentID())
                     .flatMap(
-                        shipmentEquipment ->
+                        utilizedTransportEquipment ->
                             equipmentRepository
                                 .deleteAllByEquipmentReference(
-                                    shipmentEquipment.getEquipmentReference())
-                                .thenReturn(shipmentEquipment))
+                                    utilizedTransportEquipment.getEquipmentReference())
+                                .thenReturn(utilizedTransportEquipment))
                     .flatMap(
-                        shipmentEquipment ->
-                            shipmentEquipmentRepository
-                                .deleteShipmentEquipmentByShipmentID(
-                                    shipmentEquipment.getShipmentID())
-                                .thenReturn(new ShipmentEquipmentTO()))
+                        utilizedTransportEquipment ->
+                            utilizedTransportEquipmentRepository
+                                .deleteUtilizedTransportEquipmentByShipmentID(
+                                    utilizedTransportEquipment.getShipmentID())
+                                .thenReturn(new UtilizedTransportEquipmentTO()))
                     .thenReturn(cargoItem))
         .flatMap(
             cargoItem ->
@@ -138,47 +138,47 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
         .collectList()
         .flatMap(
             ignored ->
-                addShipmentEquipmentToShippingInstruction(
-                    shipmentEquipments, shippingInstructionTO));
+                addUtilizedTransportEquipmentToShippingInstruction(
+                  utilizedTransportEquipmentTOs, shippingInstructionTO));
   }
 
   @Override
-  public Mono<List<ShipmentEquipmentTO>> createShipmentEquipment(
+  public Mono<List<UtilizedTransportEquipmentTO>> createUtilizedTransportEquipment(
       UUID shipmentID,
       String shippingInstructionReference,
-      List<ShipmentEquipmentTO> shipmentEquipments) {
-    if (Objects.isNull(shipmentEquipments) || shipmentEquipments.isEmpty()) {
+      List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
+    if (Objects.isNull(utilizedTransportEquipmentTOs) || utilizedTransportEquipmentTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
 
-    return saveShipmentEquipment(shipmentID, shipmentEquipments)
+    return saveUtilizedTransportEquipment(shipmentID, utilizedTransportEquipmentTOs)
         .flatMap(
-            shipmentEquipmentIdShipmentEquipmentTO -> {
-              UUID shipmentEquipmentID = shipmentEquipmentIdShipmentEquipmentTO.getT1();
-              ShipmentEquipmentTO shipmentEquipmentTO =
-                  shipmentEquipmentIdShipmentEquipmentTO.getT2();
+            tuple -> {
+              UUID utilizedTransportEquipmentID = tuple.getT1();
+              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO =
+                  tuple.getT2();
               return Mono.when(
-                      saveEquipment(shipmentEquipmentTO.getEquipment())
-                          .doOnNext(shipmentEquipmentTO::setEquipment),
+                      saveEquipment(utilizedTransportEquipmentTO.getEquipment())
+                          .doOnNext(utilizedTransportEquipmentTO::setEquipment),
                       saveActiveReeferSettings(
-                              shipmentEquipmentID, shipmentEquipmentTO.getActiveReeferSettings())
-                          .doOnNext(shipmentEquipmentTO::setActiveReeferSettings),
-                      saveSeals(shipmentEquipmentID, shipmentEquipmentTO.getSeals())
-                          .doOnNext(shipmentEquipmentTO::setSeals),
+                              utilizedTransportEquipmentID, utilizedTransportEquipmentTO.getActiveReeferSettings())
+                          .doOnNext(utilizedTransportEquipmentTO::setActiveReeferSettings),
+                      saveSeals(utilizedTransportEquipmentID, utilizedTransportEquipmentTO.getSeals())
+                          .doOnNext(utilizedTransportEquipmentTO::setSeals),
                       saveCargoItems(
-                              shipmentEquipmentID,
+                              utilizedTransportEquipmentID,
                               shippingInstructionReference,
-                              shipmentEquipmentTO.getCargoItems())
-                          .doOnNext(shipmentEquipmentTO::setCargoItems))
-                  .thenReturn(shipmentEquipmentTO);
+                              utilizedTransportEquipmentTO.getCargoItems())
+                          .doOnNext(utilizedTransportEquipmentTO::setCargoItems))
+                  .thenReturn(utilizedTransportEquipmentTO);
             })
         .collectList();
   }
 
   @Override
-  public Mono<List<ShipmentEquipmentTO>> addShipmentEquipmentToShippingInstruction(
-      List<ShipmentEquipmentTO> shipmentEquipments, ShippingInstructionTO shippingInstructionTO) {
-    if (shipmentEquipments == null) return Mono.empty();
+  public Mono<List<UtilizedTransportEquipmentTO>> addUtilizedTransportEquipmentToShippingInstruction(
+    List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs, ShippingInstructionTO shippingInstructionTO) {
+    if (utilizedTransportEquipmentTOs == null) return Mono.empty();
     List<String> carrierBookingReferences = getCarrierBookingReferences(shippingInstructionTO);
 
     return Flux.fromIterable(carrierBookingReferences)
@@ -193,20 +193,20 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                                     + carrierBookingReference))))
         .flatMap(
             shipment ->
-                createShipmentEquipment(
+                createUtilizedTransportEquipment(
                     shipment.getShipmentID(),
                     shippingInstructionTO.getShippingInstructionReference(),
-                    shipmentEquipments))
-        .flatMapIterable(shipmentEquipmentTOS -> shipmentEquipmentTOS)
+                  utilizedTransportEquipmentTOs))
+        .flatMapIterable(Function.identity())
         .collectList();
   }
 
   List<String> getCarrierBookingReferences(ShippingInstructionTO shippingInstructionTO) {
     if (shippingInstructionTO.getCarrierBookingReference() == null) {
       List<String> carrierBookingReferences = new ArrayList<>();
-      for (ShipmentEquipmentTO shipmentEquipmentTO :
-          shippingInstructionTO.getShipmentEquipments()) {
-        carrierBookingReferences.add(shipmentEquipmentTO.getCarrierBookingReference());
+      for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO :
+          shippingInstructionTO.getUtilizedTransportEquipments()) {
+        carrierBookingReferences.add(utilizedTransportEquipmentTO.getCarrierBookingReference());
       }
       carrierBookingReferences.removeAll(Collections.singleton(null));
       return carrierBookingReferences;
@@ -214,22 +214,22 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
     return List.of(shippingInstructionTO.getCarrierBookingReference());
   }
 
-  // Returns Flux of Tuples of shipmentEquipmentID and ShipmentEquipmentTO)
-  private Flux<Tuple2<UUID, ShipmentEquipmentTO>> saveShipmentEquipment(
-      UUID shipmentID, List<ShipmentEquipmentTO> shipmentEquipmentList) {
+  // Returns Flux of Tuples of utilizedTransportEquipmentID and ShipmentEquipmentTO
+  private Flux<Tuple2<UUID, UtilizedTransportEquipmentTO>> saveUtilizedTransportEquipment(
+      UUID shipmentID, List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOList) {
 
-    return Flux.fromIterable(shipmentEquipmentList)
+    return Flux.fromIterable(utilizedTransportEquipmentTOList)
         .flatMap(
-            shipmentEquipmentTO ->
-                shipmentEquipmentRepository
+            utilizedTransportEquipmentTO ->
+                utilizedTransportEquipmentRepository
                     .save(
-                        shipmentEquipmentMapper.dtoToShipmentEquipment(
-                            shipmentEquipmentTO, shipmentID))
+                        utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment(
+                            utilizedTransportEquipmentTO, shipmentID))
                     .flatMapMany(
-                        shipmentEquipment ->
+                        utilizedTransportEquipment ->
                             Mono.zip(
-                                Mono.just(shipmentEquipment.getId()),
-                                Mono.just(shipmentEquipmentTO))));
+                                Mono.just(utilizedTransportEquipment.getId()),
+                                Mono.just(utilizedTransportEquipmentTO))));
   }
 
   private Mono<EquipmentTO> saveEquipment(EquipmentTO equipmentTO) {
@@ -240,29 +240,29 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
   }
 
   private Mono<ActiveReeferSettingsTO> saveActiveReeferSettings(
-      UUID shipmentEquipmentID, ActiveReeferSettingsTO activeReeferSettingsTO) {
+      UUID utilizedTransportEquipmentID, ActiveReeferSettingsTO activeReeferSettingsTO) {
     return Mono.justOrEmpty(activeReeferSettingsTO)
         .map(
             arsTO ->
                 activeReeferSettingsMapper.dtoToActiveReeferSettings(
-                    arsTO, shipmentEquipmentID, true))
+                    arsTO, utilizedTransportEquipmentID, true))
         .flatMap(activeReeferSettingsRepository::save)
         .map(activeReeferSettingsMapper::activeReeferSettingsToDTO);
   }
 
-  private Mono<List<SealTO>> saveSeals(UUID shipmentEquipmentID, List<SealTO> sealTOs) {
+  private Mono<List<SealTO>> saveSeals(UUID utilizedTransportEquipmentID, List<SealTO> sealTOs) {
     if (Objects.isNull(sealTOs) || sealTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
     return Flux.fromIterable(sealTOs)
-        .map(sealTO -> sealMapper.dtoToSeal(sealTO, shipmentEquipmentID))
+        .map(sealTO -> sealMapper.dtoToSeal(sealTO, utilizedTransportEquipmentID))
         .flatMap(sealRepository::save)
         .map(sealMapper::sealToDTO)
         .collectList();
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
-      UUID shipmentEquipmentID,
+      UUID utilizedTransportEquipmentID,
       String shippingInstructionReference,
       List<CargoItemTO> cargoItemTOs) {
     if (Objects.isNull(cargoItemTOs) || cargoItemTOs.isEmpty()) {
@@ -274,7 +274,7 @@ public class ShipmentEquipmentServiceImpl implements ShipmentEquipmentService {
                 cargoItemRepository
                     .save(
                         cargoItemMapper.dtoToCargoItem(
-                            cargoItemTO, shipmentEquipmentID, shippingInstructionReference))
+                            cargoItemTO, utilizedTransportEquipmentID, shippingInstructionReference))
                     .map(CargoItem::getId)
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))

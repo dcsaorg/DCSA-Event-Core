@@ -20,7 +20,7 @@ public class ActiveReeferSettings implements Persistable<UUID> {
     @Id
     /* We do not show this in JSON as it is an internal detail */
     @Column("shipment_equipment_id")
-    private UUID shipmentEquipmentID;
+    private UUID utilizedTransportEquipmentID;
 
     @Transient
     private boolean isNewRecord;
@@ -34,7 +34,7 @@ public class ActiveReeferSettings implements Persistable<UUID> {
     @Column("temperature_unit")
     @Size(max = 3)
     private TemperatureUnit temperatureUnit;
-    
+
     @Column("humidity_min")
     private Float humidityMin;
 
@@ -49,7 +49,7 @@ public class ActiveReeferSettings implements Persistable<UUID> {
 
     @Override
     public UUID getId() {
-        return this.shipmentEquipmentID;
+        return this.utilizedTransportEquipmentID;
     }
 
     @Override

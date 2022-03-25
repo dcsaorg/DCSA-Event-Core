@@ -8,7 +8,6 @@ import org.dcsa.core.events.repository.PendingEventRepository;
 import org.dcsa.core.events.service.*;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
-import org.dcsa.core.service.impl.ExtendedBaseServiceImpl;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventRepository, Event, UUID> implements GenericEventService {
+public class GenericEventServiceImpl extends org.dcsa.core.service.impl.QueryServiceImpl<EventRepository, Event, UUID> implements GenericEventService, org.dcsa.core.service.AsymmetricQueryService<Event, Event, UUID> {
 
     private final Set<EventType> ALL_EVENT_TYPES = Set.copyOf(EnumSet.allOf(EventType.class));
 
@@ -134,7 +133,6 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
     public Mono<Event> create(Event event) {
         Mono<? extends Event> eventMono;
         EventType eventType = event.getEventType();
-        String carrierBookingReference = event.getCarrierBookingReference();
         if (!getSupportedEvents().contains(event.getEventType())) {
             throw new IllegalArgumentException("Unsupported event type: " + event.getEventType());
         }
@@ -143,7 +141,6 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
         // When they are null, Spring R2DBC will omit them from the INSERT INTO and therefore it
         // happens to work.  We restore the after we have passed them to the database.
         event.setEventType(null);
-        event.setCarrierBookingReference(null);
         switch (eventType) {
             case SHIPMENT:
                 eventMono = shipmentEventService.create((ShipmentEvent) event);
@@ -160,9 +157,7 @@ public class GenericEventServiceImpl extends ExtendedBaseServiceImpl<EventReposi
             default:
                 return Mono.error(new IllegalStateException("Unexpected value: " + event.getEventType()));
         }
-        return eventMono.doOnNext(e -> {
-            e.setEventType(eventType);
-            e.setCarrierBookingReference(carrierBookingReference);
-        }).cast(Event.class);
+        return eventMono.doOnNext(e -> e.setEventType(eventType))
+          .cast(Event.class);
     }
 }

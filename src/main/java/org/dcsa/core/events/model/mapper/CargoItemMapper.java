@@ -11,9 +11,9 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface CargoItemMapper {
 
-	@Mapping(source = "shipmentEquipmentID", target = "shipmentEquipmentID")
+	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
 	@Mapping(source = "shippingInstructionReference", target = "shippingInstructionReference")
-	CargoItem dtoToCargoItem(CargoItemTO cargoItemTO, UUID shipmentEquipmentID, String shippingInstructionReference);
+	CargoItem dtoToCargoItem(CargoItemTO cargoItemTO, UUID utilizedTransportEquipmentID, String shippingInstructionReference);
 
 	CargoItemTO cargoItemWithCargoLineItemsToDTO(CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems);
 }
