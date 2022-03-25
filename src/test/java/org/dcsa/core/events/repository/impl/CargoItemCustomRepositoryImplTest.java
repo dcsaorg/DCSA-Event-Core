@@ -69,6 +69,7 @@ public class CargoItemCustomRepositoryImplTest {
             });
 
     String expectedMessage = "utilizedTransportEquipmentID must not be null";
+    
     String actualMessage = exception.getMessage();
 
     assertTrue(actualMessage.contains(expectedMessage));

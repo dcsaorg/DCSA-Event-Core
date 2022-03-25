@@ -21,7 +21,7 @@ public class UtilizedTransportEquipmentTO extends AbstractUtilizedTransportEquip
 
 	@Valid
 	@NotNull(message = "Equipment is required.")
-	EquipmentTO equipment;
+	private EquipmentTO equipment;
 
 	@Valid
 	@NotEmpty

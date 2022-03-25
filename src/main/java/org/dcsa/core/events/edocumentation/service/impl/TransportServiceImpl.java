@@ -10,6 +10,7 @@ import org.dcsa.core.events.model.enums.TransportEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.LocationService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -62,7 +63,7 @@ public class TransportServiceImpl implements TransportService {
                                       .doOnNext(transportTO::setLoadLocation),
                                   fetchLocationByTransportCallID(
                                           transport.getDischargeTransportCallID())
-                                      .doOnNext(transportTO::setLoadLocation),
+                                      .doOnNext(transportTO::setDischargeLocation),
                                   fetchModeOfTransportByTransportCallID(
                                           transport.getLoadTransportCallID())
                                       .doOnNext(
@@ -88,24 +89,33 @@ public class TransportServiceImpl implements TransportService {
   }
 
   Mono<Tuple2<TransportEvent, TransportEvent>> fetchTransportEventByTransportID(UUID transportId) {
-    return Mono.justOrEmpty(transportId)
+    return transportRepository
+        .findById(transportId)
+        .switchIfEmpty(
+            Mono.error(
+                ConcreteRequestErrorMessageException.notFound(
+                    "Can not find a Transport event")))
         .flatMap(
-            tID ->
-                transportRepository
-                    .findById(transportId)
-                    .flatMap(
-                        x ->
-                            Mono.zip(
-                                transportEventRepository
-                                    .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                        x.getLoadTransportCallID(),
-                                        TransportEventTypeCode.ARRI,
-                                        EventClassifierCode.PLN),
-                                transportEventRepository
-                                    .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-                                        x.getDischargeTransportCallID(),
-                                        TransportEventTypeCode.DEPA,
-                                        EventClassifierCode.PLN))));
+            x ->
+                Mono.zip(
+                    transportEventRepository
+                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                            x.getLoadTransportCallID(),
+                            TransportEventTypeCode.ARRI,
+                            EventClassifierCode.PLN)
+                        .switchIfEmpty(
+                            Mono.error(
+                                ConcreteRequestErrorMessageException.notFound(
+                                    "Could not find a TransportCall"))),
+                    transportEventRepository
+                        .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+                            x.getDischargeTransportCallID(),
+                            TransportEventTypeCode.DEPA,
+                            EventClassifierCode.PLN)
+                        .switchIfEmpty(
+                            Mono.error(
+                                ConcreteRequestErrorMessageException.notFound(
+                                    "Could not find a TransportCall")))));
   }
 
   Mono<TransportCall> fetchTransportCallByID(String transportCallID) {
@@ -113,9 +123,15 @@ public class TransportServiceImpl implements TransportService {
   }
 
   Mono<LocationTO> fetchLocationByTransportCallID(String id) {
-    return Mono.justOrEmpty(id)
-        .flatMap(this::fetchTransportCallByID)
-        .flatMap(transportCall -> locationService.fetchLocationByID(transportCall.getLocationID()));
+    return fetchTransportCallByID(id)
+        .flatMap(
+            transportCall ->
+                locationService
+                    .fetchLocationByID(transportCall.getLocationID())
+                    .switchIfEmpty(
+                        Mono.error(
+                            ConcreteRequestErrorMessageException.notFound(
+                                "Could not find a Location for the TransportCall"))));
   }
 
   Mono<ModeOfTransport> fetchModeOfTransportByTransportCallID(String transportCallId) {
