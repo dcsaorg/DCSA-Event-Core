@@ -8,7 +8,5 @@ import org.mapstruct.Mapper;
 public interface ConsignmentItemMapper {
   ConsignmentItemTO consignmentItemToDTO(ConsignmentItem consignmentItem);
 
-  //	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
-  //	@Mapping(source = "isNewRecord", target = "newRecord")
   ConsignmentItem dtoToConsignmentItem(ConsignmentItemTO consignmentItemTO);
 }

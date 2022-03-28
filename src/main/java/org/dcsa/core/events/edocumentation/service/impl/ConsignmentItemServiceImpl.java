@@ -1,22 +1,18 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.dcsa.core.events.edocumentation.model.ConsignmentItem;
 import org.dcsa.core.events.edocumentation.model.mapper.ConsignmentItemMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO;
 import org.dcsa.core.events.edocumentation.repository.ConsignmentItemRepository;
 import org.dcsa.core.events.edocumentation.service.ConsignmentItemService;
 import org.dcsa.core.events.model.CargoItem;
-import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.mapper.CargoItemMapper;
 import org.dcsa.core.events.model.mapper.CargoLineItemMapper;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
 import org.dcsa.core.events.repository.CargoItemRepository;
 import org.dcsa.core.events.repository.CargoLineItemRepository;
 import org.dcsa.core.events.service.ReferenceService;
-import org.dcsa.core.events.service.impl.ReferenceServiceImpl;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
-import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.util.MappingUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -90,11 +86,8 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
             cargoItemTO ->
                 cargoItemRepository
                     .save(
-                        cargoItemMapper.dtoToCargoItem(
-                            cargoItemTO,
-                            null,
-                            consignmentId,
-                            shippingInstructionReference))
+                        cargoItemMapper.dtoToCargoItemWithConsignmentId(
+                            cargoItemTO, consignmentId, shippingInstructionReference))
                     .map(CargoItem::getId)
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
