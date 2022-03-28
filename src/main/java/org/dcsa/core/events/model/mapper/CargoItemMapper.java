@@ -12,8 +12,9 @@ import java.util.UUID;
 public interface CargoItemMapper {
 
 	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
+	@Mapping(source = "consignmentId", target = "consignmentItemID")
 	@Mapping(source = "shippingInstructionReference", target = "shippingInstructionReference")
-	CargoItem dtoToCargoItem(CargoItemTO cargoItemTO, UUID utilizedTransportEquipmentID, String shippingInstructionReference);
+	CargoItem dtoToCargoItem(CargoItemTO cargoItemTO, UUID utilizedTransportEquipmentID, UUID consignmentId, String shippingInstructionReference);
 
 	CargoItemTO cargoItemWithCargoLineItemsToDTO(CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems);
 }

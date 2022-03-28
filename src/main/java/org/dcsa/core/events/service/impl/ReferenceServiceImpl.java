@@ -44,12 +44,26 @@ public class ReferenceServiceImpl implements ReferenceService {
   }
 
   @Override
+  public Mono<List<ReferenceTO>>
+      createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+          String shippingInstructionReference, UUID consignmentId, List<ReferenceTO> references) {
+    if (shippingInstructionReference == null)
+      return Mono.error(new CreateException("ShippingInstructionReference cannot be null"));
+    return this.createReferencesByIDAndRefTOs(
+        shippingInstructionReference,
+        references,
+        ImplementationType.SHIPPING_INSTRUCTION,
+        consignmentId);
+  }
+
+  @Override
   public Mono<List<ReferenceTO>> findByBookingID(UUID bookingID) {
     return referenceRepository.findByBookingID(bookingID).map(transformRefToRefTO).collectList();
   }
 
   @Override
-  public Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference) {
+  public Mono<List<ReferenceTO>> findByShippingInstructionReference(
+      String shippingInstructionReference) {
     return referenceRepository
         .findByShippingInstructionReference(shippingInstructionReference)
         .map(transformRefToRefTO)
@@ -58,9 +72,10 @@ public class ReferenceServiceImpl implements ReferenceService {
 
   @Override
   public Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID) {
-    return referenceRepository.findByCargoItemID(cargoItemID)
-      .map(transformRefToRefTO)
-      .collectList();
+    return referenceRepository
+        .findByCargoItemID(cargoItemID)
+        .map(transformRefToRefTO)
+        .collectList();
   }
 
   @Override
@@ -85,6 +100,11 @@ public class ReferenceServiceImpl implements ReferenceService {
 
   private Mono<List<ReferenceTO>> createReferencesByIDAndRefTOs(
       Object id, List<ReferenceTO> references, ImplementationType impType) {
+    return createReferencesByIDAndRefTOs(id, references, impType, null);
+  }
+
+  private Mono<List<ReferenceTO>> createReferencesByIDAndRefTOs(
+      Object id, List<ReferenceTO> references, ImplementationType impType, UUID consignmentId) {
 
     if (Objects.isNull(references) || references.isEmpty()) {
       return Mono.empty();
@@ -99,6 +119,7 @@ public class ReferenceServiceImpl implements ReferenceService {
               } else if (impType == ImplementationType.SHIPPING_INSTRUCTION) {
                 reference.setShippingInstructionReference((String) id);
               }
+              if (consignmentId != null) reference.setConsignmentItemID(consignmentId);
               reference.setReferenceType(r.getReferenceType());
               reference.setReferenceValue(r.getReferenceValue());
               return reference;

@@ -45,7 +45,11 @@ public class Reference extends AuditBase {
   @JsonIgnore
   private UUID bookingID;
 
+  @Column("consignment_item_id")
+  private UUID consignmentItemID;
+
   @Column("cargo_item_id")
+  @JsonIgnore
   private UUID cargoItemID;
 
   @JsonIgnore

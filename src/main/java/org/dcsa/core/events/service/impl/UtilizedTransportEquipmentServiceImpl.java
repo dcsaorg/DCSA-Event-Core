@@ -276,7 +276,7 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                 cargoItemRepository
                     .save(
                         cargoItemMapper.dtoToCargoItem(
-                            cargoItemTO, utilizedTransportEquipmentID, shippingInstructionReference))
+                            cargoItemTO, utilizedTransportEquipmentID, null, shippingInstructionReference))
                     .map(CargoItem::getId)
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
