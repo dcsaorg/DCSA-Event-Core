@@ -3,6 +3,7 @@ package org.dcsa.core.events.edocumentation.model.transferobject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
+import lombok.With;
 import org.dcsa.core.events.model.enums.VolumeUnit;
 import org.dcsa.core.events.model.enums.WeightUnit;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
@@ -18,6 +19,7 @@ import java.util.List;
 @Value
 @Builder
 public class ConsignmentItemTO {
+  @With
   @Size(max = 35)
   private String carrierBookingReference;
 
