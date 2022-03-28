@@ -34,7 +34,7 @@ public class Commodity {
   private CargoGrossWeight cargoGrossWeightUnit;
 
   @Column("cargo_gross_volume")
-  private int cargoGrossVolume;
+  private Float cargoGrossVolume;
 
   @Column("cargo_gross_volume_unit")
   private CargoGrossVolume cargoGrossVolumeUnit;
