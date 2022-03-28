@@ -13,6 +13,7 @@ import org.dcsa.core.events.model.base.AbstractShippingInstruction;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -39,6 +40,7 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
   // @NotEmpty
   @Valid
   private List<ConsignmentItemTO> consignmentItems;
+
   /**
    * Pull the carrierBookingReference from utilizedTransportEquipments into the ShippingInstruction if
    * possible
@@ -119,29 +121,46 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
    */
   @JsonIgnore
   public void pushCarrierBookingReferenceIntoUtilizedTransportEquipmentIfNecessary() {
-    if (this.carrierBookingReference != null && this.utilizedTransportEquipments == null) return;
+    if (this.carrierBookingReference != null && this.utilizedTransportEquipments == null && this.consignmentItems == null) return;
 
     if (this.carrierBookingReference == null
         && (this.utilizedTransportEquipments == null
             || this.utilizedTransportEquipments.stream()
-                .allMatch(
-                    utilizedTransportEquipmentTO ->
-                        utilizedTransportEquipmentTO.getCarrierBookingReference() == null))) {
+                .allMatch(utilizedTransportEquipmentTO -> utilizedTransportEquipmentTO.getCarrierBookingReference() == null))
+        && (this.consignmentItems == null
+            || this.consignmentItems.stream()
+                .allMatch(consignmentItemTO -> consignmentItemTO.getCarrierBookingReference() == null))
+    ) {
       throw new IllegalStateException(
-          "CarrierBookingReference needs to be defined on either ShippingInstruction or UtilizedTransportEquipment level.");
+          "CarrierBookingReference needs to be defined on either ShippingInstruction, UtilizedTransportEquipment or ConsignmentItem level.");
     }
 
     String centralBookingReference = this.getCarrierBookingReference();
     if (centralBookingReference != null) {
-      for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO : this.utilizedTransportEquipments) {
-        String utilizedTransportEquipmentBookingReference = utilizedTransportEquipmentTO.getCarrierBookingReference();
-        if (utilizedTransportEquipmentBookingReference != null) {
-          throw new IllegalStateException(
-              "CarrierBookingReference defined on both ShippingInstruction and UtilizedTransportEquipment level.");
+      if (utilizedTransportEquipments != null) {
+        for (UtilizedTransportEquipmentTO utilizedTransportEquipmentTO : this.utilizedTransportEquipments) {
+          String utilizedTransportEquipmentBookingReference = utilizedTransportEquipmentTO.getCarrierBookingReference();
+          if (utilizedTransportEquipmentBookingReference != null) {
+            throw new IllegalStateException(
+                "CarrierBookingReference defined on both ShippingInstruction and UtilizedTransportEquipment level.");
+          }
+          utilizedTransportEquipmentTO.setCarrierBookingReference(centralBookingReference);
         }
-        utilizedTransportEquipmentTO.setCarrierBookingReference(centralBookingReference);
       }
-      this.setCarrierBookingReference(null);
+      if (consignmentItems != null) {
+        consignmentItems =
+            consignmentItems.stream()
+                .map(
+                    consignmentItemTO -> {
+                      if (consignmentItemTO.getCarrierBookingReference() != null) {
+                        throw new IllegalStateException(
+                            "CarrierBookingReference defined on both ShippingInstruction and ConsignmentItem level.");
+                      }
+                      return consignmentItemTO.withCarrierBookingReference(centralBookingReference);
+                    })
+                .collect(Collectors.toList());
+      }
     }
+    this.setCarrierBookingReference(null);
   }
 }
