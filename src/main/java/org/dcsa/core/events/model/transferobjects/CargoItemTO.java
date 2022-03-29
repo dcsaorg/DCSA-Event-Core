@@ -1,6 +1,5 @@
 package org.dcsa.core.events.model.transferobjects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.VolumeUnit;
 import org.dcsa.core.events.model.enums.WeightUnit;
@@ -12,29 +11,26 @@ import java.util.List;
 @Data
 public class CargoItemTO {
 
-	private List<CargoLineItemTO> cargoLineItems;
+  private List<CargoLineItemTO> cargoLineItems;
 
-	@NotNull(message = "Description of goods is required.")
-	private String descriptionOfGoods;
+  @NotNull
+  @Size(max = 15)
+  private String equipmentReference;
 
-	@JsonProperty("HSCode")
-	@NotNull(message = "HS code is required.")
-	private String hsCode;
+  @NotNull(message = "Number of packages is required.")
+  private Integer numberOfPackages;
 
-	@NotNull(message = "Number of packages is required.")
-	private Integer numberOfPackages;
+  private Float weight;
 
-	private Float weight;
+  private Float volume;
 
-	private Float volume;
+  private WeightUnit weightUnit;
 
-	private WeightUnit weightUnit;
+  private VolumeUnit volumeUnit;
 
-	private VolumeUnit volumeUnit;
+  @NotNull(message = "Package code is required.")
+  @Size(max = 3)
+  private String packageCode;
 
-	@NotNull(message = "Package code is required.")
-	@Size(max = 3)
-	private String packageCode;
-
-	private List<ReferenceTO> references;
+  private List<ReferenceTO> references;
 }

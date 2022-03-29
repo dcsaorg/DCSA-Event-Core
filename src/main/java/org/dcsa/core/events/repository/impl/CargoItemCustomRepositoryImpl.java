@@ -131,11 +131,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
     cargoItemWithCargoLineItems.setId(
         UUID.fromString(
             String.valueOf(cargoItemResult.get(column("ci.id").getName().getReference()))));
-    cargoItemWithCargoLineItems.setDescriptionOfGoods(
-        String.valueOf(
-            cargoItemResult.get(column("ci.description_of_goods").getName().getReference())));
-    cargoItemWithCargoLineItems.setHsCode(
-        String.valueOf(cargoItemResult.get(column("ci.hs_code").getName().getReference())));
     cargoItemWithCargoLineItems.setWeight(
         (Float) cargoItemResult.get(column("ci.weight").getName().getReference()));
 
@@ -164,9 +159,9 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
                   cargoItemResult.get(column("ci.number_of_packages").getName().getReference()))));
     }
 
-    cargoItemWithCargoLineItems.setShippingInstructionReference(
-        String.valueOf(
-            cargoItemResult.get(column("ci.shipping_instruction_id").getName().getReference())));
+//    cargoItemWithCargoLineItems.setShippingInstructionReference(
+//        String.valueOf(
+//            cargoItemResult.get(column("ci.shipping_instruction_id").getName().getReference())));
     cargoItemWithCargoLineItems.setPackageCode(
         String.valueOf(cargoItemResult.get(column("ci.package_code").getName().getReference())));
     cargoItemWithCargoLineItems.setUtilizedTransportEquipmentID(

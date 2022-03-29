@@ -11,6 +11,7 @@ import org.dcsa.core.events.model.mapper.CargoLineItemMapper;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
 import org.dcsa.core.events.repository.CargoItemRepository;
 import org.dcsa.core.events.repository.CargoLineItemRepository;
+import org.dcsa.core.events.repository.ShipmentRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.util.MappingUtils;
@@ -34,6 +35,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final ConsignmentItemRepository consignmentItemRepository;
   private final CargoItemRepository cargoItemRepository;
   private final CargoLineItemRepository cargoLineItemRepository;
+  private final ShipmentRepository shipmentRepository;
 
   // Mappers
   private final ConsignmentItemMapper consignmentItemMapper;
@@ -55,21 +57,30 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
     return Flux.fromIterable(consignmentItemTOs)
         .flatMap(
             consignmentItemTO ->
-                consignmentItemRepository
-                    .save(consignmentItemMapper.dtoToConsignmentItem(consignmentItemTO))
+                shipmentRepository
+                    .findByCarrierBookingReference(consignmentItemTO.getCarrierBookingReference())
                     .flatMap(
-                        consignmentItem ->
-                            Mono.when(
-                                    referenceService
-                                        .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+                        shipment ->
+                            consignmentItemRepository
+                                .save(
+                                    consignmentItemMapper
+                                        .dtoToConsignmentItemWithShippingReferenceAndShipmentId(
+                                            consignmentItemTO,
                                             shippingInstructionReference,
-                                            consignmentItem.getId(),
-                                            consignmentItemTO.getReferences()),
-                                    saveCargoItems(
-                                        shippingInstructionReference,
-                                        consignmentItem.getId(),
-                                        consignmentItemTO.getCargoItems()))
-                                .thenReturn(consignmentItem)))
+                                            shipment.getShipmentID()))
+                                .flatMap(
+                                    consignmentItem ->
+                                        Mono.when(
+                                                referenceService
+                                                    .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+                                                        shippingInstructionReference,
+                                                        consignmentItem.getId(),
+                                                        consignmentItemTO.getReferences()),
+                                                saveCargoItems(
+                                                    shippingInstructionReference,
+                                                    consignmentItem.getId(),
+                                                    consignmentItemTO.getCargoItems()))
+                                            .thenReturn(consignmentItem))))
         .buffer(MappingUtils.SQL_LIST_BUFFER_SIZE) // process in smaller batches
         .concatMap(consignmentItemRepository::saveAll)
         .map(consignmentItemMapper::consignmentItemToDTO)

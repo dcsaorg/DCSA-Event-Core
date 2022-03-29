@@ -10,7 +10,6 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface UtilizedTransportEquipmentMapper {
 
-	@Mapping(source = "shipmentID", target = "shipmentID")
 	@Mapping(source = "utilizedTransportEquipmentTO.equipment.equipmentReference", target = "equipmentReference")
-    UtilizedTransportEquipment dtoToUtilizedTransportEquipment(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO, UUID shipmentID);
+    UtilizedTransportEquipment dtoToUtilizedTransportEquipment(UtilizedTransportEquipmentTO utilizedTransportEquipmentTO);
 }

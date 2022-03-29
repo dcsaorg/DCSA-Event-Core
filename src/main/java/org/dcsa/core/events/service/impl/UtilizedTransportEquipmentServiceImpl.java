@@ -153,14 +153,13 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
 
   @Override
   public Mono<List<UtilizedTransportEquipmentTO>> createUtilizedTransportEquipment(
-      UUID shipmentID,
       String shippingInstructionReference,
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
     if (Objects.isNull(utilizedTransportEquipmentTOs) || utilizedTransportEquipmentTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
 
-    return saveUtilizedTransportEquipment(shipmentID, utilizedTransportEquipmentTOs)
+    return saveUtilizedTransportEquipment(utilizedTransportEquipmentTOs)
         .flatMap(
             tuple -> {
               UUID utilizedTransportEquipmentID = tuple.getT1();
@@ -206,7 +205,6 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
         .flatMap(
             shipment ->
                 createUtilizedTransportEquipment(
-                    shipment.getShipmentID(),
                     shippingInstructionTO.getShippingInstructionReference(),
                     utilizedTransportEquipmentTOs))
         .flatMapIterable(Function.identity())
@@ -228,15 +226,14 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
 
   // Returns Flux of Tuples of utilizedTransportEquipmentID and UtilizedEquipmentTO
   private Flux<Tuple2<UUID, UtilizedTransportEquipmentTO>> saveUtilizedTransportEquipment(
-      UUID shipmentID, List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOList) {
+      List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOList) {
 
     return Flux.fromIterable(utilizedTransportEquipmentTOList)
         .flatMap(
             utilizedTransportEquipmentTO ->
                 utilizedTransportEquipmentRepository
                     .save(
-                        utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment(
-                            utilizedTransportEquipmentTO, shipmentID))
+                        utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment(utilizedTransportEquipmentTO))
                     .flatMapMany(
                         utilizedTransportEquipment ->
                             Mono.zip(
@@ -287,8 +284,7 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                     .save(
                         cargoItemMapper.dtoToCargoItem(
                             cargoItemTO,
-                            utilizedTransportEquipmentID,
-                            shippingInstructionReference))
+                            utilizedTransportEquipmentID, shippingInstructionReference))
                     .map(CargoItem::getId)
                     .zipWith(Mono.just(cargoItemTO))
                     .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))

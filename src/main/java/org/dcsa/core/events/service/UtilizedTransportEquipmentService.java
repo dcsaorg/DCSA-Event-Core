@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UtilizedTransportEquipmentService {
-	Mono<List<UtilizedTransportEquipmentTO>> createUtilizedTransportEquipment(UUID shipmentID, String shippingInstructionReference, List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs);
+	Mono<List<UtilizedTransportEquipmentTO>> createUtilizedTransportEquipment(String shippingInstructionReference, List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs);
 
 	Mono<List<UtilizedTransportEquipmentTO>> findUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 

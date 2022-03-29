@@ -5,10 +5,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.base.AbstractCargoItem;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Table("cargo_item")
@@ -19,8 +21,14 @@ public class CargoItem extends AbstractCargoItem {
 
   @Id private UUID id;
 
+  @Transient
   @Column("shipping_instruction_id")
   private String shippingInstructionReference;
+
+  @NotNull
+  @Size(max = 15)
+  @Column("equipment_reference")
+  private String equipmentReference;
 
   @Column("utilized_transport_equipment_id")
   @NotNull
