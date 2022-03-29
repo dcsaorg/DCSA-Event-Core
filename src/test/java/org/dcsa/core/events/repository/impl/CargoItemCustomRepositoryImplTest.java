@@ -157,7 +157,6 @@ public class CargoItemCustomRepositoryImplTest {
     CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult =
         cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
     assertEquals(utilizedTransportEquipmentID, cargoItemsResult.getUtilizedTransportEquipmentID());
-    assertEquals(shippingInstructionReference, cargoItemsResult.getShippingInstructionReference());
 
     // assertions on cargoLineItems
     assertEquals(0, cargoItemsResult.getCargoLineItems().size());
