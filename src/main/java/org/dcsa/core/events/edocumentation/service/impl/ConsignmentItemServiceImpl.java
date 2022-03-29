@@ -114,7 +114,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                     .flatMap(
                         utilizedTransportEquipmentId -> {
                           CargoItem cargoItem =
-                              cargoItemMapper.dtoToCargoItemWithConsignmentId(
+                              cargoItemMapper.dtoToCargoItemWithConsignmentIdAndShippingInstructionReference(
                                   cargoItemTO, consignmentId, shippingInstructionReference);
                           cargoItem.setUtilizedTransportEquipmentID(utilizedTransportEquipmentId);
                           return cargoItemRepository

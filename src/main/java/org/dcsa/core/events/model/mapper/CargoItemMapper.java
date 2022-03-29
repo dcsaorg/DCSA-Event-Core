@@ -17,7 +17,7 @@ public interface CargoItemMapper {
 
 	@Mapping(source = "consignmentId", target = "consignmentItemID")
 	@Mapping(source = "shippingInstructionReference", target = "shippingInstructionReference")
-	CargoItem dtoToCargoItemWithConsignmentId(CargoItemTO cargoItemTO, UUID consignmentId, String shippingInstructionReference);
+	CargoItem dtoToCargoItemWithConsignmentIdAndShippingInstructionReference(CargoItemTO cargoItemTO, UUID consignmentId, String shippingInstructionReference);
 
 	CargoItemTO cargoItemWithCargoLineItemsToDTO(CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems);
 }
