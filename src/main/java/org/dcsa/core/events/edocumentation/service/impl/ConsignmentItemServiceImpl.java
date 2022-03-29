@@ -97,8 +97,6 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private Mono<List<CargoItemTO>> saveCargoItems(
       String shippingInstructionReference, UUID consignmentId, List<CargoItemTO> cargoItemTOs) {
 
-    System.out.println("About to save cargo items from consignment items!");
-
     if (Objects.isNull(cargoItemTOs) || cargoItemTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
@@ -115,7 +113,6 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                                     + cargoItemTO.getEquipmentReference())))
                     .flatMap(
                         utilizedTransportEquipmentId -> {
-                          System.out.println("Utilz ID: " + utilizedTransportEquipmentId);
                           CargoItem cargoItem =
                               cargoItemMapper.dtoToCargoItemWithConsignmentId(
                                   cargoItemTO, consignmentId, shippingInstructionReference);

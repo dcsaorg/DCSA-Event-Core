@@ -24,7 +24,7 @@ public class UtilizedTransportEquipmentTO extends AbstractUtilizedTransportEquip
 	private EquipmentTO equipment;
 
 	@Valid
-	@NotEmpty
+//	@NotEmpty
 	private List<CargoItemTO> cargoItems;
 
 	@Valid
