@@ -10,7 +10,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Table("cargo_item")
@@ -24,11 +23,6 @@ public class CargoItem extends AbstractCargoItem {
   @Transient
   @Column("shipping_instruction_id")
   private String shippingInstructionReference;
-
-  @NotNull
-  @Size(max = 15)
-  @Column("equipment_reference")
-  private String equipmentReference;
 
   @Column("utilized_transport_equipment_id")
   @NotNull

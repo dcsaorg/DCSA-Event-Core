@@ -12,6 +12,7 @@ import org.dcsa.core.events.model.transferobjects.CargoItemTO;
 import org.dcsa.core.events.repository.CargoItemRepository;
 import org.dcsa.core.events.repository.CargoLineItemRepository;
 import org.dcsa.core.events.repository.ShipmentRepository;
+import org.dcsa.core.events.repository.UtilizedTransportEquipmentRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.util.MappingUtils;
@@ -36,6 +37,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final CargoItemRepository cargoItemRepository;
   private final CargoLineItemRepository cargoLineItemRepository;
   private final ShipmentRepository shipmentRepository;
+  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
 
   // Mappers
   private final ConsignmentItemMapper consignmentItemMapper;
@@ -59,6 +61,11 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
             consignmentItemTO ->
                 shipmentRepository
                     .findByCarrierBookingReference(consignmentItemTO.getCarrierBookingReference())
+                    .switchIfEmpty(
+                        Mono.error(
+                            ConcreteRequestErrorMessageException.notFound(
+                                "No shipment found with carrierBookingReference: "
+                                    + consignmentItemTO.getCarrierBookingReference())))
                     .flatMap(
                         shipment ->
                             consignmentItemRepository
@@ -89,19 +96,36 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
 
   private Mono<List<CargoItemTO>> saveCargoItems(
       String shippingInstructionReference, UUID consignmentId, List<CargoItemTO> cargoItemTOs) {
+
+    System.out.println("About to save cargo items from consignment items!");
+
     if (Objects.isNull(cargoItemTOs) || cargoItemTOs.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
     return Flux.fromIterable(cargoItemTOs)
         .flatMap(
             cargoItemTO ->
-                cargoItemRepository
-                    .save(
-                        cargoItemMapper.dtoToCargoItemWithConsignmentId(
-                            cargoItemTO, consignmentId, shippingInstructionReference))
-                    .map(CargoItem::getId)
-                    .zipWith(Mono.just(cargoItemTO))
-                    .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
+                utilizedTransportEquipmentRepository
+                    .findUtilizedTransportEquipmentIdByEquipmentReference(
+                        cargoItemTO.getEquipmentReference())
+                    .switchIfEmpty(
+                        Mono.error(
+                            ConcreteRequestErrorMessageException.notFound(
+                                "Could not find findUtilizedTransportEquipmentId with equipment reference: "
+                                    + cargoItemTO.getEquipmentReference())))
+                    .flatMap(
+                        utilizedTransportEquipmentId -> {
+                          System.out.println("Utilz ID: " + utilizedTransportEquipmentId);
+                          CargoItem cargoItem =
+                              cargoItemMapper.dtoToCargoItemWithConsignmentId(
+                                  cargoItemTO, consignmentId, shippingInstructionReference);
+                          cargoItem.setUtilizedTransportEquipmentID(utilizedTransportEquipmentId);
+                          return cargoItemRepository
+                              .save(cargoItem)
+                              .map(CargoItem::getId)
+                              .zipWith(Mono.just(cargoItemTO))
+                              .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO));
+                        }))
         .flatMap(
             cargoItemTO ->
                 referenceService
