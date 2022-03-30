@@ -14,6 +14,9 @@ public interface ReferenceService {
   Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndTOs(
       String shippingInstructionReference, List<ReferenceTO> references);
 
+  Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+      String shippingInstructionReference, UUID consignmentId, List<ReferenceTO> references);
+
   Mono<List<ReferenceTO>> findByBookingID(UUID bookingID);
 
   Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference);

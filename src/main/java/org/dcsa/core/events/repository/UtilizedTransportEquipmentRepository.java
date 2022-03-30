@@ -8,7 +8,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-public interface UtilizedTransportEquipmentRepository extends ReactiveCrudRepository<UtilizedTransportEquipment, UUID>, UtilizedTransportEquipmentCustomRepository {
+public interface UtilizedTransportEquipmentRepository
+    extends ReactiveCrudRepository<UtilizedTransportEquipment, UUID>,
+        UtilizedTransportEquipmentCustomRepository {
 
   Mono<Void> deleteUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 
@@ -28,7 +30,8 @@ public interface UtilizedTransportEquipmentRepository extends ReactiveCrudReposi
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = ute.shipment_id "
           + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR r.shipping_instruction_id = :shippingInstructionReference")
-  Flux<String> findEquipmentReferenceByShippingInstructionReference(String shippingInstructionReference);
+  Flux<String> findEquipmentReferenceByShippingInstructionReference(
+      String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT ute.equipment_reference FROM utilized_transport_equipment ute "
