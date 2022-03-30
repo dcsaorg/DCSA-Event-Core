@@ -41,7 +41,7 @@ public class ConsignmentItemTO {
   private String hsCode;
 
   @NotEmpty
-  private List<CargoItemTO> cargoItems = Collections.emptyList();
+  private List<CargoItemTO> cargoItems;
 
-  private List<ReferenceTO> references = Collections.emptyList();
+  private List<ReferenceTO> references;
 }
