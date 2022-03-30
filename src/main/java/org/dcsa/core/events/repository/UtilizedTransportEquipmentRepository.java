@@ -14,14 +14,6 @@ public interface UtilizedTransportEquipmentRepository
 
   Mono<Void> deleteUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 
-  // Debug query... delete me!
-  @Query(
-      "SELECT DISTINCT id FROM utilized_transport_equipment "
-          + "WHERE equipment_reference = :equipmentReference LIMIT 1")
-  Mono<UUID> findUtilizedTransportEquipmentIdByEquipmentReference(String equipmentReference);
-
-  //  Mono<UUID> findUtilizedTransportEquipmentIdByEquipmentReference(String equipmentReference);
-
   Mono<UtilizedTransportEquipment> findUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
 
   @Query(

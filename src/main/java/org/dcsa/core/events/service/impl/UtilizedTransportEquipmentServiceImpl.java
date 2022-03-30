@@ -165,6 +165,9 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
             tuple -> {
               UUID utilizedTransportEquipmentID = tuple.getT1();
               UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = tuple.getT2();
+              // needed to set utilizedTransportEquipmentID
+              // on cargoItems in consignmentItemServiceImpl
+              utilizedTransportEquipmentTO.setId(utilizedTransportEquipmentID);
               return Mono.when(
                       saveEquipment(utilizedTransportEquipmentTO.getEquipment())
                           .doOnNext(utilizedTransportEquipmentTO::setEquipment),
