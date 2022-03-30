@@ -36,7 +36,6 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final CargoItemRepository cargoItemRepository;
   private final CargoLineItemRepository cargoLineItemRepository;
   private final ShipmentRepository shipmentRepository;
-  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   private final ReferenceRepository referenceRepository;
 
   // Mappers
@@ -98,7 +97,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   @Override
-  public Mono<List<ConsignmentItemTO>> removeConsignmentItemsByShippingInstructionReference(
+  public Mono<Void> removeConsignmentItemsByShippingInstructionReference(
       String shippingInstructionReference) {
     if (shippingInstructionReference == null)
       return Mono.error(
@@ -126,8 +125,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                                     x ->
                                         consignmentItemRepository.deleteById(
                                             consignmentItem.getId()))))
-        .collectList()
-        .flatMap(ignored -> Mono.empty());
+        .then(Mono.empty());
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
