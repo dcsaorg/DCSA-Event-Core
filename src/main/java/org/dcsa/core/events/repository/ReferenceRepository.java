@@ -60,6 +60,8 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
 
   Flux<Reference> findByCargoItemID(UUID cargoItemID);
 
+  Mono<Void> deleteByConsignmentItemID(UUID consignmentItemId);
+
   Mono<Void> deleteByBookingID(UUID bookingID);
 
   Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);

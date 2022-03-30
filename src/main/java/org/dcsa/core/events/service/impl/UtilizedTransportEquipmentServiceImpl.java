@@ -108,9 +108,15 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
       resolveUtilizedTransportEquipmentsForShippingInstructionReference(
           List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
           ShippingInstructionTO shippingInstructionTO) {
-    return utilizedTransportEquipmentRepository
-        .findUtilizedTransportEquipmentsByShippingInstructionReference(
-            shippingInstructionTO.getShippingInstructionReference())
+      return utilizedTransportEquipmentRepository
+          .findUtilizedTransportEquipmentsByShippingInstructionReference(
+              shippingInstructionTO.getShippingInstructionReference())
+        .flatMap(
+            utilizedTransportEquipment ->
+                utilizedTransportEquipmentRepository
+                    .deleteById(
+                        utilizedTransportEquipment.getId())
+                    .thenReturn(utilizedTransportEquipment))
         .flatMap(
             utilizedTransportEquipment ->
                 Mono.when(
@@ -121,12 +127,6 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                         equipmentRepository.deleteAllByEquipmentReference(
                             utilizedTransportEquipment.getEquipmentReference()))
                     .thenReturn(utilizedTransportEquipment))
-        .flatMap(
-            utilizedTransportEquipment ->
-                utilizedTransportEquipmentRepository
-                    .deleteUtilizedTransportEquipmentByShipmentID(
-                        utilizedTransportEquipment.getShipmentID())
-                    .thenReturn(new UtilizedTransportEquipmentTO()))
         .collectList()
         .flatMap(
             ignored ->

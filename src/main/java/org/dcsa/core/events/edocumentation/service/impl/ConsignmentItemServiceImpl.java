@@ -11,10 +11,7 @@ import org.dcsa.core.events.model.mapper.CargoLineItemMapper;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
 import org.dcsa.core.events.model.transferobjects.EquipmentTO;
 import org.dcsa.core.events.model.transferobjects.UtilizedTransportEquipmentTO;
-import org.dcsa.core.events.repository.CargoItemRepository;
-import org.dcsa.core.events.repository.CargoLineItemRepository;
-import org.dcsa.core.events.repository.ShipmentRepository;
-import org.dcsa.core.events.repository.UtilizedTransportEquipmentRepository;
+import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.util.MappingUtils;
@@ -40,6 +37,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final CargoLineItemRepository cargoLineItemRepository;
   private final ShipmentRepository shipmentRepository;
   private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
+  private final ReferenceRepository referenceRepository;
 
   // Mappers
   private final ConsignmentItemMapper consignmentItemMapper;
@@ -97,6 +95,39 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
         .concatMap(consignmentItemRepository::saveAll)
         .map(consignmentItemMapper::consignmentItemToDTO)
         .collectList();
+  }
+
+  @Override
+  public Mono<List<ConsignmentItemTO>> removeConsignmentItemsByShippingInstructionReference(
+      String shippingInstructionReference) {
+    if (shippingInstructionReference == null)
+      return Mono.error(
+          ConcreteRequestErrorMessageException.invalidParameter(
+              "ShippingInstructionReference cannot be null"));
+
+    return cargoItemRepository
+        .findAllByShippingInstructionReference(shippingInstructionReference)
+        .flatMap(
+            cargoItem ->
+                cargoLineItemRepository
+                    .deleteByCargoItemID(cargoItem.getId())
+                    .thenReturn(cargoItem))
+        .flatMap(
+            cargoItem -> cargoItemRepository.deleteById(cargoItem.getId()).thenReturn(cargoItem))
+        .flatMap(
+            ignored ->
+                consignmentItemRepository
+                    .findAllByShippingInstructionID((shippingInstructionReference))
+                    .flatMap(
+                        consignmentItem ->
+                            referenceRepository
+                                .deleteByConsignmentItemID(consignmentItem.getId())
+                                .flatMap(
+                                    x ->
+                                        consignmentItemRepository.deleteById(
+                                            consignmentItem.getId()))))
+        .collectList()
+        .flatMap(ignored -> Mono.empty());
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
