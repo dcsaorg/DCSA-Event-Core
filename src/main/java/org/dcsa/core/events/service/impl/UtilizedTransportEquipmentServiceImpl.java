@@ -108,42 +108,25 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
       resolveUtilizedTransportEquipmentsForShippingInstructionReference(
           List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
           ShippingInstructionTO shippingInstructionTO) {
-    return cargoItemRepository
-        .findAllByShippingInstructionReference(
+    return utilizedTransportEquipmentRepository
+        .findUtilizedTransportEquipmentsByShippingInstructionReference(
             shippingInstructionTO.getShippingInstructionReference())
         .flatMap(
-            cargoItems ->
+            utilizedTransportEquipment ->
                 Mono.when(
                         sealRepository.deleteAllByUtilizedTransportEquipmentID(
-                            cargoItems.getUtilizedTransportEquipmentID()),
+                            utilizedTransportEquipment.getId()),
                         activeReeferSettingsRepository.deleteByUtilizedTransportEquipmentID(
-                            cargoItems.getUtilizedTransportEquipmentID()))
-                    .thenReturn(cargoItems))
+                            utilizedTransportEquipment.getId()),
+                        equipmentRepository.deleteAllByEquipmentReference(
+                            utilizedTransportEquipment.getEquipmentReference()))
+                    .thenReturn(utilizedTransportEquipment))
         .flatMap(
-            cargoItem ->
+            utilizedTransportEquipment ->
                 utilizedTransportEquipmentRepository
-                    .findUtilizedTransportEquipmentByShipmentID(
-                        cargoItem.getUtilizedTransportEquipmentID())
-                    .flatMap(
-                        utilizedTransportEquipment ->
-                            equipmentRepository
-                                .deleteAllByEquipmentReference(
-                                    utilizedTransportEquipment.getEquipmentReference())
-                                .thenReturn(utilizedTransportEquipment))
-                    .flatMap(
-                        utilizedTransportEquipment ->
-                            utilizedTransportEquipmentRepository
-                                .deleteUtilizedTransportEquipmentByShipmentID(
-                                    utilizedTransportEquipment.getShipmentID())
-                                .thenReturn(new UtilizedTransportEquipmentTO()))
-                    .thenReturn(cargoItem))
-        .flatMap(
-            cargoItem ->
-                cargoLineItemRepository
-                    .deleteByCargoItemID(cargoItem.getId())
-                    .thenReturn(cargoItem))
-        .flatMap(
-            cargoItem -> cargoItemRepository.deleteById(cargoItem.getId()).thenReturn(cargoItem))
+                    .deleteUtilizedTransportEquipmentByShipmentID(
+                        utilizedTransportEquipment.getShipmentID())
+                    .thenReturn(new UtilizedTransportEquipmentTO()))
         .collectList()
         .flatMap(
             ignored ->
@@ -269,53 +252,5 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
         .flatMap(sealRepository::save)
         .map(sealMapper::sealToDTO)
         .collectList();
-  }
-
-  private Mono<List<CargoItemTO>> saveCargoItems(
-      UUID utilizedTransportEquipmentID,
-      String shippingInstructionReference,
-      List<CargoItemTO> cargoItemTOs) {
-    if (Objects.isNull(cargoItemTOs) || cargoItemTOs.isEmpty()) {
-      return Mono.just(Collections.emptyList());
-    }
-    return Flux.fromIterable(cargoItemTOs)
-        .flatMap(
-            cargoItemTO ->
-                cargoItemRepository
-                    .save(
-                        cargoItemMapper.dtoToCargoItem(
-                            cargoItemTO,
-                            utilizedTransportEquipmentID,
-                            shippingInstructionReference))
-                    .map(CargoItem::getId)
-                    .zipWith(Mono.just(cargoItemTO))
-                    .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO)))
-        .flatMap(
-            cargoItemTO ->
-                referenceService
-                    .createReferencesByShippingInstructionReferenceAndTOs(
-                        shippingInstructionReference, cargoItemTO.getReferences())
-                    .thenReturn(cargoItemTO))
-        .collectList();
-  }
-
-  private Mono<CargoItemTO> saveCargoLineItems(UUID cargoItemID, CargoItemTO cargoItemTO) {
-    if (Objects.isNull(cargoItemTO.getCargoLineItems())
-        || cargoItemTO.getCargoLineItems().isEmpty()) {
-      return Mono.empty();
-    }
-    return Flux.fromIterable(cargoItemTO.getCargoLineItems())
-        .map(
-            cargoLineItemTO -> cargoLineItemMapper.dtoToCargoLineItem(cargoLineItemTO, cargoItemID))
-        .flatMap(cargoLineItemRepository::save)
-        .collectList()
-        .map(
-            cargoLineItems -> {
-              cargoItemTO.setCargoLineItems(
-                  cargoLineItems.stream()
-                      .map(cargoLineItemMapper::cargoLineItemToDTO)
-                      .collect(Collectors.toList()));
-              return cargoItemTO;
-            });
   }
 }
