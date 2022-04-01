@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class ConsignmentItemTO {
   @With
   @Size(max = 35)

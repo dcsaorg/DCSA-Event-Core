@@ -9,21 +9,19 @@ import org.dcsa.core.events.model.CargoItem;
 import org.dcsa.core.events.model.mapper.CargoItemMapper;
 import org.dcsa.core.events.model.mapper.CargoLineItemMapper;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
-import org.dcsa.core.events.model.transferobjects.EquipmentTO;
 import org.dcsa.core.events.model.transferobjects.UtilizedTransportEquipmentTO;
-import org.dcsa.core.events.repository.*;
+import org.dcsa.core.events.repository.CargoItemRepository;
+import org.dcsa.core.events.repository.CargoLineItemRepository;
+import org.dcsa.core.events.repository.ReferenceRepository;
+import org.dcsa.core.events.repository.ShipmentRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
-import org.dcsa.core.util.MappingUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -59,40 +57,43 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
 
     return Flux.fromIterable(consignmentItemTOs)
         .flatMap(
-            consignmentItemTO ->
-                shipmentRepository
-                    .findByCarrierBookingReference(consignmentItemTO.getCarrierBookingReference())
-                    .switchIfEmpty(
-                        Mono.error(
-                            ConcreteRequestErrorMessageException.notFound(
-                                "No shipment found with carrierBookingReference: "
-                                    + consignmentItemTO.getCarrierBookingReference())))
-                    .flatMap(
-                        shipment ->
-                            consignmentItemRepository
-                                .save(
-                                    consignmentItemMapper
-                                        .dtoToConsignmentItemWithShippingReferenceAndShipmentId(
-                                            consignmentItemTO,
-                                            shippingInstructionReference,
-                                            shipment.getShipmentID()))
-                                .flatMap(
-                                    consignmentItem ->
-                                        Mono.when(
-                                                referenceService
-                                                    .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-                                                        shippingInstructionReference,
-                                                        consignmentItem.getId(),
-                                                        consignmentItemTO.getReferences()),
-                                                saveCargoItems(
-                                                    shippingInstructionReference,
-                                                    consignmentItem.getId(),
-                                                    consignmentItemTO.getCargoItems(),
-                                                    utilizedTransportEquipmentTOs))
-                                            .thenReturn(consignmentItem))))
-        .buffer(MappingUtils.SQL_LIST_BUFFER_SIZE) // process in smaller batches
-        .concatMap(consignmentItemRepository::saveAll)
-        .map(consignmentItemMapper::consignmentItemToDTO)
+            consignmentItemTO -> {
+              ConsignmentItemTO.ConsignmentItemTOBuilder consignmentItemTOBuilder =
+                  consignmentItemTO.toBuilder();
+              return shipmentRepository
+                  .findByCarrierBookingReference(consignmentItemTO.getCarrierBookingReference())
+                  .switchIfEmpty(
+                      Mono.error(
+                          ConcreteRequestErrorMessageException.notFound(
+                              "No shipment found with carrierBookingReference: "
+                                  + consignmentItemTO.getCarrierBookingReference())))
+                  .flatMap(
+                      shipment ->
+                          consignmentItemRepository
+                              .save(
+                                  consignmentItemMapper
+                                      .dtoToConsignmentItemWithShippingReferenceAndShipmentId(
+                                          consignmentItemTO,
+                                          shippingInstructionReference,
+                                          shipment.getShipmentID()))
+                              .flatMap(
+                                  consignmentItem ->
+                                      Mono.when(
+                                              referenceService
+                                                  .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+                                                      shippingInstructionReference,
+                                                      consignmentItem.getId(),
+                                                      consignmentItemTO.getReferences())
+                                                  .doOnNext(consignmentItemTOBuilder::references),
+                                              saveCargoItems(
+                                                      shippingInstructionReference,
+                                                      consignmentItem.getId(),
+                                                      consignmentItemTO.getCargoItems(),
+                                                      utilizedTransportEquipmentTOs)
+                                                  .doOnNext(consignmentItemTOBuilder::cargoItems))
+                                          .thenReturn(consignmentItem)))
+                  .thenReturn(consignmentItemTOBuilder.build());
+            })
         .collectList();
   }
 
