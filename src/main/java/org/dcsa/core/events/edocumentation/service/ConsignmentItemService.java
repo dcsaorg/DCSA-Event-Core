@@ -7,6 +7,9 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 public interface ConsignmentItemService {
+
+  Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionReference(String shippingInstructionReference);
+
   Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionReferenceAndTOs(
       String shippingInstructionReference,
       List<ConsignmentItemTO> consignmentItemTOs,

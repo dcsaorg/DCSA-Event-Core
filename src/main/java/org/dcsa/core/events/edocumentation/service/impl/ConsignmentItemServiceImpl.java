@@ -43,6 +43,45 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final CargoItemMapper cargoItemMapper;
 
   @Override
+  public Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionReference(
+      String shippingInstructionReference) {
+
+    return consignmentItemRepository
+        .findAllByShippingInstructionID(shippingInstructionReference)
+        .switchIfEmpty(
+            Mono.error(
+                ConcreteRequestErrorMessageException.notFound(
+                    "Could not find Consignment Items for the shipping instruction")))
+        .flatMap(
+            ci -> {
+              ConsignmentItemTO.ConsignmentItemTOBuilder ciTo =
+                  consignmentItemMapper.consignmentItemToDTO(ci).toBuilder();
+
+              return Mono.when(
+                      referenceService
+                          .findByShippingInstructionReference(shippingInstructionReference)
+                          .doOnNext(ciTo::references),
+                      cargoItemRepository
+                          .findAllByConsignmentItemID(ci.getId())
+                          .map(cargoItemMapper::cargoItemToDto)
+                          .collectList()
+                          .flatMap(
+                              c -> {
+                                if (c.isEmpty()) {
+                                  return Mono.error(
+                                      ConcreteRequestErrorMessageException.notFound(
+                                          "Could not find cargo items"));
+                                }
+                                return Mono.just(c);
+                              })
+                          .doOnNext(ciTo::cargoItems))
+                  .thenReturn(ciTo);
+            })
+        .flatMap(x -> Mono.just(x.build()))
+        .collectList();
+  }
+
+  @Override
   public Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionReferenceAndTOs(
       String shippingInstructionReference,
       List<ConsignmentItemTO> consignmentItemTOs,

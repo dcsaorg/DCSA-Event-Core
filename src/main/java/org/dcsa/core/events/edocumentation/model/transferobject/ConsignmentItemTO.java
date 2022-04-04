@@ -13,7 +13,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.List;
 
 @Value
@@ -21,27 +20,27 @@ import java.util.List;
 public class ConsignmentItemTO {
   @With
   @Size(max = 35)
-  private String carrierBookingReference;
+  String carrierBookingReference;
 
   @NotNull
-  private Double weight;
+  Double weight;
 
   @NotNull
-  private WeightUnit weightUnit;
+  WeightUnit weightUnit;
 
-  private Double volume;
+  Double volume;
 
-  private VolumeUnit volumeUnit;
+  VolumeUnit volumeUnit;
 
   @NotBlank
-  private String descriptionOfGoods;
+  String descriptionOfGoods;
 
   @Size(max = 10)
   @JsonProperty("HSCode")
-  private String hsCode;
+  String hsCode;
 
   @NotEmpty
-  private List<CargoItemTO> cargoItems;
+  List<CargoItemTO> cargoItems;
 
-  private List<ReferenceTO> references;
+  List<ReferenceTO> references;
 }
