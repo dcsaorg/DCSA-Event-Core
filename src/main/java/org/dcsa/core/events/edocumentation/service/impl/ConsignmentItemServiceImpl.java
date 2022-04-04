@@ -99,7 +99,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   @Override
-  public Mono<String> removeConsignmentItemsByShippingInstructionReference(
+  public Mono<Void> removeConsignmentItemsByShippingInstructionReference(
       String shippingInstructionReference) {
     if (shippingInstructionReference == null)
       return Mono.error(
@@ -126,7 +126,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                                         consignmentItem.getId()),
                                     consignmentItemRepository.deleteById(consignmentItem.getId()))
                                 .thenReturn(consignmentItem)))
-        .then(Mono.just(shippingInstructionReference));
+        .then(Mono.empty());
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(

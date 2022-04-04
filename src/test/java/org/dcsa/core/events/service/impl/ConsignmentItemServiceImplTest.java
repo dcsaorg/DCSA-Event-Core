@@ -452,16 +452,6 @@ class ConsignmentItemServiceImplTest {
       StepVerifier.create(
               consignmentItemService.removeConsignmentItemsByShippingInstructionReference(
                   shippingInstructionReference))
-          .assertNext(
-              consignmentItemTOs -> {
-                verify(cargoLineItemRepository).deleteByCargoItemID(any());
-                verify(consignmentItemRepository).findAllByShippingInstructionID(any());
-                verify(referenceRepository).deleteByConsignmentItemID(any(UUID.class));
-                verify(consignmentItemRepository).deleteById(any(UUID.class));
-                verify(cargoItemRepository).findAllByShippingInstructionReference(any());
-                verify(cargoItemRepository).deleteById(any(UUID.class));
-                assertEquals(shippingInstructionReference, consignmentItemTOs);
-              })
           .verifyComplete();
     }
   }

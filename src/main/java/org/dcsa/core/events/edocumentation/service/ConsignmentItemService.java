@@ -12,6 +12,6 @@ public interface ConsignmentItemService {
       List<ConsignmentItemTO> consignmentItemTOs,
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs);
 
-  Mono<String> removeConsignmentItemsByShippingInstructionReference(
+  Mono<Void> removeConsignmentItemsByShippingInstructionReference(
       String shippingInstructionReference);
 }
