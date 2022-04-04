@@ -9,10 +9,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+
 import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.BOOKING_DOCUMENT_STATUSES;
 
 @Table("booking")
@@ -131,6 +133,9 @@ public class Booking implements Persistable<UUID> {
   @Column("pre_carriage_mode_of_transport_code")
   @Size(max = 3)
   protected String preCarriageModeOfTransportCode;
+
+  @Column("valid_until")
+  private OffsetDateTime validUntil;
 
   // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
   // This is not part of the official IM model. They are added in the sql only.
