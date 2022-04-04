@@ -9,9 +9,11 @@ import org.dcsa.core.events.model.CargoItem;
 import org.dcsa.core.events.model.mapper.CargoItemMapper;
 import org.dcsa.core.events.model.mapper.CargoLineItemMapper;
 import org.dcsa.core.events.model.transferobjects.CargoItemTO;
-import org.dcsa.core.events.model.transferobjects.EquipmentTO;
 import org.dcsa.core.events.model.transferobjects.UtilizedTransportEquipmentTO;
-import org.dcsa.core.events.repository.*;
+import org.dcsa.core.events.repository.CargoItemRepository;
+import org.dcsa.core.events.repository.CargoLineItemRepository;
+import org.dcsa.core.events.repository.ReferenceRepository;
+import org.dcsa.core.events.repository.ShipmentRepository;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.util.MappingUtils;
@@ -19,11 +21,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -42,6 +41,45 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final ConsignmentItemMapper consignmentItemMapper;
   private final CargoLineItemMapper cargoLineItemMapper;
   private final CargoItemMapper cargoItemMapper;
+
+  @Override
+  public Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionReference(
+      String shippingInstructionReference) {
+
+    return consignmentItemRepository
+        .findAllByShippingInstructionID(shippingInstructionReference)
+        .switchIfEmpty(
+            Mono.error(
+                ConcreteRequestErrorMessageException.notFound(
+                    "Could not find Consignment Items for the shipping instruction")))
+        .flatMap(
+            ci -> {
+              ConsignmentItemTO.ConsignmentItemTOBuilder ciTo =
+                  consignmentItemMapper.consignmentItemToDTO(ci).toBuilder();
+
+              return Mono.when(
+                      referenceService
+                          .findByShippingInstructionReference(shippingInstructionReference)
+                          .doOnNext(ciTo::references),
+                      cargoItemRepository
+                          .findAllByConsignmentItemID(ci.getId())
+                          .map(cargoItemMapper::cargoItemToDto)
+                          .collectList()
+                          .flatMap(
+                              c -> {
+                                if (c.isEmpty()) {
+                                  return Mono.error(
+                                      ConcreteRequestErrorMessageException.notFound(
+                                          "Could not find cargo items"));
+                                }
+                                return Mono.just(c);
+                              })
+                          .doOnNext(ciTo::cargoItems))
+                  .thenReturn(ciTo);
+            })
+        .flatMap(x -> Mono.just(x.build()))
+        .collectList();
+  }
 
   @Override
   public Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionReferenceAndTOs(
