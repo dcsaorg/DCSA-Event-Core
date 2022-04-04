@@ -1,6 +1,7 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.dcsa.core.events.edocumentation.model.ConsignmentItem;
 import org.dcsa.core.events.edocumentation.model.mapper.ConsignmentItemMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO;
 import org.dcsa.core.events.edocumentation.repository.ConsignmentItemRepository;
@@ -98,7 +99,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   @Override
-  public Mono<Void> removeConsignmentItemsByShippingInstructionReference(
+  public Mono<String> removeConsignmentItemsByShippingInstructionReference(
       String shippingInstructionReference) {
     if (shippingInstructionReference == null)
       return Mono.error(
@@ -120,13 +121,12 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                     .findAllByShippingInstructionID((shippingInstructionReference))
                     .flatMap(
                         consignmentItem ->
-                            referenceRepository
-                                .deleteByConsignmentItemID(consignmentItem.getId())
-                                .flatMap(
-                                    x ->
-                                        consignmentItemRepository.deleteById(
-                                            consignmentItem.getId()))))
-        .then(Mono.empty());
+                            Mono.when(
+                                    referenceRepository.deleteByConsignmentItemID(
+                                        consignmentItem.getId()),
+                                    consignmentItemRepository.deleteById(consignmentItem.getId()))
+                                .thenReturn(consignmentItem)))
+        .then(Mono.just(shippingInstructionReference));
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
