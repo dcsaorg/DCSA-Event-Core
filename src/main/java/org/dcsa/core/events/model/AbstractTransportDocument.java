@@ -21,6 +21,9 @@ import java.util.UUID;
 public abstract class AbstractTransportDocument extends AuditBase {
 
     @Id
+    @Column("id")
+    private UUID id;
+
     @Column("transport_document_reference")
     @Size(max = 20)
     private String transportDocumentReference;
@@ -66,4 +69,7 @@ public abstract class AbstractTransportDocument extends AuditBase {
 
     @Column("number_of_rider_pages")
     private Integer numberOfRiderPages;
+
+    @Column("valid_until")
+    private OffsetDateTime validUntil;
 }

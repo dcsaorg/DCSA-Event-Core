@@ -48,6 +48,9 @@ public class Shipment {
   @JsonProperty("shipmentCreatedDateTime")
   private OffsetDateTime confirmationDateTime;
 
+  @Column("valid_until")
+  private OffsetDateTime validUntil;
+
   // updatedDateTime is metadata to avoid having to query shipment_event for updated dateTime.
   // This is not part of the official IM model. They are added in the sql only.
 
