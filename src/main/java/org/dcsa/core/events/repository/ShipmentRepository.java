@@ -25,8 +25,7 @@ public interface ShipmentRepository
 
   @Query(
       "SELECT DISTINCT s.* FROM shipment s "
-          + "JOIN utilized_transport_equipment ute ON ute.shipment_id = s.id "
-          + "JOIN cargo_item ci ON ci.utilized_transport_equipment_id = ute.id  "
+          + "JOIN consignment_item ci ON ci.shipment_id = s.id  "
           + "JOIN shipping_instruction si ON si.id = ci.shipping_instruction_id "
           + "WHERE si.id = :shippingInstructionReference")
   Flux<Shipment> findByShippingInstructionReference(String shippingInstructionReference);
