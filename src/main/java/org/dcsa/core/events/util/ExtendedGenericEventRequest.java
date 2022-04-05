@@ -211,19 +211,19 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .registerQueryFieldFromField("vesselIMONumber")
                 // TODO: add filter for UNLocationCode
 
-                /* TODO: Support import voyage number
-                // Go back to Transport Call to add import voyage
-                .onTable(TransportCall.class)
-                .chainJoin(Voyage.class)
-                .onFieldEqualsThen("importVoyageID", "id")
-                .registerQueryFieldFromField("carrierVoyageNumber")
-                 */
-
                 // Go back to Transport Call
                 .onTable(TransportCall.class)
-                .chainJoin(Voyage.class)
+                .chainJoin(Voyage.class, "export_voyage")
                 .onFieldEqualsThen("exportVoyageID", "id")
                 .registerQueryFieldFromFieldThen("carrierVoyageNumber")
+                .registerQueryFieldAlias("carrierVoyageNumber", "exportVoyageNumber")
+
+                 // Go back to the Transport Call
+                .onTable(TransportCall.class)
+                .chainJoin(Voyage.class, "import_voyage")
+                .onFieldEqualsThen("importVoyageID", "id")
+                .registerQueryFieldFromFieldThen("carrierVoyageNumber", "importVoyage.")
+                .registerQueryFieldAliasThen("importVoyage.carrierVoyageNumber", "importVoyageNumber")
 
 
                 .chainJoin(Service.class)
