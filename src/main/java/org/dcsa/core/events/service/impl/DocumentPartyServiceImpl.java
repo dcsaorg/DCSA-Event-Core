@@ -10,6 +10,8 @@ import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.DocumentPartyService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
+import org.dcsa.core.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -154,7 +156,15 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
         .findByPartyID(partyID)
         .map(pcd -> new PartyContactDetailsTO(pcd.getName(), pcd.getPhone(), pcd.getEmail()))
         .collectList()
-        .defaultIfEmpty(Collections.emptyList());
+      .flatMap(
+      partyContactDetailsTOS -> {
+        if (partyContactDetailsTOS.isEmpty()) {
+          return Mono.error(
+            ConcreteRequestErrorMessageException.notFound(
+              "No contacts details were found for party"));
+        }
+        return Mono.just(partyContactDetailsTOS);
+      });
   }
 
   private Mono<List<DocumentPartyTO>> createDocumentParties(

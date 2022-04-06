@@ -10,6 +10,8 @@ import org.dcsa.core.events.model.transferobjects.PartyContactDetailsTO;
 import org.dcsa.core.events.model.transferobjects.PartyTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.AddressService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -314,18 +316,20 @@ class DocumentPartyServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test fetch party contact details by party ID returns empty list.")
+  @DisplayName("Test fetch party contact details by party ID returns exception when not found")
   void testFetchPartyContactDetailsByPartyIDEmptyList() {
 
     when(partyContactDetailsRepository.findByPartyID(any())).thenReturn(Flux.empty());
 
     StepVerifier.create(documentPartyService.fetchPartyContactDetailsByPartyID(party.getId()))
-        .assertNext(
-            dpTOs -> {
-              verify(partyContactDetailsRepository).findByPartyID(any());
-              assertEquals(0, dpTOs.size());
-            })
-        .verifyComplete();
+      .expectErrorSatisfies(
+        throwable -> {
+          Assertions.assertTrue(throwable instanceof ConcreteRequestErrorMessageException);
+          assertEquals(
+            "No contacts details were found for party",
+            throwable.getMessage());
+        })
+        .verify();
   }
 
   @Test

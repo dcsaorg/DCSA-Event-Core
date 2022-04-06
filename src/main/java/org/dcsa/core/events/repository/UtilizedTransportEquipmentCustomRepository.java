@@ -7,13 +7,13 @@ import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
-public interface ShipmentEquipmentCustomRepository {
+public interface UtilizedTransportEquipmentCustomRepository {
 
-  Flux<ShipmentEquipmentDetails> findShipmentEquipmentDetailsByShipmentID(UUID shipmentID);
+  Flux<UtilizedTransportEquipmentDetails> findUtilizedTransportEquipmentDetailsByShipmentID(UUID shipmentID);
 
 	@Getter
 	@AllArgsConstructor
-	class ShipmentEquipmentDetails{
+	class UtilizedTransportEquipmentDetails {
     private String carrierBookingReference;
 		private String equipmentReference;
 		private Float cargoGrossWeight;
@@ -22,6 +22,6 @@ public interface ShipmentEquipmentCustomRepository {
 		private Float tareWeight;
 		private String weightUnit;
 		private Boolean isShipperOwned;
-		private UUID shipmentEquipmentID;
+		private UUID utilizedTransportEquipmentID;
 	}
 }

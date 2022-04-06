@@ -39,7 +39,7 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
     private final ServiceRepository serviceRepository;
     private final TransportDocumentRepository transportDocumentRepository;
     private final TransportDocumentTypeRepository transportDocumentTypeRepository;
-    private final ShipmentEquipmentRepository shipmentEquipmentRepository;
+    private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
     private final TransportRepository transportRepository;
     private final BookingRepository bookingRepository;
 
@@ -241,7 +241,7 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
                 .findTransportCallIDByCarrierBookingRef(shipmentEvent.getDocumentID())
                 .collectList();
         equipmentReferences =
-            shipmentEquipmentRepository
+            utilizedTransportEquipmentRepository
                 .findEquipmentReferenceByCarrierBookRef(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =
@@ -279,7 +279,7 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
                 .findTransportCallIDByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         equipmentReferences =
-            shipmentEquipmentRepository
+            utilizedTransportEquipmentRepository
                 .findEquipmentReferenceByShippingInstructionReference(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =
@@ -320,7 +320,7 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
                 .findTransportCallIDByTransportDocumentRef(shipmentEvent.getDocumentID())
                 .collectList();
         equipmentReferences =
-            shipmentEquipmentRepository
+            utilizedTransportEquipmentRepository
                 .findEquipmentReferenceByTransportDocumentRef(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =

@@ -1,6 +1,5 @@
 package org.dcsa.core.events.model.base;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,16 +15,6 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public abstract class AbstractCargoItem extends AuditBase {
-
-  @Column("description_of_goods")
-  @NotNull
-  private String descriptionOfGoods;
-
-  @JsonProperty("HSCode")
-  @NotNull
-  @Size(max = 10)
-  @Column("hs_code")
-  private String hsCode;
 
   @NotNull
   @Column("number_of_packages")

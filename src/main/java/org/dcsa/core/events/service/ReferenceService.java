@@ -14,11 +14,12 @@ public interface ReferenceService {
   Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndTOs(
       String shippingInstructionReference, List<ReferenceTO> references);
 
+  Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
+      String shippingInstructionReference, UUID consignmentId, List<ReferenceTO> references);
+
   Mono<List<ReferenceTO>> findByBookingID(UUID bookingID);
 
   Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference);
-
-  Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID);
 
   Mono<List<ReferenceTO>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID);
