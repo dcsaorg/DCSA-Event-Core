@@ -23,8 +23,7 @@ class UtilizedTransportEquipmentCustomRepositoryImplTest {
 
   @Spy R2dbcDialect r2dbcDialect = new PostgresDialect();
 
-  @InjectMocks
-  UtilizedTransportEquipmentCustomRepositoryImpl utilizedTransportEquipmentRepository;
+  @InjectMocks UtilizedTransportEquipmentCustomRepositoryImpl utilizedTransportEquipmentRepository;
 
   @Test
   @DisplayName(
@@ -32,20 +31,24 @@ class UtilizedTransportEquipmentCustomRepositoryImplTest {
   void testCargoItemCustomRepositoryQuery() {
     ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
     UUID shipmentID = UUID.randomUUID();
-    utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID);
+    utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentDetailsByShipmentID(
+        shipmentID);
     verify(client).sql(queryCaptor.capture());
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
-        "SELECT equipment.equipment_reference, utilized_transport_equipment.cargo_gross_weight_unit, utilized_transport_equipment.shipment_id AS shipmentId, "
-            + "utilized_transport_equipment.cargo_gross_weight, shipment.id AS sShipmentId, utilized_transport_equipment.is_shipper_owned, "
+        "SELECT equipment.equipment_reference, utilized_transport_equipment.cargo_gross_weight_unit, shipment.id AS shipmentId, "
+            + "utilized_transport_equipment.cargo_gross_weight, utilized_transport_equipment.is_shipper_owned, "
             + "equipment.iso_equipment_code, utilized_transport_equipment.id, utilized_transport_equipment.equipment_reference, "
             + "equipment.tare_weight, shipment.carrier_booking_reference, equipment.weight_unit FROM utilized_transport_equipment "
             + "JOIN equipment ON utilized_transport_equipment.equipment_reference = equipment.equipment_reference "
-            + "JOIN shipment ON utilized_transport_equipment.shipment_id = shipment.id "
-            + "WHERE utilized_transport_equipment.shipment_id = '"
+            + "JOIN cargo_item ON utilized_transport_equipment.id = cargo_item.utilized_transport_equipment_id "
+            + "JOIN consignment_item ON consignment_item.id = cargo_item.consignment_item_id "
+            + "JOIN shipment ON shipment.id = consignment_item.shipment_id "
+            +  "WHERE shipment.id = '"
             + shipmentID
             + "'";
+
     Assertions.assertEquals(expectedQuery, executedQuery);
   }
 }

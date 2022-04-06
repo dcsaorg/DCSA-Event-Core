@@ -42,10 +42,10 @@ public class CargoItemCustomRepositoryImplTest {
     String executedQuery = queryCaptor.getValue();
     Assertions.assertNotNull(executedQuery);
     String expectedQuery =
-        "SELECT cargo_item.id, cargo_item.description_of_goods, cargo_item.hs_code, cargo_item.weight, "
+        "SELECT cargo_item.id, cargo_item.weight, "
             + "cargo_item.volume, cargo_item.weight_unit, cargo_item.volume_unit, cargo_item.number_of_packages, "
-            + "cargo_item.shipping_instruction_id, cargo_item.package_code, cargo_item.utilized_transport_equipment_id, "
-            + "utilized_transport_equipment.id, utilized_transport_equipment.shipment_id, "
+            + "cargo_item.package_code, cargo_item.utilized_transport_equipment_id, "
+            + "utilized_transport_equipment.id, "
             + "cargo_line_item.cargo_line_item_id, "
             + "cargo_line_item.cargo_item_id, cargo_line_item.shipping_marks, cargo_line_item.id "
             + "FROM cargo_item "

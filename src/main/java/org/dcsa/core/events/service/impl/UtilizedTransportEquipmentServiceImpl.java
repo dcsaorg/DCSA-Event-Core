@@ -45,50 +45,14 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
         .findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID)
         .flatMap(
             utilizedTransportEquipmentDetails -> {
-              UUID utilizedTransportEquipmentID =
-                  utilizedTransportEquipmentDetails.getUtilizedTransportEquipmentID();
-              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO =
-                  new UtilizedTransportEquipmentTO();
-              utilizedTransportEquipmentTO.setCarrierBookingReference(
-                  utilizedTransportEquipmentDetails.getCarrierBookingReference());
-              utilizedTransportEquipmentTO.setEquipment(
-                  equipmentMapper.utilizedTransportEquipmentDetailsToDTO(
-                      utilizedTransportEquipmentDetails));
-              utilizedTransportEquipmentTO.setCargoGrossWeightUnit(
-                  utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
-              utilizedTransportEquipmentTO.setCargoGrossWeight(
-                  utilizedTransportEquipmentDetails.getCargoGrossWeight());
-              utilizedTransportEquipmentTO.setIsShipperOwned(
-                  utilizedTransportEquipmentDetails.getIsShipperOwned());
+              UUID utilizedTransportEquipmentID = utilizedTransportEquipmentDetails.getUtilizedTransportEquipmentID();
+              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
+              utilizedTransportEquipmentTO.setCarrierBookingReference(utilizedTransportEquipmentDetails.getCarrierBookingReference());
+              utilizedTransportEquipmentTO.setEquipment(equipmentMapper.utilizedTransportEquipmentDetailsToDTO(utilizedTransportEquipmentDetails));
+              utilizedTransportEquipmentTO.setCargoGrossWeightUnit(utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
+              utilizedTransportEquipmentTO.setCargoGrossWeight(utilizedTransportEquipmentDetails.getCargoGrossWeight());
+              utilizedTransportEquipmentTO.setIsShipperOwned(utilizedTransportEquipmentDetails.getIsShipperOwned());
               return Mono.when(
-                      cargoItemRepository
-                          .findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
-                              utilizedTransportEquipmentID)
-                          .flatMap(
-                              cargoItemWithCargoLineItems ->
-                                  referenceService
-                                      .findByCargoItemID(cargoItemWithCargoLineItems.getId())
-                                      .filter(
-                                          refs ->
-                                              (null != refs
-                                                  && !refs
-                                                      .isEmpty())) // mapNotNull was causing issues
-                                      // with the chain, random
-                                      // termination hence used a filter
-                                      .map(
-                                          referenceTOS -> {
-                                            CargoItemTO cargoItemTO =
-                                                cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
-                                                    cargoItemWithCargoLineItems);
-                                            cargoItemTO.setReferences(referenceTOS);
-                                            return cargoItemTO;
-                                          })
-                                      .switchIfEmpty(
-                                          Mono.just(
-                                              cargoItemMapper.cargoItemWithCargoLineItemsToDTO(
-                                                  cargoItemWithCargoLineItems))))
-                          .collectList()
-                          .doOnNext(utilizedTransportEquipmentTO::setCargoItems),
                       activeReeferSettingsRepository
                           .findById(utilizedTransportEquipmentID)
                           .map(activeReeferSettingsMapper::activeReeferSettingsToDTO)

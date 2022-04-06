@@ -31,27 +31,15 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
           new LinkedHashMap<>() {
             {
               put("ci.id", Column.create("id", CARGO_ITEM_TABLE));
-              put(
-                  "ci.description_of_goods",
-                  Column.create("description_of_goods", CARGO_ITEM_TABLE));
-              put("ci.hs_code", Column.create("hs_code", CARGO_ITEM_TABLE));
               put("ci.weight", Column.create("weight", CARGO_ITEM_TABLE));
               put("ci.volume", Column.create("volume", CARGO_ITEM_TABLE));
               put("ci.weight_unit", Column.create("weight_unit", CARGO_ITEM_TABLE));
               put("ci.volume_unit", Column.create("volume_unit", CARGO_ITEM_TABLE));
               put("ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
-              put(
-                  "ci.shipping_instruction_id",
-                  Column.create("shipping_instruction_id", CARGO_ITEM_TABLE));
               put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
-              put(
-                  "ci.utilized_transport_equipment_id",
-                  Column.create("utilized_transport_equipment_id", CARGO_ITEM_TABLE));
+              put("ci.utilized_transport_equipment_id", Column.create("utilized_transport_equipment_id", CARGO_ITEM_TABLE));
               put("ute.id", Column.create("id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
-              put("ute.shipment_id", Column.create("shipment_id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
-              put(
-                  "cli.cargo_line_item_id",
-                  Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
+              put("cli.cargo_line_item_id", Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
               put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));
               put("cli.shipping_marks", Column.create("shipping_marks", CARGO_LINE_ITEM_TABLE));
               put("cli.id", Column.create("id", CARGO_LINE_ITEM_TABLE));
@@ -159,9 +147,6 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
                   cargoItemResult.get(column("ci.number_of_packages").getName().getReference()))));
     }
 
-//    cargoItemWithCargoLineItems.setShippingInstructionReference(
-//        String.valueOf(
-//            cargoItemResult.get(column("ci.shipping_instruction_id").getName().getReference())));
     cargoItemWithCargoLineItems.setPackageCode(
         String.valueOf(cargoItemResult.get(column("ci.package_code").getName().getReference())));
     cargoItemWithCargoLineItems.setUtilizedTransportEquipmentID(
