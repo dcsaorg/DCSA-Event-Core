@@ -64,8 +64,8 @@ public class CargoItemCustomRepositoryImplTest {
         assertThrows(
             NullPointerException.class,
             () -> {
-              cargoItemCustomRepository.findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(
-                  null);
+              cargoItemCustomRepository
+                  .findAllCargoItemsAndCargoLineItemsByUtilizedTransportEquipmentID(null);
             });
 
     String expectedMessage = "utilizedTransportEquipmentID must not be null";
@@ -82,7 +82,7 @@ public class CargoItemCustomRepositoryImplTest {
     Map<String, Object> cargoItemWithCargoLineItem1 = new HashMap<>();
     UUID cargoItemId = UUID.randomUUID();
     UUID utilizedTransportEquipmentID = UUID.randomUUID();
-    String shippingInstructionReference = UUID.randomUUID().toString();
+    UUID shippingInstructionID = UUID.randomUUID();
 
     cargoItemWithCargoLineItem1.put("id", cargoItemId);
     cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
@@ -92,9 +92,10 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("weight_unit", "KGM");
     cargoItemWithCargoLineItem1.put("volume_unit", "CBM");
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
-    cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
+    cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionID);
     cargoItemWithCargoLineItem1.put("package_code", "123");
-    cargoItemWithCargoLineItem1.put("utilized_transport_equipment_id", utilizedTransportEquipmentID);
+    cargoItemWithCargoLineItem1.put(
+        "utilized_transport_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem1.put("cargo_line_item_id", "1");
     cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
     cargoItemWithCargoLineItem1.put("shipping_marks", "shipping_marks");
@@ -108,9 +109,10 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem2.put("weight_unit", "KGM");
     cargoItemWithCargoLineItem2.put("volume_unit", "CBM");
     cargoItemWithCargoLineItem2.put("number_of_packages", 2);
-    cargoItemWithCargoLineItem2.put("shipping_instruction_id", shippingInstructionReference);
+    cargoItemWithCargoLineItem2.put("shipping_instruction_id", shippingInstructionID);
     cargoItemWithCargoLineItem2.put("package_code", "123");
-    cargoItemWithCargoLineItem2.put("utilized_transport_equipment_id", utilizedTransportEquipmentID);
+    cargoItemWithCargoLineItem2.put(
+        "utilized_transport_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem2.put("cargo_line_item_id", "2");
     cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
     cargoItemWithCargoLineItem2.put("shipping_marks", "shipping_marks2");
@@ -150,7 +152,8 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
     cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
     cargoItemWithCargoLineItem1.put("package_code", "123");
-    cargoItemWithCargoLineItem1.put("utilized_transport_equipment_id", utilizedTransportEquipmentID);
+    cargoItemWithCargoLineItem1.put(
+        "utilized_transport_equipment_id", utilizedTransportEquipmentID);
 
     List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1);
 
@@ -173,14 +176,16 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("id", cargoItemId);
     cargoItemWithCargoLineItem1.put("description_of_goods", "description of goods");
     cargoItemWithCargoLineItem1.put("hs_code", "720711");
-    cargoItemWithCargoLineItem1.put("utilized_transport_equipment_id", utilizedTransportEquipmentID);
+    cargoItemWithCargoLineItem1.put(
+        "utilized_transport_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem1.put("cargo_item_id", cargoItemId);
 
     Map<String, Object> cargoItemWithCargoLineItem2 = new HashMap<>();
     cargoItemWithCargoLineItem2.put("id", cargoItemId);
     cargoItemWithCargoLineItem2.put("description_of_goods", "description of goods");
     cargoItemWithCargoLineItem2.put("hs_code", "720711");
-    cargoItemWithCargoLineItem2.put("utilized_transport_equipment_id", utilizedTransportEquipmentID);
+    cargoItemWithCargoLineItem2.put(
+        "utilized_transport_equipment_id", utilizedTransportEquipmentID);
     cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
 
     List<Map<String, Object>> cargoItemWithCargoLineItems =

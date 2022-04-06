@@ -11,13 +11,13 @@ import java.util.UUID;
 public interface ReferenceRepository extends ReactiveCrudRepository<Reference, UUID> {
 
   @Query(
-      "SELECT reference.* "
-          + "FROM reference "
-          + "WHERE shipping_instruction_id = :shippingInstructionReference "
-          + "OR shipment_id IN ( SELECT s.id from shipment s "
-          + "JOIN consignment_item con ON s.id = con.shipment_id "
-          + "WHERE con.shipping_instruction_id = :shippingInstructionReference ) ")
-  Flux<Reference> findByShippingInstructionReference(String shippingInstructionReference);
+    "SELECT reference.* "
+      + "FROM reference "
+      + "WHERE shipping_instruction_id = :shippingInstructionID "
+      + "OR shipment_id IN ( SELECT s.id from shipment s "
+      + "JOIN consignment_item ci ON ci.shipment_id = s.id "
+      + "WHERE ci.shipping_instruction_id = :shippingInstructionID ) ")
+  Flux<Reference> findByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
       "SELECT reference.* "
@@ -57,5 +57,5 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
 
   Mono<Void> deleteByBookingID(UUID bookingID);
 
-  Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);
+  Mono<Void> deleteByShippingInstructionID(UUID shippingInstructionID);
 }

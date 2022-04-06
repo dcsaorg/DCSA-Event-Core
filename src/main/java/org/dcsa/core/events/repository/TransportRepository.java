@@ -26,8 +26,8 @@ public interface TransportRepository extends ReactiveCrudRepository<Transport, U
           + " ON st.shipment_id = ci.shipment_id "
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = st.shipment_id "
-          + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR r.shipping_instruction_id = :shippingInstructionReference)")
-  Flux<String> findVesselIMONumbersByShippingInstructionReference(String shippingInstructionReference);
+          + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID)")
+  Flux<String> findVesselIMONumbersByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "

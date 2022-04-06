@@ -11,16 +11,19 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface CargoItemMapper {
 
-	@Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
-	@Mapping(source = "shippingInstructionReference", target = "shippingInstructionReference")
-	CargoItem dtoToCargoItem(CargoItemTO cargoItemTO, UUID utilizedTransportEquipmentID, String shippingInstructionReference);
+  @Mapping(source = "utilizedTransportEquipmentID", target = "utilizedTransportEquipmentID")
+  @Mapping(source = "shippingInstructionID", target = "shippingInstructionID")
+  CargoItem dtoToCargoItem(
+      CargoItemTO cargoItemTO, UUID utilizedTransportEquipmentID, UUID shippingInstructionID);
 
   @Mapping(source = "equipmentReference", target = "equipmentReference")
   CargoItemTO cargoItemToDto(CargoItem cargoItem, String equipmentReference);
 
-	@Mapping(source = "consignmentId", target = "consignmentItemID")
-	@Mapping(source = "shippingInstructionReference", target = "shippingInstructionReference")
-	CargoItem dtoToCargoItemWithConsignmentIdAndShippingInstructionReference(CargoItemTO cargoItemTO, UUID consignmentId, String shippingInstructionReference);
+  @Mapping(source = "consignmentId", target = "consignmentItemID")
+  @Mapping(source = "shippingInstructionID", target = "shippingInstructionID")
+  CargoItem dtoToCargoItemWithConsignmentIdAndShippingInstructionID(
+      CargoItemTO cargoItemTO, UUID consignmentId, UUID shippingInstructionID);
 
-	CargoItemTO cargoItemWithCargoLineItemsToDTO(CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems);
+  CargoItemTO cargoItemWithCargoLineItemsToDTO(
+      CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemWithCargoLineItems);
 }

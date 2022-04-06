@@ -11,7 +11,6 @@ import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.AddressService;
 import org.dcsa.core.events.service.DocumentPartyService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
-import org.dcsa.core.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,8 +44,8 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   }
 
   @Override
-  public Mono<List<DocumentPartyTO>> createDocumentPartiesByShippingInstructionReference(
-      String shippingInstructionReference, List<DocumentPartyTO> documentParties) {
+  public Mono<List<DocumentPartyTO>> createDocumentPartiesByShippingInstructionID(
+      UUID shippingInstructionReference, List<DocumentPartyTO> documentParties) {
     return createDocumentParties(
         shippingInstructionReference, ColumnReferenceType.SHIPPING_INSTRUCTION, documentParties);
   }
@@ -57,27 +56,27 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   }
 
   @Override
-  public Mono<List<DocumentPartyTO>> fetchDocumentPartiesByByShippingInstructionReference(
-      String shippingInstructionReference) {
+  public Mono<List<DocumentPartyTO>> fetchDocumentPartiesByByShippingInstructionID(
+      UUID shippingInstructionID) {
     return this.fetchDocumentPartiesByID(
-        shippingInstructionReference, ColumnReferenceType.SHIPPING_INSTRUCTION);
+        shippingInstructionID, ColumnReferenceType.SHIPPING_INSTRUCTION);
   }
 
   @Override
-  public Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionReference(
-      String shippingInstructionReference, List<DocumentPartyTO> documentPartyTOs) {
+  public Mono<List<DocumentPartyTO>> resolveDocumentPartiesForShippingInstructionID(
+      UUID shippingInstructionID, List<DocumentPartyTO> documentPartyTOs) {
     // this will create orphan parties
     return documentPartyRepository
-        .findByShippingInstructionReference(shippingInstructionReference)
+        .findByShippingInstructionID(shippingInstructionID)
         .flatMap(
             documentParty ->
                 displayedAddressRepository
                     .deleteAllByDocumentPartyID(documentParty.getId())
                     .thenReturn(documentParty))
         .flatMap(
-            ignored -> documentPartyRepository.deleteByShippingInstructionReference(shippingInstructionReference))
+            ignored -> documentPartyRepository.deleteByShippingInstructionID(shippingInstructionID))
         .then(
-            createDocumentPartiesByShippingInstructionReference(shippingInstructionReference, documentPartyTOs));
+            createDocumentPartiesByShippingInstructionID(shippingInstructionID, documentPartyTOs));
   }
 
   Mono<List<DocumentPartyTO>> fetchDocumentPartiesByID(Object id, ColumnReferenceType implType) {
@@ -90,7 +89,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
     if (implType == ColumnReferenceType.BOOKING) {
       documentParties = documentPartyRepository.findByBookingID((UUID) id);
     } else if (implType == ColumnReferenceType.SHIPPING_INSTRUCTION) {
-      documentParties = documentPartyRepository.findByShippingInstructionReference((String) id);
+      documentParties = documentPartyRepository.findByShippingInstructionID((UUID) id);
     }
 
     return documentParties
@@ -333,7 +332,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
         documentParty.setBookingID((UUID) id);
         break;
       case SHIPPING_INSTRUCTION:
-        documentParty.setShippingInstructionReference((String) id);
+        documentParty.setShippingInstructionID((UUID) id);
         break;
       case SHIPMENT:
         documentParty.setShipmentID((UUID) id);

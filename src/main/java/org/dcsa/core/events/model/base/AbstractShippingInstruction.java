@@ -9,7 +9,6 @@ import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.model.enums.TransportDocumentTypeCode;
 import org.dcsa.core.model.AuditBase;
 import org.dcsa.core.validator.EnumSubset;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotNull;
@@ -23,10 +22,6 @@ import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.EBL_DOCUMEN
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public abstract class AbstractShippingInstruction extends AuditBase {
-
-  @Id
-  @Column("id")
-  private UUID id;
 
   @Size(max = 100)
   @Column("shipping_instruction_reference")
@@ -93,9 +88,8 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("displayed_name_for_place_of_delivery")
   private String displayedNameForPlaceOfDelivery;
 
-  @Size(max = 20)
   @Column("amendment_to_transport_document")
-  private String amendmentToTransportDocument;
+  private UUID amendmentToTransportDocument;
 
   @Column("valid_until")
   private OffsetDateTime validUntil;

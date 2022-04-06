@@ -11,19 +11,19 @@ public interface ReferenceService {
   Mono<List<ReferenceTO>> createReferencesByBookingIDAndTOs(
       UUID bookingID, List<ReferenceTO> references);
 
-  Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndTOs(
-      String shippingInstructionReference, List<ReferenceTO> references);
+  Mono<List<ReferenceTO>> createReferencesByShippingInstructionIdAndTOs(
+      UUID shippingInstructionReference, List<ReferenceTO> references);
 
   Mono<List<ReferenceTO>> createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-      String shippingInstructionReference, UUID consignmentId, List<ReferenceTO> references);
+      UUID shippingInstructionReference, UUID consignmentId, List<ReferenceTO> references);
 
   Mono<List<ReferenceTO>> findByBookingID(UUID bookingID);
 
-  Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference);
+  Mono<List<ReferenceTO>> findByShippingInstructionID(UUID shippingInstructionID);
 
   Mono<List<ReferenceTO>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID);
 
   Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionReference(
-      List<ReferenceTO> references, String shippingInstructionReference);
+      List<ReferenceTO> references, UUID shippingInstructionReference);
 }

@@ -28,11 +28,12 @@ public interface BookingRepository
   Flux<String> findCarrierBookingRefsByTransportDocumentRef(String transportDocumentRef);
 
   @Query(
-      "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
-          + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-          + "JOIN consignment_item ci ON ci.shipment_id = s.id "
-          + "WHERE ci.shipping_instruction_id = :shippingInstructionReference")
-  Flux<String> findCarrierBookingRefsByShippingInstructionReference(String shippingInstructionReference);
+    "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
+      + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
+      + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
+      + "JOIN cargo_item ci ON ute.id = ci.utilized_transport_equipment_id "
+      + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
+  Flux<String> findCarrierBookingRefsByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
@@ -66,7 +67,7 @@ public interface BookingRepository
       String carrierBookingRequestReference,
       OffsetDateTime updatedDateTime);
 
-    @Query(
+  @Query(
       "SELECT DISTINCT b.* FROM shipment s "
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference")
@@ -77,7 +78,6 @@ public interface BookingRepository
           + "JOIN consignment_item ci ON ci.shipping_instruction_id = si.id "
           + "JOIN shipment s ON s.id = ci.shipment_id "
           + "JOIN booking b ON b.id = s.booking_id "
-          + "WHERE si.id = :shippingInstructionReference")
+          + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
   Flux<Booking> findAllByShippingInstructionReference(String shippingInstructionReference);
-
 }
