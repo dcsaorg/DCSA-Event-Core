@@ -14,18 +14,18 @@ import java.util.UUID;
 @Service
 public class ChargeServiceImpl implements ChargeService {
 
-	private final ChargeRepository chargeRepository;
-	private final ChargeMapper chargeMapper;
+  private final ChargeRepository chargeRepository;
+  private final ChargeMapper chargeMapper;
 
-	@Override
-	public Flux<ChargeTO> fetchChargesByTransportDocumentReference(String transportDocumentReference) {
-		return chargeRepository.findAllByTransportDocumentReference(transportDocumentReference)
-			.map(chargeMapper::chargeToDTO);
-	}
+  @Override
+  public Flux<ChargeTO> fetchChargesByTransportDocumentID(UUID transportDocumentID) {
+    return chargeRepository
+        .findAllByTransportDocumentID(transportDocumentID)
+        .map(chargeMapper::chargeToDTO);
+  }
 
-	@Override
-	public Flux<ChargeTO> fetchChargesByShipmentID(UUID shipmentID) {
-		return chargeRepository.findAllByShipmentID(shipmentID)
-			.map(chargeMapper::chargeToDTO);
-	}
+  @Override
+  public Flux<ChargeTO> fetchChargesByShipmentID(UUID shipmentID) {
+    return chargeRepository.findAllByShipmentID(shipmentID).map(chargeMapper::chargeToDTO);
+  }
 }

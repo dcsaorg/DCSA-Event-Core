@@ -11,10 +11,10 @@ import java.util.UUID;
 public interface ConsignmentItemMapper {
   ConsignmentItemTO consignmentItemToDTO(ConsignmentItem consignmentItem);
 
-  @Mapping(source = "shippingInstructionReference", target = "shippingInstructionID")
+  @Mapping(source = "shippingInstructionID", target = "shippingInstructionID")
   @Mapping(source = "shipmentId", target = "shipmentID")
-  ConsignmentItem dtoToConsignmentItemWithShippingReferenceAndShipmentId(
-      ConsignmentItemTO consignmentItemTO, String shippingInstructionReference, UUID shipmentId);
+  ConsignmentItem dtoToConsignmentItemWithShippingInstructionIDAndShipmentId(
+      ConsignmentItemTO consignmentItemTO, UUID shippingInstructionID, UUID shipmentId);
 
   ConsignmentItem dtoToConsignmentItem(ConsignmentItemTO consignmentItemTO);
 }

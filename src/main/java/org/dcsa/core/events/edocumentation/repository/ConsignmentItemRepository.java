@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface ConsignmentItemRepository extends ReactiveCrudRepository<ConsignmentItem, UUID> {
-  Flux<ConsignmentItem> findAllByShippingInstructionID(String shippingInstructionReference);
+  Flux<ConsignmentItem> findAllByShippingInstructionID(UUID shippingInstructionReference);
 }

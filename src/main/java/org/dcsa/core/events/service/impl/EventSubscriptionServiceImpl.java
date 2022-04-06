@@ -28,106 +28,123 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscriptionRepository, EventSubscription, UUID> implements EventSubscriptionService {
-    // This is not guaranteed to be correct, but it will work "most of the time".
-    private static final List<String> EMPTY_SQL_LIST = List.of("");
+public class EventSubscriptionServiceImpl
+    extends QueryServiceImpl<EventSubscriptionRepository, EventSubscription, UUID>
+    implements EventSubscriptionService {
+  // This is not guaranteed to be correct, but it will work "most of the time".
+  private static final List<String> EMPTY_SQL_LIST = List.of("");
 
-    private final EventSubscriptionRepository eventSubscriptionRepository;
-    private final MessageServiceConfig messageServiceConfig;
-    private final TransportCallRepository transportCallRepository;
-    private final VoyageRepository voyageRepository;
-    private final ServiceRepository serviceRepository;
-    private final TransportDocumentRepository transportDocumentRepository;
-    private final TransportDocumentTypeRepository transportDocumentTypeRepository;
-    private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
-    private final TransportRepository transportRepository;
-    private final BookingRepository bookingRepository;
+  private final EventSubscriptionRepository eventSubscriptionRepository;
+  private final MessageServiceConfig messageServiceConfig;
+  private final TransportCallRepository transportCallRepository;
+  private final VoyageRepository voyageRepository;
+  private final ServiceRepository serviceRepository;
+  private final TransportDocumentRepository transportDocumentRepository;
+  private final TransportDocumentTypeRepository transportDocumentTypeRepository;
+  private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
+  private final TransportRepository transportRepository;
+  private final BookingRepository bookingRepository;
 
-    @Override
-    public EventSubscriptionRepository getRepository() {
-        return eventSubscriptionRepository;
+  @Override
+  public EventSubscriptionRepository getRepository() {
+    return eventSubscriptionRepository;
+  }
+
+  @Override
+  public Mono<EventSubscription> findById(UUID id) {
+    return eventSubscriptionRepository
+        .findById(id)
+        .switchIfEmpty(Mono.error(new GetException("No EventSubscription with ID: " + id)));
+  }
+
+  @Override
+  public Mono<Void> deleteById(UUID subscriptionID) {
+    return eventSubscriptionRepository
+        .deleteById(subscriptionID)
+        .switchIfEmpty(
+            Mono.error(new DeleteException("No EventSubscription with ID: " + subscriptionID)));
+  }
+
+  @Override
+  public Mono<EventSubscription> create(EventSubscription eventSubscription) {
+    byte[] secret = eventSubscription.getSecret();
+    SignatureMethod signatureMethod;
+    if (eventSubscription.getSignatureMethod() == null) {
+      signatureMethod = messageServiceConfig.getDefaultSignatureMethod();
+      eventSubscription.setSignatureMethod(signatureMethod);
+    } else {
+      signatureMethod = eventSubscription.getSignatureMethod();
     }
-
-    @Override
-    public Mono<EventSubscription> findById(UUID id) {
-        return eventSubscriptionRepository.findById(id)
-                .switchIfEmpty(Mono.error(new GetException("No EventSubscription with ID: " + id)));
+    if (secret == null || secret.length < 1) {
+      return Mono.error(new CreateException("Please provide a non-empty \"secret\" attribute"));
     }
-
-    @Override
-    public Mono<Void> deleteById(UUID subscriptionID) {
-        return eventSubscriptionRepository.deleteById(subscriptionID)
-                .switchIfEmpty(Mono.error(new DeleteException("No EventSubscription with ID: " + subscriptionID)));
-    }
-
-    @Override
-    public Mono<EventSubscription> create(EventSubscription eventSubscription) {
-        byte[] secret = eventSubscription.getSecret();
-        SignatureMethod signatureMethod;
-        if (eventSubscription.getSignatureMethod() == null) {
-            signatureMethod = messageServiceConfig.getDefaultSignatureMethod();
-            eventSubscription.setSignatureMethod(signatureMethod);
-        } else {
-            signatureMethod = eventSubscription.getSignatureMethod();
+    if (signatureMethod.getMinKeyLength() == signatureMethod.getMaxKeyLength()) {
+      if (secret.length != signatureMethod.getMinKeyLength()) {
+        if (secret.length > 1
+            && secret.length - 1 == signatureMethod.getMinKeyLength()
+            && Character.isSpaceChar(((int) secret[secret.length - 1]) & 0xff)) {
+          return Mono.error(
+              new CreateException(
+                  "The secret provided in the \"secret\" attribute must be exactly "
+                      + signatureMethod.getMinKeyLength()
+                      + " bytes long (when deserialized).  Did you"
+                      + " accidentally include a trailing newline/space in the secret?"));
         }
-        if (secret == null || secret.length < 1) {
-            return Mono.error(new CreateException("Please provide a non-empty \"secret\" attribute"));
-        }
-        if (signatureMethod.getMinKeyLength() == signatureMethod.getMaxKeyLength()) {
-            if (secret.length != signatureMethod.getMinKeyLength()) {
-                if (secret.length  > 1 && secret.length - 1 == signatureMethod.getMinKeyLength()
-                        && Character.isSpaceChar(((int)secret[secret.length - 1]) & 0xff)) {
-                    return Mono.error(new CreateException("The secret provided in the \"secret\" attribute must be exactly "
-                            + signatureMethod.getMinKeyLength() + " bytes long (when deserialized).  Did you"
-                            + " accidentally include a trailing newline/space in the secret?"));
-                }
-                return Mono.error(new CreateException("The secret provided in the \"secret\" attribute must be exactly "
-                        + signatureMethod.getMinKeyLength() + " bytes long (when deserialized)"));
-            }
-        } else {
-            if (secret.length < signatureMethod.getMinKeyLength()) {
-                return Mono.error(new CreateException("The secret provided in the \"secret\" attribute must be at least "
-                        + signatureMethod.getMinKeyLength() + " bytes long (when deserialized)"));
-            }
-            if (secret.length > signatureMethod.getMaxKeyLength()) {
-                return Mono.error(new CreateException("The secret provided in the \"secret\" attribute must be at most "
-                        + signatureMethod.getMaxKeyLength() + " bytes long (when deserialized)"));
-            }
-        }
-        return checkEventSubscription(eventSubscription);
+        return Mono.error(
+            new CreateException(
+                "The secret provided in the \"secret\" attribute must be exactly "
+                    + signatureMethod.getMinKeyLength()
+                    + " bytes long (when deserialized)"));
+      }
+    } else {
+      if (secret.length < signatureMethod.getMinKeyLength()) {
+        return Mono.error(
+            new CreateException(
+                "The secret provided in the \"secret\" attribute must be at least "
+                    + signatureMethod.getMinKeyLength()
+                    + " bytes long (when deserialized)"));
+      }
+      if (secret.length > signatureMethod.getMaxKeyLength()) {
+        return Mono.error(
+            new CreateException(
+                "The secret provided in the \"secret\" attribute must be at most "
+                    + signatureMethod.getMaxKeyLength()
+                    + " bytes long (when deserialized)"));
+      }
     }
+    return checkEventSubscription(eventSubscription);
+  }
 
-    @Override
-    public Mono<EventSubscription> update(EventSubscription update) {
-        return checkEventSubscription(update)
-                .flatMap(eventSubscriptionRepository::save);
-    }
+  @Override
+  public Mono<EventSubscription> update(EventSubscription update) {
+    return checkEventSubscription(update).flatMap(eventSubscriptionRepository::save);
+  }
 
-    protected Mono<EventSubscription> checkEventSubscription(EventSubscription eventSubscription) {
-        // Ensure that the callback url at least looks valid.
-        try {
-            new URI(eventSubscription.getCallbackUrl());
-        } catch (URISyntaxException e) {
-            return Mono.error(new UpdateException("callbackUrl is invalid: " + e.getLocalizedMessage()));
-        }
-        return Mono.just(eventSubscription);
+  protected Mono<EventSubscription> checkEventSubscription(EventSubscription eventSubscription) {
+    // Ensure that the callback url at least looks valid.
+    try {
+      new URI(eventSubscription.getCallbackUrl());
+    } catch (URISyntaxException e) {
+      return Mono.error(new UpdateException("callbackUrl is invalid: " + e.getLocalizedMessage()));
     }
+    return Mono.just(eventSubscription);
+  }
 
-    @Override
-    public Flux<EventSubscription> findSubscriptionsFor(Event event) {
-        switch (event.getEventType()){
-            case EQUIPMENT:
-                return findSubscriptionsFor((EquipmentEvent) event);
-            case SHIPMENT:
-                return findSubscriptionsFor((ShipmentEvent) event);
-            case TRANSPORT:
-                return findSubscriptionsFor((TransportEvent) event);
-          case OPERATIONS:
-                return findSubscriptionsFor((OperationsEvent) event);
-            default:
-                throw new IllegalArgumentException("Unsupported event type.");
-        }
+  @Override
+  public Flux<EventSubscription> findSubscriptionsFor(Event event) {
+    switch (event.getEventType()) {
+      case EQUIPMENT:
+        return findSubscriptionsFor((EquipmentEvent) event);
+      case SHIPMENT:
+        return findSubscriptionsFor((ShipmentEvent) event);
+      case TRANSPORT:
+        return findSubscriptionsFor((TransportEvent) event);
+      case OPERATIONS:
+        return findSubscriptionsFor((OperationsEvent) event);
+      default:
+        throw new IllegalArgumentException("Unsupported event type.");
     }
+  }
 
   private Flux<EventSubscription> findSubscriptionsFor(EquipmentEvent equipmentEvent) {
 
@@ -177,19 +194,19 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
               List<String> transportDocumentRefs = transportDocumentReferences;
               // Force these to be null when empty to avoid invalid queries
               if (voyageNumbers.isEmpty()) {
-                  voyageNumbers = emptySQLList();
+                voyageNumbers = emptySQLList();
               }
               if (serviceCodes.isEmpty()) {
-                  serviceCodes = emptySQLList();
+                serviceCodes = emptySQLList();
               }
               if (documentTypeCodes.isEmpty()) {
-                  documentTypeCodes = emptySQLList();
+                documentTypeCodes = emptySQLList();
               }
               if (carrierBookingRefs.isEmpty()) {
-                  carrierBookingRefs = emptySQLList();
+                carrierBookingRefs = emptySQLList();
               }
               if (transportDocumentRefs.isEmpty()) {
-                  transportDocumentRefs = emptySQLList();
+                transportDocumentRefs = emptySQLList();
               }
 
               return eventSubscriptionRepository.findByEquipmentEventFields(
@@ -219,113 +236,116 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
     switch (shipmentEvent.getDocumentTypeCode()) {
       case BKG:
         carrierBookingReferences =
-            Mono.just(Collections.singletonList(shipmentEvent.getDocumentID()));
+            Mono.just(Collections.singletonList(shipmentEvent.getDocumentReference()));
         carrierVoyageNumbers =
             voyageRepository
-                .findCarrierVoyageNumbersByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findCarrierVoyageNumbersByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         carrierServiceCodes =
             serviceRepository
-                .findCarrierServiceCodesByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findCarrierServiceCodesByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         transportDocumentReferences =
             transportDocumentRepository
-                .findTransportDocumentReferencesByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findTransportDocumentReferencesByCarrierBookingRef(
+                    shipmentEvent.getDocumentReference())
                 .collectList();
         transportDocumentTypeCodes =
             transportDocumentTypeRepository
-                .findCodesByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findCodesByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         transportCallIDs =
             transportCallRepository
-                .findTransportCallIDByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findTransportCallIDByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
             utilizedTransportEquipmentRepository
-                .findEquipmentReferenceByCarrierBookRef(shipmentEvent.getDocumentID())
+                .findEquipmentReferenceByCarrierBookRef(shipmentEvent.getDocumentReference())
                 .collectList();
         vesselIMONumbers =
             transportRepository
-                .findVesselIMONumbersByCarrierBookingRef(shipmentEvent.getDocumentID())
+                .findVesselIMONumbersByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         break;
       case SHI:
         carrierBookingReferences =
             bookingRepository
-                .findCarrierBookingRefsByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findCarrierBookingRefsByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
             voyageRepository
-                .findCarrierVoyageNumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findCarrierVoyageNumbersByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
         carrierServiceCodes =
             serviceRepository
-                .findCarrierServiceCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findCarrierServiceCodesByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
 
         transportDocumentReferences =
             transportDocumentRepository
                 .findDistinctTransportDocumentReferencesByShippingInstructionReference(
-                    shipmentEvent.getDocumentID())
+                    shipmentEvent.getDocumentReference())
                 .map(TransportDocument::getTransportDocumentReference)
                 .collectList();
 
         transportDocumentTypeCodes =
             transportDocumentTypeRepository
-                .findCodesByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findCodesByShippingInstructionReference(shipmentEvent.getDocumentReference())
                 .collectList();
         transportCallIDs =
             transportCallRepository
-                .findTransportCallIDByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findTransportCallIDByShippingInstructionReference(
+                    shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
             utilizedTransportEquipmentRepository
-                .findEquipmentReferenceByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findEquipmentReferenceByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
         vesselIMONumbers =
             transportRepository
-                .findVesselIMONumbersByShippingInstructionReference(shipmentEvent.getDocumentID())
+                .findVesselIMONumbersByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
 
         break;
       case TRD:
         carrierBookingReferences =
             bookingRepository
-                .findCarrierBookingRefsByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findCarrierBookingRefsByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         carrierVoyageNumbers =
             voyageRepository
-                .findCarrierVoyageNumbersByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findCarrierVoyageNumbersByTransportDocumentRef(
+                    shipmentEvent.getDocumentReference())
                 .collectList();
 
         carrierServiceCodes =
             serviceRepository
-                .findCarrierServiceCodesByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findCarrierServiceCodesByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
 
         transportDocumentReferences =
             transportDocumentRepository
                 .findDistinctTransportDocumentReferencesByTransportDocumentReference(
-                    shipmentEvent.getDocumentID())
+                    shipmentEvent.getDocumentReference())
                 .map(TransportDocument::getTransportDocumentReference)
                 .collectList();
 
         transportDocumentTypeCodes =
             transportDocumentTypeRepository
-                .findCodesByTransportDocumentReference(shipmentEvent.getDocumentID())
+                .findCodesByTransportDocumentReference(shipmentEvent.getDocumentReference())
                 .collectList();
 
         transportCallIDs =
             transportCallRepository
-                .findTransportCallIDByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findTransportCallIDByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
             utilizedTransportEquipmentRepository
-                .findEquipmentReferenceByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findEquipmentReferenceByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         vesselIMONumbers =
             transportRepository
-                .findVesselIMONumbersByTransportDocumentRef(shipmentEvent.getDocumentID())
+                .findVesselIMONumbersByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         break;
       default:
@@ -358,63 +378,78 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
                     params.getT8()));
   }
 
-    private Flux<EventSubscription> findSubscriptionsFor(TransportEvent transportEvent) {
-        Mono<List<String>> carrierVoyageNumbers = transportCallRepository
-                .findCarrierVoyageNumbersByTransportCallID(transportEvent.getTransportCallID())
-                .collectList();
-        Mono<List<String>> carrierServiceCodes = transportCallRepository
-                .findCarrierServiceCodesByTransportCallID(transportEvent.getTransportCallID())
-                .collectList();
+  private Flux<EventSubscription> findSubscriptionsFor(TransportEvent transportEvent) {
+    Mono<List<String>> carrierVoyageNumbers =
+        transportCallRepository
+            .findCarrierVoyageNumbersByTransportCallID(transportEvent.getTransportCallID())
+            .collectList();
+    Mono<List<String>> carrierServiceCodes =
+        transportCallRepository
+            .findCarrierServiceCodesByTransportCallID(transportEvent.getTransportCallID())
+            .collectList();
 
-        TransportEventTypeCode transportEventTypeCode = transportEvent.getTransportEventTypeCode();
-        String vesselIMONumber = transportEvent.getTransportCall().getVessel().getVesselIMONumber();
-        String transportCallID = transportEvent.getTransportCallID();
+    TransportEventTypeCode transportEventTypeCode = transportEvent.getTransportEventTypeCode();
+    String vesselIMONumber = transportEvent.getTransportCall().getVessel().getVesselIMONumber();
+    String transportCallID = transportEvent.getTransportCallID();
 
-        List<DocumentReferenceTO> documentReferences = transportEvent.getDocumentReferences();
-        List<String> carrierBookingReferences = documentReferences.stream()
-                .filter(documentReferenceTO -> documentReferenceTO.getDocumentReferenceType() == DocumentReferenceType.BKG)
-                .map(DocumentReferenceTO::getDocumentReferenceValue)
-                .collect(Collectors.toList());
-        List<String> transportDocumentReferences = documentReferences.stream()
-                .filter(documentReferenceTO -> documentReferenceTO.getDocumentReferenceType() == DocumentReferenceType.TRD)
-                .map(DocumentReferenceTO::getDocumentReferenceValue)
-                .collect(Collectors.toList());
+    List<DocumentReferenceTO> documentReferences = transportEvent.getDocumentReferences();
+    List<String> carrierBookingReferences =
+        documentReferences.stream()
+            .filter(
+                documentReferenceTO ->
+                    documentReferenceTO.getDocumentReferenceType() == DocumentReferenceType.BKG)
+            .map(DocumentReferenceTO::getDocumentReferenceValue)
+            .collect(Collectors.toList());
+    List<String> transportDocumentReferences =
+        documentReferences.stream()
+            .filter(
+                documentReferenceTO ->
+                    documentReferenceTO.getDocumentReferenceType() == DocumentReferenceType.TRD)
+            .map(DocumentReferenceTO::getDocumentReferenceValue)
+            .collect(Collectors.toList());
 
-        Mono<List<String>> transportDocumentTypeCodes = Flux.fromIterable(transportDocumentReferences)
-                .flatMap(transportCallRepository::findTransportDocumentTypeCodeByTransportDocumentReference)
-                .collectList();
+    Mono<List<String>> transportDocumentTypeCodes =
+        Flux.fromIterable(transportDocumentReferences)
+            .flatMap(
+                transportCallRepository::findTransportDocumentTypeCodeByTransportDocumentReference)
+            .collectList();
 
-        return Mono.zip(carrierVoyageNumbers, carrierServiceCodes, transportDocumentTypeCodes).flatMapMany(vnScTc -> {
-            List<String> voyageNumbers = vnScTc.getT1();
-            List<String> serviceCodes = vnScTc.getT2();
-            List<String> documentTypeCodes = vnScTc.getT3();
-            List<String> carrierBookingRefs = carrierBookingReferences;
-            List<String> transportDocumentRefs = transportDocumentReferences;
-            // Force these to be null when empty to avoid invalid queries
-            if (voyageNumbers.isEmpty()) {
+    return Mono.zip(carrierVoyageNumbers, carrierServiceCodes, transportDocumentTypeCodes)
+        .flatMapMany(
+            vnScTc -> {
+              List<String> voyageNumbers = vnScTc.getT1();
+              List<String> serviceCodes = vnScTc.getT2();
+              List<String> documentTypeCodes = vnScTc.getT3();
+              List<String> carrierBookingRefs = carrierBookingReferences;
+              List<String> transportDocumentRefs = transportDocumentReferences;
+              // Force these to be null when empty to avoid invalid queries
+              if (voyageNumbers.isEmpty()) {
                 voyageNumbers = emptySQLList();
-            }
-            if (serviceCodes.isEmpty()) {
+              }
+              if (serviceCodes.isEmpty()) {
                 serviceCodes = emptySQLList();
-            }
-            if (documentTypeCodes.isEmpty()) {
+              }
+              if (documentTypeCodes.isEmpty()) {
                 documentTypeCodes = emptySQLList();
-            }
-            if (carrierBookingRefs.isEmpty()) {
+              }
+              if (carrierBookingRefs.isEmpty()) {
                 carrierBookingRefs = emptySQLList();
-            }
-            if (transportDocumentRefs.isEmpty()) {
+              }
+              if (transportDocumentRefs.isEmpty()) {
                 transportDocumentRefs = emptySQLList();
-            }
+              }
 
-            return eventSubscriptionRepository.findByTransportEventFields(
-                    voyageNumbers, serviceCodes,
-                    transportEventTypeCode, vesselIMONumber, transportCallID,
-                    carrierBookingRefs, transportDocumentRefs,
-                    documentTypeCodes
-            );
-        });
-    }
+              return eventSubscriptionRepository.findByTransportEventFields(
+                  voyageNumbers,
+                  serviceCodes,
+                  transportEventTypeCode,
+                  vesselIMONumber,
+                  transportCallID,
+                  carrierBookingRefs,
+                  transportDocumentRefs,
+                  documentTypeCodes);
+            });
+  }
 
   private Flux<EventSubscription> findSubscriptionsFor(OperationsEvent operationsEvent) {
     Mono<List<String>> carrierVoyageNumbers =
@@ -461,21 +496,20 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
 
               // Force these to be null when empty to avoid invalid queries
               if (cvns.isEmpty()) {
-                  cvns = emptySQLList();
+                cvns = emptySQLList();
               }
               if (cscs.isEmpty()) {
-                  cscs = emptySQLList();
+                cscs = emptySQLList();
               }
               if (cbrs.isEmpty()) {
-                  cbrs = emptySQLList();
+                cbrs = emptySQLList();
               }
               if (tdrs.isEmpty()) {
-                  tdrs = emptySQLList();
+                tdrs = emptySQLList();
               }
               if (tdtcs.isEmpty()) {
-                  tdtcs = emptySQLList();
+                tdtcs = emptySQLList();
               }
-
 
               return eventSubscriptionRepository.findByOperationEventFields(
                   operationsEventTypeCode,
@@ -491,6 +525,6 @@ public class EventSubscriptionServiceImpl extends QueryServiceImpl<EventSubscrip
 
   @SuppressWarnings({"unchecked"})
   private static <E> List<E> emptySQLList() {
-        return (List<E>)EMPTY_SQL_LIST;
+    return (List<E>) EMPTY_SQL_LIST;
   }
 }
