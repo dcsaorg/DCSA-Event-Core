@@ -71,14 +71,6 @@ public class ReferenceServiceImpl implements ReferenceService {
   }
 
   @Override
-  public Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID) {
-    return referenceRepository
-        .findByCargoItemID(cargoItemID)
-        .map(transformRefToRefTO)
-        .collectList();
-  }
-
-  @Override
   public Mono<List<ReferenceTO>> resolveReferencesForShippingInstructionReference(
       List<ReferenceTO> references, String shippingInstructionReference) {
 

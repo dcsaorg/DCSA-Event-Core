@@ -21,8 +21,6 @@ public interface ReferenceService {
 
   Mono<List<ReferenceTO>> findByShippingInstructionReference(String shippingInstructionReference);
 
-  Mono<List<ReferenceTO>> findByCargoItemID(UUID cargoItemID);
-
   Mono<List<ReferenceTO>> resolveReferencesForBookingID(
       List<ReferenceTO> references, UUID bookingID);
 
