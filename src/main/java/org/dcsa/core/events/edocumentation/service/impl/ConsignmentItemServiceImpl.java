@@ -1,7 +1,6 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.AllArgsConstructor;
-import org.dcsa.core.events.edocumentation.model.ConsignmentItem;
 import org.dcsa.core.events.edocumentation.model.mapper.ConsignmentItemMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO;
 import org.dcsa.core.events.edocumentation.repository.ConsignmentItemRepository;
@@ -43,11 +42,11 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   private final CargoItemMapper cargoItemMapper;
 
   @Override
-  public Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionReference(
-      String shippingInstructionReference) {
+  public Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionID(
+      UUID shippingInstructionID) {
 
     return consignmentItemRepository
-        .findAllByShippingInstructionID(shippingInstructionReference)
+        .findAllByShippingInstructionID(shippingInstructionID)
         .switchIfEmpty(
             Mono.error(
                 ConcreteRequestErrorMessageException.notFound(
@@ -59,7 +58,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
 
               return Mono.when(
                       referenceService
-                          .findByShippingInstructionReference(shippingInstructionReference)
+                          .findByShippingInstructionID(shippingInstructionID)
                           .doOnNext(ciTo::references),
                       cargoItemRepository
                           .findAllByConsignmentItemID(ci.getId())
@@ -82,11 +81,11 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   @Override
-  public Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionReferenceAndTOs(
-      String shippingInstructionReference,
+  public Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionIDAndTOs(
+      UUID shippingInstructionID,
       List<ConsignmentItemTO> consignmentItemTOs,
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
-    if (shippingInstructionReference == null)
+    if (shippingInstructionID == null)
       return Mono.error(
           ConcreteRequestErrorMessageException.invalidParameter(
               "ShippingInstructionReference cannot be null"));
@@ -112,21 +111,21 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                           consignmentItemRepository
                               .save(
                                   consignmentItemMapper
-                                      .dtoToConsignmentItemWithShippingReferenceAndShipmentId(
+                                      .dtoToConsignmentItemWithShippingInstructionIDAndShipmentId(
                                           consignmentItemTO,
-                                          shippingInstructionReference,
+                                          shippingInstructionID,
                                           shipment.getShipmentID()))
                               .flatMap(
                                   consignmentItem ->
                                       Mono.when(
                                               referenceService
                                                   .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-                                                      shippingInstructionReference,
+                                                      shippingInstructionID,
                                                       consignmentItem.getId(),
                                                       consignmentItemTO.getReferences())
                                                   .doOnNext(consignmentItemTOBuilder::references),
                                               saveCargoItems(
-                                                      shippingInstructionReference,
+                                                      shippingInstructionID,
                                                       consignmentItem.getId(),
                                                       consignmentItemTO.getCargoItems(),
                                                       utilizedTransportEquipmentTOs)
@@ -138,15 +137,14 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   @Override
-  public Mono<Void> removeConsignmentItemsByShippingInstructionReference(
-      String shippingInstructionReference) {
-    if (shippingInstructionReference == null)
+  public Mono<Void> removeConsignmentItemsByShippingInstructionID(UUID shippingInstructionID) {
+    if (shippingInstructionID == null)
       return Mono.error(
           ConcreteRequestErrorMessageException.invalidParameter(
-              "ShippingInstructionReference cannot be null"));
+              "ShippingInstructionID cannot be null"));
 
     return cargoItemRepository
-        .findAllByShippingInstructionReference(shippingInstructionReference)
+        .findAllByShippingInstructionID(shippingInstructionID)
         .flatMap(
             cargoItem ->
                 cargoLineItemRepository
@@ -157,7 +155,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
         .flatMap(
             ignored ->
                 consignmentItemRepository
-                    .findAllByShippingInstructionID((shippingInstructionReference))
+                    .findAllByShippingInstructionID((shippingInstructionID))
                     .flatMap(
                         consignmentItem ->
                             Mono.when(
@@ -169,7 +167,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
   }
 
   private Mono<List<CargoItemTO>> saveCargoItems(
-      String shippingInstructionReference,
+      UUID shippingInstructionID,
       UUID consignmentId,
       List<CargoItemTO> cargoItemTOs,
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs) {
@@ -196,20 +194,19 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
               }
               UUID utilizedTransportEquipmentId = equipment.get().getId();
               CargoItem cargoItem =
-                  cargoItemMapper.dtoToCargoItemWithConsignmentIdAndShippingInstructionReference(
-                      cargoItemTO, consignmentId, shippingInstructionReference);
+                  cargoItemMapper.dtoToCargoItemWithConsignmentIdAndShippingInstructionID(
+                      cargoItemTO, consignmentId, shippingInstructionID);
               cargoItem.setUtilizedTransportEquipmentID(utilizedTransportEquipmentId);
               return cargoItemRepository
                   .save(cargoItem)
                   .map(CargoItem::getId)
-                  .zipWith(Mono.just(cargoItemTO))
-                  .flatMap(t -> saveCargoLineItems(t.getT1(), cargoItemTO));
+                  .flatMap(cargoItemId -> saveCargoLineItems(cargoItemId, cargoItemTO));
             })
         .flatMap(
             cargoItemTO ->
                 referenceService
-                    .createReferencesByShippingInstructionReferenceAndTOs(
-                        shippingInstructionReference, cargoItemTO.getReferences())
+                    .createReferencesByShippingInstructionIdAndTOs(
+                        shippingInstructionID, cargoItemTO.getReferences())
                     .thenReturn(cargoItemTO))
         .collectList();
   }

@@ -1,7 +1,6 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.CargoItem;
 import org.dcsa.core.events.model.mapper.*;
 import org.dcsa.core.events.model.transferobjects.*;
 import org.dcsa.core.events.repository.*;
@@ -15,7 +14,6 @@ import reactor.util.function.Tuple2;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,15 +41,23 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
       UUID shipmentID) {
     return utilizedTransportEquipmentRepository
         .findUtilizedTransportEquipmentDetailsByShipmentID(shipmentID)
-        .flatMap(
+        .concatMap(
             utilizedTransportEquipmentDetails -> {
-              UUID utilizedTransportEquipmentID = utilizedTransportEquipmentDetails.getUtilizedTransportEquipmentID();
-              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO = new UtilizedTransportEquipmentTO();
-              utilizedTransportEquipmentTO.setCarrierBookingReference(utilizedTransportEquipmentDetails.getCarrierBookingReference());
-              utilizedTransportEquipmentTO.setEquipment(equipmentMapper.utilizedTransportEquipmentDetailsToDTO(utilizedTransportEquipmentDetails));
-              utilizedTransportEquipmentTO.setCargoGrossWeightUnit(utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
-              utilizedTransportEquipmentTO.setCargoGrossWeight(utilizedTransportEquipmentDetails.getCargoGrossWeight());
-              utilizedTransportEquipmentTO.setIsShipperOwned(utilizedTransportEquipmentDetails.getIsShipperOwned());
+              UUID utilizedTransportEquipmentID =
+                  utilizedTransportEquipmentDetails.getUtilizedTransportEquipmentID();
+              UtilizedTransportEquipmentTO utilizedTransportEquipmentTO =
+                  new UtilizedTransportEquipmentTO();
+              utilizedTransportEquipmentTO.setCarrierBookingReference(
+                  utilizedTransportEquipmentDetails.getCarrierBookingReference());
+              utilizedTransportEquipmentTO.setEquipment(
+                  equipmentMapper.utilizedTransportEquipmentDetailsToDTO(
+                      utilizedTransportEquipmentDetails));
+              utilizedTransportEquipmentTO.setCargoGrossWeightUnit(
+                  utilizedTransportEquipmentDetails.getCargoGrossWeightUnit());
+              utilizedTransportEquipmentTO.setCargoGrossWeight(
+                  utilizedTransportEquipmentDetails.getCargoGrossWeight());
+              utilizedTransportEquipmentTO.setIsShipperOwned(
+                  utilizedTransportEquipmentDetails.getIsShipperOwned());
               return Mono.when(
                       activeReeferSettingsRepository
                           .findById(utilizedTransportEquipmentID)
@@ -72,14 +78,13 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
       resolveUtilizedTransportEquipmentsForShippingInstructionReference(
           List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
           ShippingInstructionTO shippingInstructionTO) {
-      return utilizedTransportEquipmentRepository
-          .findUtilizedTransportEquipmentsByShippingInstructionReference(
-              shippingInstructionTO.getShippingInstructionReference())
+    return utilizedTransportEquipmentRepository
+        .findUtilizedTransportEquipmentsByShippingInstructionReference(
+            shippingInstructionTO.getShippingInstructionReference())
         .flatMap(
             utilizedTransportEquipment ->
                 utilizedTransportEquipmentRepository
-                    .deleteById(
-                        utilizedTransportEquipment.getId())
+                    .deleteById(utilizedTransportEquipment.getId())
                     .thenReturn(utilizedTransportEquipment))
         .flatMap(
             utilizedTransportEquipment ->

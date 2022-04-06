@@ -21,7 +21,7 @@ public interface UtilizedTransportEquipmentRepository
           + "JOIN shipping_instruction si ON con.shipping_instruction_id = si.id "
           + "JOIN cargo_item ci ON ci.consignment_item_id = con.id "
           + "JOIN utilized_transport_equipment ute ON ute.id = ci.utilized_transport_equipment_id "
-          + "WHERE si.id = :shippingInstructionReference")
+          + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
   Flux<UtilizedTransportEquipment> findUtilizedTransportEquipmentsByShippingInstructionReference(
       String shippingInstructionReference);
 
@@ -35,9 +35,8 @@ public interface UtilizedTransportEquipmentRepository
       "SELECT DISTINCT ute.equipment_reference FROM utilized_transport_equipment ute "
           + "JOIN cargo_item ci ON ci.utilized_transport_equipment_id = ute.id"
           + "LEFT JOIN reference r ON r.shipment_id = ute.shipment_id "
-          + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR r.shipping_instruction_id = :shippingInstructionReference")
-  Flux<String> findEquipmentReferenceByShippingInstructionReference(
-      String shippingInstructionReference);
+          + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID")
+  Flux<String> findEquipmentReferenceByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT ute.equipment_reference FROM utilized_transport_equipment ute "
