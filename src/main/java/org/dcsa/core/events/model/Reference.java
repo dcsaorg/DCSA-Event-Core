@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.ReferenceTypeCode;
 import org.dcsa.core.model.AuditBase;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -48,6 +49,7 @@ public class Reference extends AuditBase {
   @Column("consignment_item_id")
   private UUID consignmentItemID;
 
+  @Transient
   @Column("cargo_item_id")
   @JsonIgnore
   private UUID cargoItemID;
