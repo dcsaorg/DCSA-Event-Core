@@ -74,7 +74,7 @@ public interface BookingRepository
 
   @Query(
       "SELECT DISTINCT b.* FROM shipping_instruction si "
-          + "JOIN consignment_item ci ON ci.shipment_id = s.id "
+          + "JOIN consignment_item ci ON ci.shipping_instruction_id = si.id "
           + "JOIN shipment s ON s.id = ci.shipment_id "
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE si.id = :shippingInstructionReference")
