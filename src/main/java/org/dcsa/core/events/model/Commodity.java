@@ -40,7 +40,7 @@ public class Commodity {
   private CargoGrossVolume cargoGrossVolumeUnit;
 
   @Column("number_of_packages")
-  private int numberOfPackages;
+  private Integer numberOfPackages;
 
   @Column("export_license_issue_date")
   private LocalDate exportLicenseIssueDate;
