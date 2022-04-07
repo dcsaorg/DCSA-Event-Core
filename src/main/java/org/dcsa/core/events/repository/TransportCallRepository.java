@@ -24,9 +24,8 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
     Flux<String> findBookingReferencesByTransportCallID(String transportCallID);
 
     @Query("SELECT DISTINCT transport_document.transport_document_reference from transport_document transport_document"
-            + " JOIN cargo_item cargo_item ON cargo_item.shipping_instruction_id = transport_document.shipping_instruction_id"
-            + " JOIN utilized_transport_equipment utilized_transport_equipment ON utilized_transport_equipment.id = cargo_item.utilized_transport_equipment_id"
-            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = utilized_transport_equipment.shipment_id"
+            + " JOIN consignment_item consignment_item ON consignment_item.shipping_instruction_id = transport_document.shipping_instruction_id"
+            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = consignment_item.shipment_id"
             + " JOIN transport transport ON transport.id = shipment_transport.transport_id"
             + " WHERE transport.load_transport_call_id = :transportCallID"
             + " OR transport.discharge_transport_call_id = :transportCallID")
@@ -112,7 +111,7 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
           + "ON st.transport_id = t.id "
           + "JOIN shipment s "
           + "ON s.id = st.shipment_id "
-          + "LEFT JOIN cargo_item ci "
+          + "LEFT JOIN consignment_item ci "
           + "ON ci.shipment_id = s.id"
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = s.id "
