@@ -7,6 +7,7 @@ import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ShipmentEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
+import org.dcsa.core.events.service.DocumentReferenceService;
 import org.dcsa.core.events.service.ShipmentEventService;
 import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.function.BiFunction;
 public class ShipmentEventServiceImpl
     extends QueryServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID>
     implements ShipmentEventService {
+  private final DocumentReferenceService documentReferenceService;
   private final ShipmentEventRepository shipmentEventRepository;
   private final ReferenceRepository referenceRepository;
   private final UnmappedEventRepository unmappedEventRepository;
@@ -37,30 +39,35 @@ public class ShipmentEventServiceImpl
 
   @Override
   public Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent shipmentEvent) {
-    switch (shipmentEvent.getDocumentTypeCode()) {
-      case BKG:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByCarrierBookingReference(
-                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
-            .thenReturn(shipmentEvent);
-      case TRD:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByTransportDocumentReference(
-                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
-            .thenReturn(shipmentEvent);
-      case SHI:
-        return shipmentEventReferences
-            .apply(
-                shipmentEvent,
-                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
-            .thenReturn(shipmentEvent);
-      default:
-        return Mono.just(shipmentEvent);
-    }
+    return documentReferenceService.findAllDocumentReferencesForEvent(shipmentEvent)
+      .doOnNext(shipmentEvent::setDocumentReferences)
+      .flatMap(ignored -> {
+        // TODO: Refactor this based on DDT-1010
+        switch (shipmentEvent.getDocumentTypeCode()) {
+          case BKG:
+            return shipmentEventReferences
+                .apply(
+                    shipmentEvent,
+                    referenceRepository.findByCarrierBookingReference(
+                        shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
+                .thenReturn(shipmentEvent);
+          case TRD:
+            return shipmentEventReferences
+                .apply(
+                    shipmentEvent,
+                    referenceRepository.findByTransportDocumentReference(
+                        shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
+                .thenReturn(shipmentEvent);
+          case SHI:
+            return shipmentEventReferences
+                .apply(
+                    shipmentEvent,
+                    referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
+                .thenReturn(shipmentEvent);
+          default:
+            return Mono.just(shipmentEvent);
+        }
+      });
   }
 
   private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>

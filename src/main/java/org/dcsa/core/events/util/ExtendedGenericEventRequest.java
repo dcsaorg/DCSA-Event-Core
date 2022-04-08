@@ -6,6 +6,7 @@ import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import lombok.SneakyThrows;
 import org.dcsa.core.events.model.*;
+import org.dcsa.core.events.model.enums.TransportDocumentTypeCode;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.extendedrequest.QueryField;
@@ -40,33 +41,25 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
     private static final String TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME = "transportDocumentReference";
     private static final String TRANSPORT_DOCUMENT_ID_JSON_NAME = "transportDocumentID";
-    private static final String TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME = "transportDocumentTypeCode";
     private static final String VESSEL_IMO_NUMBER_JSON_NAME = "vesselIMONumber";
 
-    private static final String SHIPPING_INSTRUCTION_TABLE_NAME = "shipping_instruction";
-    private static final String SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME = "transport_document_type";
-    private static final String SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "id";
-
-    private static final String TRANSPORT_DOCUMENT_TABLE_NAME = "transport_document";
-    private static final String TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME = "shipping_instruction_id";
-    private static final String TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME = "transport_document_reference";
-
-    private static final TableLike EVENT_CARRIER_BOOKING_REFERENCE_TABLE = Table.create("event_shipment");
-    private static final String DOCUMENT_ID_COLUMN = "document_id";
-    private static final String LINK_TYPE_COLUMN = "link_type";
-
-    private static final String SHIPMENT_TABLE_ID_COLUMN = "id";
-    private static final String EVENT_SHIPMENT_SHIPMENT_TABLE_ID_COLUMN = "shipment_id";
+    private static final TableLike EVENT_DOCUMENT_REFERENCE_TABLE = Table.create("event_document_reference");
+    private static final SqlIdentifier DOCUMENT_ID_COLUMN = SqlIdentifier.unquoted("document_id");
+    private static final SqlIdentifier LINK_TYPE_COLUMN = SqlIdentifier.unquoted("link_type");
+    private static final SqlIdentifier CARRIER_BOOKING_REFERENCE_COLUMN = SqlIdentifier.unquoted("carrier_booking_reference");
+    private static final SqlIdentifier CARRIER_BOOKING_REQUEST_REFERENCE_COLUMN = SqlIdentifier.unquoted("carrier_booking_request_reference");
+    private static final SqlIdentifier TRANSPORT_DOCUMENT_REFERENCE_COLUMN = SqlIdentifier.unquoted("transport_document_reference");
+    private static final SqlIdentifier DOCUMENT_REFERENCE_TYPE_COLUMN = SqlIdentifier.unquoted("document_reference_type");
 
     private static final String TRANSPORT_CALL_ID_COLUMN = "transport_call_id";
     private static final String CARRIER_BOOKING_REFERENCE_JSON_NAME = "carrierBookingReference";
     private static final String BOOKING_REFERENCE_JSON_NAME = "bookingReference";
     private static final String CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME = "carrierBookingRequestReference";
+    private static final String DOCUMENT_REFERENCE_TYPE_JSON_NAME = "documentReferenceType";
 
     private static final Set<String> JSON_FIELDS_REQUIRING_DISTINCT = Set.of(
             TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
             TRANSPORT_DOCUMENT_ID_JSON_NAME,
-            TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,
             VESSEL_IMO_NUMBER_JSON_NAME,
             CARRIER_BOOKING_REFERENCE_JSON_NAME,
             CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME
@@ -136,22 +129,18 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
         }
     }
 
-    @SneakyThrows({NoSuchFieldException.class})
     protected DBEntityAnalysis.DBEntityAnalysisBuilder<Event> prepareDBEntityAnalysis() {
         DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder = super.prepareDBEntityAnalysis();
         TableLike eventTable = builder.getPrimaryModelTable();
         Set<String> seen = new HashSet<>();
-        boolean includesShipmentEvents = false;
         boolean needsTransportCall = false;
 
 
         for (Class<?> clazz : modelSubClasses) {
             Class<?> currentClass = clazz;
-            if (ShipmentEvent.class.isAssignableFrom(currentClass)) {
-                includesShipmentEvents = true;
-            } else if (TransportEvent.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass) || OperationsEvent.class.isAssignableFrom(currentClass)) {
+            if (TransportEvent.class.isAssignableFrom(currentClass) || EquipmentEvent.class.isAssignableFrom(currentClass) || OperationsEvent.class.isAssignableFrom(currentClass)) {
                 needsTransportCall = true;
-            } else {
+            } else if (!ShipmentEvent.class.isAssignableFrom(currentClass)){
                 throw new IllegalStateException("Unsupported event subclass: " + currentClass.getSimpleName());
             }
             while (currentClass != Event.class) {
@@ -172,15 +161,11 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
             }
         }
 
-
-        if (includesShipmentEvents) {
-            builder = queryParametersForShipmentEvents(builder, eventTable);
-        }
         if (needsTransportCall) {
             builder = queryParameterForTransportCall(builder);
         }
         return builder.onTable(Event.class)
-          .chainJoin(EVENT_CARRIER_BOOKING_REFERENCE_TABLE)
+          .chainJoin(EVENT_DOCUMENT_REFERENCE_TABLE)
           // This complex join is read as:
           //   (X AND Y) OR (X AND Z)
           // (because of how the underlying API works)
@@ -189,14 +174,11 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
           .or()
           .onEquals(LINK_TYPE_COLUMN, LINK_TYPE_COLUMN)
           .and().onEqualsThen(DOCUMENT_ID_COLUMN, DOCUMENT_ID_COLUMN)
-          .chainJoin(Shipment.class)
-          // Since the LHS is a Table (and not a class) we cannot use onFieldEqualsThen
-          .onEqualsThen(EVENT_SHIPMENT_SHIPMENT_TABLE_ID_COLUMN, SHIPMENT_TABLE_ID_COLUMN)
-          .registerQueryFieldFromFieldThen(CARRIER_BOOKING_REFERENCE_JSON_NAME)
+          .registerQueryFieldThen(CARRIER_BOOKING_REFERENCE_COLUMN, CARRIER_BOOKING_REFERENCE_JSON_NAME, String.class)
           .registerQueryFieldAliasThen(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME)
-          .chainJoin(Booking.class)
-          .onFieldEqualsThen("bookingID", "id")
-          .registerQueryFieldFromField(CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME);
+          .registerQueryFieldThen(CARRIER_BOOKING_REQUEST_REFERENCE_COLUMN, CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME, String.class)
+          .registerQueryFieldThen(TRANSPORT_DOCUMENT_REFERENCE_COLUMN, TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME, String.class)
+          .registerQueryField(DOCUMENT_REFERENCE_TYPE_COLUMN, DOCUMENT_REFERENCE_TYPE_JSON_NAME, TransportDocumentType.class);
     }
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder) {
@@ -229,28 +211,6 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .chainJoin(Service.class)
                 .onFieldEqualsThen("serviceID", "id")
                 .registerQueryFieldFromField("carrierServiceCode");
-    }
-
-    private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParametersForShipmentEvents(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder, TableLike eventTable) throws NoSuchFieldException {
-        // FIXME - this is incorrect (should join with a table based on the value of documentTypeCode)
-        String shipmentEventdocumentIdColumn = ReflectUtility.transformFromFieldNameToColumnName(ShipmentEvent.class, "documentID");
-        Table shippingInstructionsTable = Table.create(SHIPPING_INSTRUCTION_TABLE_NAME);
-        Table transportDocumentTable = Table.create(TRANSPORT_DOCUMENT_TABLE_NAME);
-        return builder
-                .join(Join.JoinType.JOIN, eventTable, shippingInstructionsTable)
-                .onEqualsThen(shipmentEventdocumentIdColumn, SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
-                .registerQueryFieldThen(
-                        SqlIdentifier.unquoted(SHIPPING_INSTRUCTION_TRANSPORT_DOCUMENT_TYPE_COLUMN_NAME),
-                        TRANSPORT_DOCUMENT_TYPE_CODE_JSON_NAME,
-                        String.class
-                )
-                .chainJoin(transportDocumentTable)
-                .onEqualsThen(SHIPPING_INSTRUCTION_ID_COLUMN_NAME, TRANSPORT_DOCUMENT_TABLE_SHIPPING_INSTRUCTION_ID_COLUMN_NAME)
-                .registerQueryFieldThen(
-                        SqlIdentifier.unquoted(TRANSPORT_DOCUMENT_TABLE_TRANSPORT_DOCUMENT_REFERENCE_COLUMN_NAME),
-                        TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME,
-                        String.class
-                ).registerQueryFieldAlias(TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME, TRANSPORT_DOCUMENT_ID_JSON_NAME);
     }
 
     @Override
