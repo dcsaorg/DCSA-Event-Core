@@ -1,7 +1,6 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Reference;
-import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -17,7 +16,6 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
           + "WHERE shipping_instruction_id = :shippingInstructionReference "
           + "OR shipment_id IN ( SELECT s.id from shipment s "
           + "JOIN consignment_item con ON s.id = con.shipment_id "
-          + "JOIN cargo_item ci ON ci.consignment_item_id = con.id "
           + "WHERE con.shipping_instruction_id = :shippingInstructionReference ) ")
   Flux<Reference> findByShippingInstructionReference(String shippingInstructionReference);
 
