@@ -5,6 +5,7 @@ import org.dcsa.core.events.model.TransportEvent;
 import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.TransportEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
+import org.dcsa.core.events.service.DocumentReferenceService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.events.service.TransportEventService;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class TransportEventServiceImpl extends QueryServiceImpl<TransportEventRepository, TransportEvent, UUID> implements TransportEventService {
+    private final DocumentReferenceService documentReferenceService;
     private final TransportEventRepository transportEventRepository;
     private final TransportCallService transportCallService;
     private final TransportCallTOService transportCallTOService;
@@ -43,7 +45,7 @@ public class TransportEventServiceImpl extends QueryServiceImpl<TransportEventRe
                     .flatMap(transportEvent ->
                             transportCallService.findReferencesForTransportCallID(event.getTransportCallID())
                                     .doOnNext(transportEvent::setReferences)
-                                    .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
+                                    .then(documentReferenceService.findAllDocumentReferencesForEvent(event))
                                     .doOnNext(transportEvent::setDocumentReferences)
                                     .thenReturn(transportEvent)
                     );
