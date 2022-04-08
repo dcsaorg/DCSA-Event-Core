@@ -16,22 +16,6 @@ public interface TransportCallRepository extends ExtendedRepository<TransportCal
             + " OR transport.discharge_transport_call_id = :transportCallID")
     Mono<UUID> findShipmentIDByTransportCallID(String transportCallID);
 
-    @Query("SELECT DISTINCT shipment.carrier_booking_reference from shipment shipment"
-            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = shipment.id"
-            + " JOIN transport transport ON transport.id = shipment_transport.transport_id"
-            + " WHERE transport.load_transport_call_id = :transportCallID"
-            + " OR transport.discharge_transport_call_id = :transportCallID")
-    Flux<String> findBookingReferencesByTransportCallID(String transportCallID);
-
-    @Query("SELECT DISTINCT transport_document.transport_document_reference from transport_document transport_document"
-            + " JOIN cargo_item cargo_item ON cargo_item.shipping_instruction_id = transport_document.shipping_instruction_id"
-            + " JOIN utilized_transport_equipment utilized_transport_equipment ON utilized_transport_equipment.id = cargo_item.utilized_transport_equipment_id"
-            + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = utilized_transport_equipment.shipment_id"
-            + " JOIN transport transport ON transport.id = shipment_transport.transport_id"
-            + " WHERE transport.load_transport_call_id = :transportCallID"
-            + " OR transport.discharge_transport_call_id = :transportCallID")
-    Flux<String> findTransportDocumentReferencesByTransportCallID(String transportCallID);
-
     @Query("SELECT DISTINCT seal.* FROM seal"
             + " JOIN utilized_transport_equipment utilized_transport_equipment ON utilized_transport_equipment.id = seal.utilized_transport_equipment_id"
             + " JOIN shipment_transport shipment_transport ON shipment_transport.shipment_id = utilized_transport_equipment.shipment_id"
