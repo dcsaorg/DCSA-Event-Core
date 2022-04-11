@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(callSuper = true)
 public class ShippingInstructionTO extends AbstractShippingInstruction {
 
+  private String amendToTransportDocument;
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String carrierBookingReference;
 
