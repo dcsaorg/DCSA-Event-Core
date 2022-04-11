@@ -36,7 +36,7 @@ public class Reference extends AuditBase {
 
   @Column("shipping_instruction_id")
   @JsonIgnore
-  private String shippingInstructionReference;
+  private UUID shippingInstructionID;
 
   @Column("shipment_id")
   @JsonIgnore

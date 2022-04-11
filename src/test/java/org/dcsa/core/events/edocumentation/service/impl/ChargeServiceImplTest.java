@@ -36,7 +36,7 @@ class ChargeServiceImplTest {
   void init() {
     charge = new Charge();
     charge.setChargeType("chargeTypeCode");
-    charge.setTransportDocumentReference("TransportDocumentReference1");
+    charge.setTransportDocumentID(UUID.randomUUID());
     charge.setShipmentID(UUID.randomUUID());
     charge.setCalculationBasis("calculationBasics");
     charge.setCurrencyCode("EUR");
@@ -49,10 +49,10 @@ class ChargeServiceImplTest {
   @Test
   @DisplayName("Test fetch charges for transport document with one charge should return one charge")
   void testFetchSingleChargeByTransportDocument() {
-    when(chargeRepository.findAllByTransportDocumentReference(any())).thenReturn(Flux.just(charge));
+    when(chargeRepository.findAllByTransportDocumentID(any())).thenReturn(Flux.just(charge));
 
     StepVerifier.create(
-            chargeService.fetchChargesByTransportDocumentReference("TransportDocumentReference1"))
+            chargeService.fetchChargesByTransportDocumentID(charge.getTransportDocumentID()))
         .assertNext(
             chargeTO -> {
               assertEquals(charge.getChargeType(), chargeTO.getChargeType());
@@ -66,7 +66,7 @@ class ChargeServiceImplTest {
   void testFetchMultipleChargesByTransportDocument() {
     Charge charge2 = new Charge();
     charge2.setChargeType("chargeTypeCode2");
-    charge2.setTransportDocumentReference("TransportDocumentReference1");
+    charge2.setTransportDocumentID(charge.getTransportDocumentID());
     charge2.setShipmentID(UUID.randomUUID());
     charge2.setCalculationBasis("calculationBasics");
     charge2.setCurrencyCode("EUR");
@@ -75,11 +75,11 @@ class ChargeServiceImplTest {
     charge2.setQuantity(100.0);
     charge2.setUnitPrice(76.0);
 
-    when(chargeRepository.findAllByTransportDocumentReference(any()))
+    when(chargeRepository.findAllByTransportDocumentID(any()))
         .thenReturn(Flux.just(charge, charge2));
 
     StepVerifier.create(
-            chargeService.fetchChargesByTransportDocumentReference("TransportDocumentReference1"))
+            chargeService.fetchChargesByTransportDocumentID(charge.getTransportDocumentID()))
         .assertNext(
             chargeTO -> {
               assertEquals(charge.getChargeType(), chargeTO.getChargeType());
@@ -96,10 +96,10 @@ class ChargeServiceImplTest {
   @Test
   @DisplayName("Test fetch no charges found by transportReference should return empty Flux")
   void testFetchNoChargesFoundByTransportReference() {
-    when(chargeRepository.findAllByTransportDocumentReference(any())).thenReturn(Flux.empty());
+    when(chargeRepository.findAllByTransportDocumentID(any())).thenReturn(Flux.empty());
 
     StepVerifier.create(
-            chargeService.fetchChargesByTransportDocumentReference("TransportDocumentReference1"))
+            chargeService.fetchChargesByTransportDocumentID(charge.getTransportDocumentID()))
         .verifyComplete();
   }
 
@@ -122,7 +122,7 @@ class ChargeServiceImplTest {
   void testFetchMultipleChargesByShipmentID() {
     Charge charge2 = new Charge();
     charge2.setChargeType("chargeTypeCode2");
-    charge2.setTransportDocumentReference("TransportDocumentReference1");
+    charge2.setTransportDocumentID(charge.getTransportDocumentID());
     charge2.setShipmentID(UUID.randomUUID());
     charge2.setCalculationBasis("calculationBasics");
     charge2.setCurrencyCode("EUR");

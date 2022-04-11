@@ -22,7 +22,7 @@ public class CargoItem extends AbstractCargoItem {
 
   @Transient
   @Column("shipping_instruction_id")
-  private String shippingInstructionReference;
+  private UUID shippingInstructionID;
 
   @Column("utilized_transport_equipment_id")
   @NotNull

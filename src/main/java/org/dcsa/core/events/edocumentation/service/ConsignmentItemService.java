@@ -5,16 +5,17 @@ import org.dcsa.core.events.model.transferobjects.UtilizedTransportEquipmentTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ConsignmentItemService {
 
-  Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionReference(String shippingInstructionReference);
+  Mono<List<ConsignmentItemTO>> fetchConsignmentItemsTOByShippingInstructionID(
+      UUID shippingInstructionID);
 
-  Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionReferenceAndTOs(
-      String shippingInstructionReference,
+  Mono<List<ConsignmentItemTO>> createConsignmentItemsByShippingInstructionIDAndTOs(
+      UUID shippingInstructionID,
       List<ConsignmentItemTO> consignmentItemTOs,
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs);
 
-  Mono<Void> removeConsignmentItemsByShippingInstructionReference(
-      String shippingInstructionReference);
+  Mono<Void> removeConsignmentItemsByShippingInstructionID(UUID shippingInstructionID);
 }

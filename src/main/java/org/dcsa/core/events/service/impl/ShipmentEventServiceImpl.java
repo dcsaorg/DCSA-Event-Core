@@ -16,70 +16,75 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-
 @RequiredArgsConstructor
 @Service
-public class ShipmentEventServiceImpl extends QueryServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID> implements ShipmentEventService {
-    private final ShipmentEventRepository shipmentEventRepository;
-    private final ReferenceRepository referenceRepository;
-    private final UnmappedEventRepository unmappedEventRepository;
+public class ShipmentEventServiceImpl
+    extends QueryServiceImpl<ShipmentEventRepository, ShipmentEvent, UUID>
+    implements ShipmentEventService {
+  private final ShipmentEventRepository shipmentEventRepository;
+  private final ReferenceRepository referenceRepository;
+  private final UnmappedEventRepository unmappedEventRepository;
 
-    @Override
-    protected ShipmentEventRepository getRepository() {
-        return shipmentEventRepository;
+  @Override
+  protected ShipmentEventRepository getRepository() {
+    return shipmentEventRepository;
+  }
+
+  @Override
+  public Mono<ShipmentEvent> findById(UUID id) {
+    return shipmentEventRepository.findById(id);
+  }
+
+  @Override
+  public Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent shipmentEvent) {
+    switch (shipmentEvent.getDocumentTypeCode()) {
+      case BKG:
+        return shipmentEventReferences
+            .apply(
+                shipmentEvent,
+                referenceRepository.findByCarrierBookingReference(
+                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
+            .thenReturn(shipmentEvent);
+      case TRD:
+        return shipmentEventReferences
+            .apply(
+                shipmentEvent,
+                referenceRepository.findByTransportDocumentReference(
+                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
+            .thenReturn(shipmentEvent);
+      case SHI:
+        return shipmentEventReferences
+            .apply(
+                shipmentEvent,
+                referenceRepository.findByShippingInstructionID(shipmentEvent.getDocumentID()))
+            .thenReturn(shipmentEvent);
+      default:
+        return Mono.just(shipmentEvent);
     }
+  }
 
-    @Override
-    public Mono<ShipmentEvent> findById(UUID id) {
-        return shipmentEventRepository.findById(id);
-    }
+  private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>
+      shipmentEventReferences =
+          (se, rs) ->
+              Mono.justOrEmpty(se)
+                  .flatMap(
+                      shipmentEvent ->
+                          rs.collectList()
+                              .doOnNext(shipmentEvent::setReferences)
+                              .thenReturn(shipmentEvent));
 
-    @Override
-    public Mono<ShipmentEvent> loadRelatedEntities(ShipmentEvent shipmentEvent) {
-        switch (shipmentEvent.getDocumentTypeCode()) {
-            case BKG:
-                return shipmentEventReferences
-                        .apply(
-                                shipmentEvent,
-                                referenceRepository.findByCarrierBookingReference(shipmentEvent.getDocumentID()))
-                        .thenReturn(shipmentEvent);
-            case TRD:
-                return shipmentEventReferences
-                        .apply(
-                                shipmentEvent,
-                                referenceRepository.findByTransportDocumentReference(shipmentEvent.getDocumentID()))
-                        .thenReturn(shipmentEvent);
-            case SHI:
-                return shipmentEventReferences
-                        .apply(
-                                shipmentEvent,
-                                referenceRepository.findByShippingInstructionReference(shipmentEvent.getDocumentID()))
-                        .thenReturn(shipmentEvent);
-            default:
-                return Mono.just(shipmentEvent);
-        }
-    }
-
-    private final BiFunction<ShipmentEvent, Flux<Reference>, Mono<ShipmentEvent>>
-            shipmentEventReferences =
-            (se, rs) ->
-                    Mono.justOrEmpty(se)
-                            .flatMap(
-                                    shipmentEvent ->
-                                            rs.collectList()
-                                                    .doOnNext(shipmentEvent::setReferences)
-                                                    .thenReturn(shipmentEvent));
-
-    @Override
-    public Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent) {
-        return shipmentEventRepository.save(shipmentEvent).flatMap(
-                se -> {
-                    UnmappedEvent unmappedEvent = new UnmappedEvent();
-                    unmappedEvent.setNewRecord(true);
-                    unmappedEvent.setEventID(se.getEventID());
-                    unmappedEvent.setEnqueuedAtDateTime(se.getEventCreatedDateTime());
-                    return unmappedEventRepository.save(unmappedEvent);
-                }).thenReturn(shipmentEvent);
-    }
-
+  @Override
+  public Mono<ShipmentEvent> create(ShipmentEvent shipmentEvent) {
+    return shipmentEventRepository
+        .save(shipmentEvent)
+        .flatMap(
+            se -> {
+              UnmappedEvent unmappedEvent = new UnmappedEvent();
+              unmappedEvent.setNewRecord(true);
+              unmappedEvent.setEventID(se.getEventID());
+              unmappedEvent.setEnqueuedAtDateTime(se.getEventCreatedDateTime());
+              return unmappedEventRepository.save(unmappedEvent);
+            })
+        .thenReturn(shipmentEvent);
+  }
 }

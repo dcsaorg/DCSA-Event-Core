@@ -104,7 +104,7 @@ class ConsignmentItemServiceImplTest {
     cargoItem = new CargoItem();
     cargoItem.setId(UUID.randomUUID());
     cargoItem.setUtilizedTransportEquipmentID(utilizedTransportEquipment.getId());
-    cargoItem.setShippingInstructionReference(UUID.randomUUID().toString());
+    cargoItem.setShippingInstructionID(UUID.randomUUID());
     cargoItem.setPackageCode("ABC");
     cargoItem.setNumberOfPackages(1);
     cargoItem.setWeight(100F);
@@ -119,13 +119,14 @@ class ConsignmentItemServiceImplTest {
 
     OffsetDateTime now = OffsetDateTime.now();
     shippingInstruction = new ShippingInstruction();
+    shippingInstruction.setId(UUID.randomUUID());
     shippingInstruction.setShippingInstructionReference(UUID.randomUUID().toString());
     shippingInstruction.setDocumentStatus(ShipmentEventTypeCode.RECE);
     shippingInstruction.setShippingInstructionCreatedDateTime(now);
     shippingInstruction.setShippingInstructionUpdatedDateTime(now);
 
     consignmentItem = new ConsignmentItem();
-    consignmentItem.setShippingInstructionID(shippingInstruction.getShippingInstructionReference());
+    consignmentItem.setShippingInstructionID(shippingInstruction.getId());
     consignmentItem.setId(UUID.randomUUID());
     consignmentItem.setVolume(12.02);
     consignmentItem.setHsCode("411510");
@@ -185,23 +186,23 @@ class ConsignmentItemServiceImplTest {
     @Test
     @DisplayName("Test create testCreateConsignmentItems")
     void testCreateConsignmentItems() {
-      String shippingInstructionReference = shippingInstruction.getShippingInstructionReference();
+      UUID shippingInstructionID = shippingInstruction.getId();
 
       when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
       when(consignmentItemRepository.save(any())).thenReturn(Mono.just(consignmentItem));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
       when(cargoLineItemRepository.save(any())).thenReturn(Mono.just(cargoLineItem));
-      when(referenceService.createReferencesByShippingInstructionReferenceAndTOs(
-              eq(shippingInstructionReference), any()))
+      when(referenceService.createReferencesByShippingInstructionIdAndTOs(
+              eq(shippingInstructionID), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
       when(referenceService.createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-              eq(shippingInstructionReference), any(), any()))
+              eq(shippingInstructionID), any(), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       StepVerifier.create(
-              consignmentItemService.createConsignmentItemsByShippingInstructionReferenceAndTOs(
-                  shippingInstructionReference,
+              consignmentItemService.createConsignmentItemsByShippingInstructionIDAndTOs(
+                  shippingInstructionID,
                   Collections.singletonList(consignmentItemTO),
                   Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
@@ -209,7 +210,7 @@ class ConsignmentItemServiceImplTest {
                 verify(cargoItemRepository).save(argumentCaptorCargoItem.capture());
                 verify(cargoLineItemRepository).save(any());
                 verify(referenceService)
-                    .createReferencesByShippingInstructionReferenceAndTOs(any(), any());
+                    .createReferencesByShippingInstructionIdAndTOs(any(), any());
                 verify(referenceService)
                     .createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
                         any(), any(), any());
@@ -225,8 +226,8 @@ class ConsignmentItemServiceImplTest {
                     consignmentItemTOs.stream().findFirst().get().getDescriptionOfGoods());
 
                 assertEquals(
-                    shippingInstructionReference,
-                    argumentCaptorCargoItem.getValue().getShippingInstructionReference());
+                    shippingInstructionID,
+                    argumentCaptorCargoItem.getValue().getShippingInstructionID());
                 assertTrue(
                     consignmentItemTOs.stream().findFirst().get().getCargoItems().stream()
                         .findFirst()
@@ -253,23 +254,23 @@ class ConsignmentItemServiceImplTest {
       consignmentItemTOBuilder.references(null);
       consignmentItemTO = consignmentItemTOBuilder.build();
 
-      String shippingInstructionReference = shippingInstruction.getShippingInstructionReference();
+      UUID shippingInstructionID = shippingInstruction.getId();
 
       when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
       when(consignmentItemRepository.save(any())).thenReturn(Mono.just(consignmentItem));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
       when(cargoLineItemRepository.save(any())).thenReturn(Mono.just(cargoLineItem));
-      when(referenceService.createReferencesByShippingInstructionReferenceAndTOs(
-              eq(shippingInstructionReference), any()))
+      when(referenceService.createReferencesByShippingInstructionIdAndTOs(
+              eq(shippingInstructionID), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
       when(referenceService.createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-              eq(shippingInstructionReference), any(), any()))
+              eq(shippingInstructionID), any(), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       StepVerifier.create(
-              consignmentItemService.createConsignmentItemsByShippingInstructionReferenceAndTOs(
-                  shippingInstructionReference,
+              consignmentItemService.createConsignmentItemsByShippingInstructionIDAndTOs(
+                  shippingInstructionID,
                   Collections.singletonList(consignmentItemTO),
                   Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
@@ -288,8 +289,8 @@ class ConsignmentItemServiceImplTest {
                     consignmentItemTOs.stream().findFirst().get().getDescriptionOfGoods());
 
                 assertEquals(
-                    shippingInstructionReference,
-                    argumentCaptorCargoItem.getValue().getShippingInstructionReference());
+                    shippingInstructionID,
+                    argumentCaptorCargoItem.getValue().getShippingInstructionID());
                 assertTrue(
                     consignmentItemTOs.stream().findFirst().get().getCargoItems().stream()
                         .findFirst()
@@ -316,19 +317,19 @@ class ConsignmentItemServiceImplTest {
       consignmentItemTOBuilder.cargoItems(List.of(cargoItemTO));
       consignmentItemTO = consignmentItemTOBuilder.build();
 
-      String shippingInstructionReference = shippingInstruction.getShippingInstructionReference();
+      UUID shippingInstructionID = shippingInstruction.getId();
 
       when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
       when(consignmentItemRepository.save(any())).thenReturn(Mono.just(consignmentItem));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
       when(referenceService.createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-              eq(shippingInstructionReference), any(), any()))
+              eq(shippingInstructionID), any(), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       StepVerifier.create(
-              consignmentItemService.createConsignmentItemsByShippingInstructionReferenceAndTOs(
-                  shippingInstructionReference,
+              consignmentItemService.createConsignmentItemsByShippingInstructionIDAndTOs(
+                  shippingInstructionID,
                   Collections.singletonList(consignmentItemTO),
                   Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
@@ -349,8 +350,8 @@ class ConsignmentItemServiceImplTest {
                     consignmentItemTOs.stream().findFirst().get().getDescriptionOfGoods());
 
                 assertEquals(
-                    shippingInstructionReference,
-                    argumentCaptorCargoItem.getValue().getShippingInstructionReference());
+                    shippingInstructionID,
+                    argumentCaptorCargoItem.getValue().getShippingInstructionID());
                 assertTrue(
                     consignmentItemTOs.stream().findFirst().get().getCargoItems().stream()
                         .findFirst()
@@ -378,19 +379,19 @@ class ConsignmentItemServiceImplTest {
       consignmentItemTOBuilder.references(null);
       consignmentItemTO = consignmentItemTOBuilder.build();
 
-      String shippingInstructionReference = shippingInstruction.getShippingInstructionReference();
+      UUID shippingInstructionID = shippingInstruction.getId();
 
       when(shipmentRepository.findByCarrierBookingReference(any())).thenReturn(Mono.just(shipment));
       when(consignmentItemRepository.save(any())).thenReturn(Mono.just(consignmentItem));
       when(cargoItemRepository.save(any())).thenReturn(Mono.just(cargoItem));
       when(referenceService.createReferencesByShippingInstructionReferenceAndConsignmentIdAndTOs(
-              eq(shippingInstructionReference), any(), any()))
+              eq(shippingInstructionID), any(), any()))
           .thenReturn(Mono.just(List.of(referenceTO)));
 
       ArgumentCaptor<CargoItem> argumentCaptorCargoItem = ArgumentCaptor.forClass(CargoItem.class);
       StepVerifier.create(
-              consignmentItemService.createConsignmentItemsByShippingInstructionReferenceAndTOs(
-                  shippingInstructionReference,
+              consignmentItemService.createConsignmentItemsByShippingInstructionIDAndTOs(
+                  shippingInstructionID,
                   Collections.singletonList(consignmentItemTO),
                   Collections.singletonList(utilizedTransportEquipmentTO)))
           .assertNext(
@@ -410,8 +411,8 @@ class ConsignmentItemServiceImplTest {
                     consignmentItemTOs.stream().findFirst().get().getDescriptionOfGoods());
 
                 assertEquals(
-                    shippingInstructionReference,
-                    argumentCaptorCargoItem.getValue().getShippingInstructionReference());
+                    shippingInstructionID,
+                    argumentCaptorCargoItem.getValue().getShippingInstructionID());
                 assertTrue(
                     consignmentItemTOs.stream().findFirst().get().getCargoItems().stream()
                         .findFirst()
@@ -438,9 +439,9 @@ class ConsignmentItemServiceImplTest {
     @Test
     @DisplayName("Test removeConsignmentItemsByShippingInstructionReference")
     void testRemoveConsignmentItems() {
-      String shippingInstructionReference = shippingInstruction.getShippingInstructionReference();
+      UUID shippingInstructionID = shippingInstruction.getId();
 
-      when(cargoItemRepository.findAllByShippingInstructionReference(any()))
+      when(cargoItemRepository.findAllByShippingInstructionID(any()))
           .thenReturn(Flux.just(cargoItem));
       when(cargoLineItemRepository.deleteByCargoItemID(any())).thenReturn(Mono.empty());
       when(cargoItemRepository.deleteById(any(UUID.class))).thenReturn(Mono.empty());
@@ -450,8 +451,8 @@ class ConsignmentItemServiceImplTest {
       when(consignmentItemRepository.deleteById(any(UUID.class))).thenReturn(Mono.empty());
 
       StepVerifier.create(
-              consignmentItemService.removeConsignmentItemsByShippingInstructionReference(
-                  shippingInstructionReference))
+              consignmentItemService.removeConsignmentItemsByShippingInstructionID(
+                  shippingInstructionID))
           .verifyComplete();
     }
   }

@@ -19,14 +19,15 @@ public class CarrierClauseServiceImpl implements CarrierClauseService {
   @Override
   public Flux<CarrierClauseTO> fetchCarrierClausesByTransportDocumentReference(
       String transportDocumentReference) {
-    return carrierClauseRepository.fetchAllByTransportDocumentReference(transportDocumentReference)
-      .map(carrierClauseMapper::carrierClauseToDTO);
+    return carrierClauseRepository
+        .fetchAllByTransportDocumentReference(transportDocumentReference)
+        .map(carrierClauseMapper::carrierClauseToDTO);
   }
 
   @Override
   public Flux<CarrierClauseTO> fetchCarrierClausesByShipmentID(UUID shipmentID) {
     return carrierClauseRepository
-      .fetchAllByShipmentID(shipmentID)
-      .map(carrierClauseMapper::carrierClauseToDTO);
+        .fetchAllByShipmentID(shipmentID)
+        .map(carrierClauseMapper::carrierClauseToDTO);
   }
 }
