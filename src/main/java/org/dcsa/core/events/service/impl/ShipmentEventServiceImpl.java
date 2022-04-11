@@ -43,14 +43,14 @@ public class ShipmentEventServiceImpl
             .apply(
                 shipmentEvent,
                 referenceRepository.findByCarrierBookingReference(
-                    shipmentEvent.getDocumentReference()))
+                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
             .thenReturn(shipmentEvent);
       case TRD:
         return shipmentEventReferences
             .apply(
                 shipmentEvent,
                 referenceRepository.findByTransportDocumentReference(
-                    shipmentEvent.getDocumentReference()))
+                    shipmentEvent.getDocumentReference())) //ToDo this needs to change to use shipmentEvent.getDocumentID
             .thenReturn(shipmentEvent);
       case SHI:
         return shipmentEventReferences

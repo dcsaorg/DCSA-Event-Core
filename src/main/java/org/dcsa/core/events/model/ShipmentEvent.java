@@ -1,6 +1,7 @@
 package org.dcsa.core.events.model;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -36,35 +37,20 @@ public class ShipmentEvent extends Event {
     @Column("document_id")
     @Size(max = 100)
     @JsonIgnore
-//    @JsonProperty("foo")
     private UUID documentID;
 
     @Column("document_reference")
     @Size(max = 100)
-//    @JsonProperty("documentID")
     private String documentReference;
+
+    @JsonGetter("documentID")
+    public String getDocumentReferenceAsDocumentID() {
+      return documentReference;
+    }
 
     @Column("reason")
     @Size(max = 250)
     private String reason;
-
-    @JsonProperty("shipmentID")
-    @Deprecated
-    public UUID getShipmentID() {
-        if (documentTypeCode == DocumentTypeCode.SHI) {
-            return documentID;
-        }
-        return null;
-    }
-
-    @JsonProperty("shipmentInformationTypeCode")
-    @Deprecated
-    public DocumentTypeCode getShipmentInformationTypeCode() {
-        if (documentTypeCode == DocumentTypeCode.BKG) {
-            return DocumentTypeCode.BOK;
-        }
-        return documentTypeCode;
-    }
 
     @Transient
     private List<Reference> references;
