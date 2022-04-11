@@ -12,6 +12,7 @@ public class PartyContactDetailsTO {
   private String name;
   private String phone;
   private String email;
+  private String url;
 
   public PartyContactDetails toPartyContactDetails(String partyID) {
     PartyContactDetails partyContactDetails = new PartyContactDetails();
