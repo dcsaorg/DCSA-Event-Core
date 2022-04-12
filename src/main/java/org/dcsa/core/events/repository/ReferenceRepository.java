@@ -15,8 +15,7 @@ public interface ReferenceRepository extends ReactiveCrudRepository<Reference, U
           + "FROM reference "
           + "WHERE shipping_instruction_id = :shippingInstructionID "
           + "OR shipment_id IN ( SELECT s.id from shipment s "
-          + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
-          + "JOIN cargo_item ci ON ci.utilized_transport_equipment_id = ute.id "
+          + "JOIN consignment_item ci ON ci.shipment_id = s.id "
           + "WHERE ci.shipping_instruction_id = :shippingInstructionID ) ")
   Flux<Reference> findByShippingInstructionID(UUID shippingInstructionID);
 

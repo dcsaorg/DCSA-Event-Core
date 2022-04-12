@@ -12,10 +12,6 @@ public interface UtilizedTransportEquipmentRepository
     extends ReactiveCrudRepository<UtilizedTransportEquipment, UUID>,
         UtilizedTransportEquipmentCustomRepository {
 
-  Mono<Void> deleteUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
-
-  Mono<UtilizedTransportEquipment> findUtilizedTransportEquipmentByShipmentID(UUID shipmentID);
-
   @Query(
       "SELECT DISTINCT ute.* FROM consignment_item con "
           + "JOIN shipping_instruction si ON con.shipping_instruction_id = si.id "

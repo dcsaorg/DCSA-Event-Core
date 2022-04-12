@@ -186,7 +186,7 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                 utilizedTransportEquipmentRepository
                     .save(
                         utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment(
-                            utilizedTransportEquipmentTO, shipmentID))
+                            utilizedTransportEquipmentTO))
                     .flatMapMany(
                         utilizedTransportEquipment ->
                             Mono.zip(
