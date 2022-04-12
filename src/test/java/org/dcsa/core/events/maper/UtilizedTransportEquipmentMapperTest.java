@@ -38,12 +38,11 @@ public class UtilizedTransportEquipmentMapperTest {
   @DisplayName(
       "Test UtilizedTransportEquipmentTO.Id is not mapped in utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment")
   void testUtilizedTransportEquipmentMapperExcludesIdFromTO() {
-    UUID shipmentID = UUID.randomUUID();
     UUID utilizedTransportEquipmentTOId = UUID.randomUUID();
     utilizedTransportEquipmentTO.setId(utilizedTransportEquipmentTOId);
     UtilizedTransportEquipment utilizedTransportEquipment =
         utilizedTransportEquipmentMapper.dtoToUtilizedTransportEquipment(
-            utilizedTransportEquipmentTO, shipmentID);
+            utilizedTransportEquipmentTO);
     assertNull(utilizedTransportEquipment.getId());
   }
 }
