@@ -23,11 +23,6 @@ public class UtilizedTransportEquipment extends AbstractUtilizedTransportEquipme
   @Column("id")
   private UUID id;
 
-  @JsonIgnore
-  @NotNull
-  @Column("shipment_id")
-  private UUID shipmentID;
-
   @NotNull
   @Size(max = 15)
   @Column("equipment_reference")

@@ -84,7 +84,6 @@ class UtilizedTransportEquipmentServiceImplTest {
     utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
     utilizedTransportEquipment.setCargoGrossWeight(120.0F);
     utilizedTransportEquipment.setCargoGrossWeightUnit(WeightUnit.KGM);
-    utilizedTransportEquipment.setShipmentID(shipmentID);
     utilizedTransportEquipment.setEquipmentReference(equipmentReference);
     utilizedTransportEquipment.setIsShipperOwned(true);
 
@@ -192,7 +191,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
 
       when(utilizedTransportEquipmentRepository.save(any()))
@@ -220,9 +218,6 @@ class UtilizedTransportEquipmentServiceImplTest {
                 verify(activeReeferSettingsRepository)
                     .save(argumentCaptorActiveReeferSettings.capture());
                 assertEquals(
-                    shipmentID,
-                    argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
-                assertEquals(
                     utilizedTransportEquipmentID,
                     argumentCaptorActiveReeferSettings
                         .getValue()
@@ -241,7 +236,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID shippingInstructionID = UUID.randomUUID();
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
       utilizedTransportEquipmentTO.setActiveReeferSettings(null);
@@ -279,7 +273,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       utilizedTransportEquipmentTO.setSeals(null);
 
@@ -306,9 +299,6 @@ class UtilizedTransportEquipmentServiceImplTest {
                 verify(activeReeferSettingsRepository)
                     .save(argumentCaptorActiveReeferSettings.capture());
                 assertEquals(
-                    shipmentID,
-                    argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
-                assertEquals(
                     utilizedTransportEquipmentID,
                     argumentCaptorActiveReeferSettings
                         .getValue()
@@ -323,7 +313,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       UUID shipmentID = UUID.randomUUID();
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
 
       when(utilizedTransportEquipmentRepository.save(any()))
@@ -353,9 +342,6 @@ class UtilizedTransportEquipmentServiceImplTest {
                 verify(cargoItemRepository, never()).save(any());
                 verify(cargoLineItemRepository, never()).save(any());
                 assertEquals(
-                    shipmentID,
-                    argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
-                assertEquals(
                     utilizedTransportEquipmentID,
                     argumentCaptorActiveReeferSettings
                         .getValue()
@@ -374,7 +360,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID shippingInstructionID = UUID.randomUUID();
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 
@@ -404,9 +389,6 @@ class UtilizedTransportEquipmentServiceImplTest {
                     .save(argumentCaptorActiveReeferSettings.capture());
                 verify(cargoLineItemRepository, never()).save(any());
                 assertEquals(
-                    shipmentID,
-                    argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
-                assertEquals(
                     utilizedTransportEquipmentID,
                     argumentCaptorActiveReeferSettings
                         .getValue()
@@ -425,7 +407,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID shippingInstructionID = UUID.randomUUID();
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 
@@ -458,9 +439,6 @@ class UtilizedTransportEquipmentServiceImplTest {
                 verify(sealRepository, times(2)).save(argumentCaptorSeal.capture());
                 verify(activeReeferSettingsRepository)
                     .save(argumentCaptorActiveReeferSettings.capture());
-                assertEquals(
-                    shipmentID,
-                    argumentCaptorUtilizedTransportEquipment.getValue().getShipmentID());
                 assertEquals(
                     utilizedTransportEquipmentID,
                     argumentCaptorActiveReeferSettings
@@ -539,7 +517,6 @@ class UtilizedTransportEquipmentServiceImplTest {
       String shippingInstructionReference = "shippingInstructionReference1";
       UUID shippingInstructionID = UUID.randomUUID();
       UUID utilizedTransportEquipmentID = UUID.randomUUID();
-      utilizedTransportEquipment.setShipmentID(shipmentID);
       utilizedTransportEquipment.setId(utilizedTransportEquipmentID);
       cargoItem.setShippingInstructionID(shippingInstructionID);
 

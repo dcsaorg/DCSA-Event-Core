@@ -97,7 +97,6 @@ class ConsignmentItemServiceImplTest {
     utilizedTransportEquipment.setId(UUID.randomUUID());
     utilizedTransportEquipment.setCargoGrossWeight(120.0F);
     utilizedTransportEquipment.setCargoGrossWeightUnit(WeightUnit.KGM);
-    utilizedTransportEquipment.setShipmentID(shipment.getShipmentID());
     utilizedTransportEquipment.setEquipmentReference(equipment.getEquipmentReference());
     utilizedTransportEquipment.setIsShipperOwned(true);
 
