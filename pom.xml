@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.4</version>
+		<groupId>org.dcsa</groupId>
+		<artifactId>dcsa-bom</artifactId>
+		<version>1.0-RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -17,86 +17,54 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
-		<dcsa.version>0.8.32</dcsa.version>
-		<dcsa.core.tag/>
-		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
+		<!-- Define DCSA-Event-Core version -->
 		<revision>0.0.60</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
-		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-		<org.lombok.version>1.18.22</org.lombok.version>
+		<!-- End: Define DCSA-Event-Core version -->
+
+		<!-- Define DCSA-Core version -->
+		<dcsa.version>0.8.32</dcsa.version>
+		<dcsa.core.tag/>
+		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
+		<core.version>${dcsa.version}${dcsa.core.tag}${dcsa.artifacttype}</core.version>
+		<!-- End: Define DCSA-Core version -->
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.dcsa</groupId>
 			<artifactId>dcsa_core</artifactId>
-			<version>${dcsa.version}${dcsa.core.tag}${dcsa.artifacttype}</version>
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.mapstruct</groupId>
-							<artifactId>mapstruct-processor</artifactId>
-							<version>${org.mapstruct.version}</version>
-						</path>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok-mapstruct-binding</artifactId>
-							<version>0.2.0</version>
-						</path>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${org.lombok.version}</version>
-						</path>
-						<!-- other annotation processors -->
-					</annotationProcessorPaths>
-					<compilerArgs>
-						<compilerArg>
-							-Amapstruct.defaultComponentModel=spring
-						</compilerArg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo1.maven.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
-	<pluginRepositories>
-		<pluginRepository>
+		<repository>
 			<id>github</id>
-			<name>GitHub dcsaorg Apache Maven Packages</name>
+			<name>GitHub DCSA Backend</name>
 			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Core</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
+				<updatePolicy>always</updatePolicy>
 			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>github</id>
@@ -104,5 +72,4 @@
 			<url>https://maven.pkg.github.com/dcsaorg/DCSA-Event-Core</url>
 		</repository>
 	</distributionManagement>
-
 </project>
