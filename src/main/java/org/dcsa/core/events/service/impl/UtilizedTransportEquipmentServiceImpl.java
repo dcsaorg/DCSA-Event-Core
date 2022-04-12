@@ -81,21 +81,6 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
     return utilizedTransportEquipmentRepository
         .findUtilizedTransportEquipmentsByShippingInstructionReference(
             shippingInstructionTO.getShippingInstructionReference())
-        .flatMap(
-            utilizedTransportEquipment ->
-                utilizedTransportEquipmentRepository
-                    .deleteById(utilizedTransportEquipment.getId())
-                    .thenReturn(utilizedTransportEquipment))
-        .flatMap(
-            utilizedTransportEquipment ->
-                Mono.when(
-                        sealRepository.deleteAllByUtilizedTransportEquipmentID(
-                            utilizedTransportEquipment.getId()),
-                        activeReeferSettingsRepository.deleteByUtilizedTransportEquipmentID(
-                            utilizedTransportEquipment.getId()),
-                        equipmentRepository.deleteAllByEquipmentReference(
-                            utilizedTransportEquipment.getEquipmentReference()))
-                    .thenReturn(utilizedTransportEquipment))
         .collectList()
         .flatMap(
             ignored ->

@@ -7,6 +7,5 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface EquipmentRepository extends ReactiveCrudRepository<Equipment, String> {
-    Mono<Void> deleteAllByEquipmentReference(String equipmentReference);
     Mono<Equipment> findByEquipmentReference(String equipmentReference);
 }
