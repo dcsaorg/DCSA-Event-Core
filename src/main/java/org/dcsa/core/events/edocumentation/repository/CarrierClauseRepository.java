@@ -20,7 +20,8 @@ public interface CarrierClauseRepository extends ReactiveCrudRepository<CarrierC
 	@Query("select cc.* "
 		+ "from carrier_clauses cc "
 		+ "join shipment_carrier_clauses scc on scc.carrier_clause_id = cc.id "
-		+ "where scc.transport_document_reference = :transportDocumentReference")
+    + "join transport_document td on td.id = scc.transport_document_id "
+    + "where td.transport_document_reference = :transportDocumentReference")
 	Flux<CarrierClause> fetchAllByTransportDocumentReference(String transportDocumentReference);
 
 }
