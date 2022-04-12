@@ -25,6 +25,7 @@ public class ShippingInstructionTO extends AbstractShippingInstruction {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String carrierBookingReference;
 
+  @Valid
   private LocationTO placeOfIssue;
 
   @Valid
