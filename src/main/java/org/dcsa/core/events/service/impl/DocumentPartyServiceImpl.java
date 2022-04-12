@@ -154,17 +154,20 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   Mono<List<PartyContactDetailsTO>> fetchPartyContactDetailsByPartyID(String partyID) {
     return partyContactDetailsRepository
         .findByPartyID(partyID)
-        .map(pcd -> new PartyContactDetailsTO(pcd.getName(), pcd.getPhone(), pcd.getEmail()))
+        .map(
+            pcd ->
+                new PartyContactDetailsTO(
+                    pcd.getName(), pcd.getPhone(), pcd.getEmail(), pcd.getUrl()))
         .collectList()
-      .flatMap(
-      partyContactDetailsTOS -> {
-        if (partyContactDetailsTOS.isEmpty()) {
-          return Mono.error(
-            ConcreteRequestErrorMessageException.notFound(
-              "No contacts details were found for party"));
-        }
-        return Mono.just(partyContactDetailsTOS);
-      });
+        .flatMap(
+            partyContactDetailsTOS -> {
+              if (partyContactDetailsTOS.isEmpty()) {
+                return Mono.error(
+                    ConcreteRequestErrorMessageException.notFound(
+                        "No contacts details were found for party"));
+              }
+              return Mono.just(partyContactDetailsTOS);
+            });
   }
 
   private Mono<List<DocumentPartyTO>> createDocumentParties(
