@@ -35,28 +35,6 @@ public class ShipmentEvent extends Event {
     @Size(max = 250)
     private String reason;
 
-    @JsonProperty("shipmentID")
-    public UUID getShipmentID() {
-        if (documentTypeCode == DocumentTypeCode.SHI) {
-            return UUID.fromString(documentID);
-        }
-        return null;
-    }
-
-    @JsonProperty("shipmentInformationTypeCode")
-    public DocumentTypeCode getShipmentInformationTypeCode() {
-        if (documentTypeCode == DocumentTypeCode.BKG) {
-            return DocumentTypeCode.BOK;
-        }
-        return documentTypeCode;
-    }
-
     @Transient
     private List<Reference> references;
-
-    @JsonProperty("eventTypeCode")
-    @Deprecated
-    public ShipmentEventTypeCode getEventTypeCode() {
-        return shipmentEventTypeCode;
-    }
 }
