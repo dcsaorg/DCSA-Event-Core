@@ -1,6 +1,8 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -42,6 +44,8 @@ public class Shipment {
 
   @Column("confirmation_datetime")
   @NotNull(message = "ConfirmedDateTime is required.")
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  @JsonProperty("shipmentCreatedDateTime")
   private OffsetDateTime confirmationDateTime;
 
   @Column("valid_until")
@@ -51,5 +55,7 @@ public class Shipment {
   // This is not part of the official IM model. They are added in the sql only.
 
   @Column("updated_date_time")
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  @JsonProperty("shipmentUpdatedDateTime")
   protected OffsetDateTime updatedDateTime;
 }

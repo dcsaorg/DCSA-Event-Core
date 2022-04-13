@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Repository
 public interface ShipmentRepository
-    extends ReactiveCrudRepository<Shipment, UUID>, ShipmentCustomRepository {
+    extends ReactiveCrudRepository<Shipment, UUID> {
 
   Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
 

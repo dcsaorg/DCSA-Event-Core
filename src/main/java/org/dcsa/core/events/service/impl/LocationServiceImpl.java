@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
-import org.dcsa.core.events.model.mappers.LocationMapper;
+import org.dcsa.core.events.model.mapper.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.repository.UnLocationRepository;
@@ -42,6 +42,9 @@ public class LocationServiceImpl implements LocationService {
 
   @Override
   public Mono<LocationTO> ensureResolvable(LocationTO locationTO) {
+    // if locationTO is null we just return empty mono
+    if (Objects.isNull(locationTO)) return Mono.empty();
+
     Mono<LocationTO> locationTOMono = ensureUnLocationResolvable(locationTO);
 
     Address address = locationTO.getAddress();
