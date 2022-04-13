@@ -17,8 +17,6 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
-
 		<!-- Define DCSA-Event-Core version -->
 		<revision>0.0.60</revision>
 		<sha1/>
