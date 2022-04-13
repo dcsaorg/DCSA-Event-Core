@@ -61,6 +61,10 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                           .doOnNext(ciTo::references),
                       cargoItemRepository
                           .findAllByConsignmentItemID(ci.getId())
+                          .switchIfEmpty(
+                              Flux.error(
+                                  ConcreteRequestErrorMessageException.notFound(
+                                      "Could not find cargo items")))
                           .flatMap(
                               cargoItem ->
                                   Mono.zip(
@@ -69,42 +73,29 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                                               shippingInstructionReference)
                                           .collectList()
                                           .flatMap(
-                                              utilizedTransportEquipmentTOs -> {
-                                                Optional<UtilizedTransportEquipment> equipment =
-                                                    utilizedTransportEquipmentTOs.stream()
-                                                        .filter(
-                                                            x ->
-                                                                x.getId()
-                                                                    .equals(
-                                                                        cargoItem
-                                                                            .getUtilizedTransportEquipmentID()))
-                                                        .findFirst();
-                                                return equipment
-                                                    .map(
-                                                        utilizedTransportEquipment ->
-                                                            Mono.just(
-                                                                utilizedTransportEquipment
-                                                                    .getEquipmentReference()))
-                                                    .orElseGet(
-                                                        () ->
-                                                            Mono.error(
-                                                                ConcreteRequestErrorMessageException
-                                                                    .notFound(
-                                                                        "Could not find equipment reference for one of the cargoItems")));
+                                              utilizedTransportEquipments -> {
+                                                Map<UUID, String> equipments =
+                                                    utilizedTransportEquipments.stream()
+                                                        .collect(
+                                                            Collectors.toMap(
+                                                                UtilizedTransportEquipment::getId,
+                                                                UtilizedTransportEquipment
+                                                                    ::getEquipmentReference));
+
+                                                return Mono.justOrEmpty(
+                                                        equipments.get(
+                                                            cargoItem
+                                                                .getUtilizedTransportEquipmentID()))
+                                                    .switchIfEmpty(
+                                                        Mono.error(
+                                                            ConcreteRequestErrorMessageException
+                                                                .notFound(
+                                                                    "Could not find equipment reference for one of the cargoItems")));
                                               }),
                                       Mono.just(cargoItem)))
                           .map(
                               tuple -> cargoItemMapper.cargoItemToDto(tuple.getT2(), tuple.getT1()))
                           .collectList()
-                          .flatMap(
-                              c -> {
-                                if (c.isEmpty()) {
-                                  return Mono.error(
-                                      ConcreteRequestErrorMessageException.notFound(
-                                          "Could not find cargo items"));
-                                }
-                                return Mono.just(c);
-                              })
                           .doOnNext(ciTo::cargoItems))
                   .thenReturn(ciTo);
             })
