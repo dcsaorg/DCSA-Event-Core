@@ -132,7 +132,7 @@ public class Booking implements Persistable<UUID> {
   @JsonIgnore
   @Column("pre_carriage_mode_of_transport_code")
   @Size(max = 3)
-  protected String preCarriageModeOfTransportCode;
+  private String preCarriageModeOfTransportCode;
 
   @Column("valid_until")
   private OffsetDateTime validUntil;
