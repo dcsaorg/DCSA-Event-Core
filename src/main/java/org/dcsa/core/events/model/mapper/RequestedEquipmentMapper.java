@@ -2,7 +2,6 @@ package org.dcsa.core.events.model.mapper;
 
 import org.dcsa.core.events.edocumentation.model.transferobject.RequestedEquipmentTO;
 import org.dcsa.core.events.model.*;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

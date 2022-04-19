@@ -3,7 +3,7 @@ package org.dcsa.core.events.edocumentation.model.transferobject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.LocationType;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

@@ -1,11 +1,10 @@
 package org.dcsa.core.events.service.impl;
 
-import org.dcsa.core.events.model.Carrier;
+import org.dcsa.skernel.model.Carrier;
 import org.dcsa.core.events.model.Service;
 import org.dcsa.core.events.model.TransportCall;
-import org.dcsa.core.events.model.Vessel;
+import org.dcsa.skernel.model.Vessel;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.AbstractTransportCallTORepository;
 import org.dcsa.core.events.repository.ModeOfTransportRepository;
@@ -16,6 +15,11 @@ import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.dcsa.core.util.MappingUtils;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
+import org.dcsa.skernel.service.CarrierService;
+import org.dcsa.skernel.service.FacilityService;
+import org.dcsa.skernel.service.LocationService;
+import org.dcsa.skernel.service.VesselService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
 import reactor.core.publisher.Flux;
