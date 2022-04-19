@@ -6,7 +6,7 @@ import org.dcsa.core.events.model.base.AbstractEventSubscription;
 import org.dcsa.core.events.model.transferobjects.EventSubscriptionSecretUpdateTO;
 import org.dcsa.core.events.service.EventSubscriptionTOService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
-import org.dcsa.core.exception.GetException;
+import org.dcsa.core.exception.DCSAException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
@@ -72,8 +72,8 @@ public abstract class AbstractEventSubscriptionController<
     ExtendedRequest<EventSubscription> extendedRequest = newExtendedRequest();
     try {
       extendedRequest.parseParameter(request.getQueryParams());
-    } catch (GetException getException) {
-      return Flux.error(getException);
+    } catch (DCSAException ex) {
+      return Flux.error(ex);
     }
 
     return getService()
