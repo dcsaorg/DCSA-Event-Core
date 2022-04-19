@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.model.enums.TransportPlanStageCode;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
-import org.dcsa.core.validator.ValidVesselIMONumber;
+import org.dcsa.skernel.validator.ValidVesselIMONumber;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

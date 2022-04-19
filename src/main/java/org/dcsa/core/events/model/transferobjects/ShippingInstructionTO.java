@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.dcsa.core.events.edocumentation.model.transferobject.ConsignmentItemTO;
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentTO;
 import org.dcsa.core.events.model.base.AbstractShippingInstruction;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;

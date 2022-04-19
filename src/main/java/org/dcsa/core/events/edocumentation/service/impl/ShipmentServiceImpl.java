@@ -11,7 +11,7 @@ import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.ShipmentService;
 import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.repository.ShipmentRepository;
-import org.dcsa.core.events.service.LocationService;
+import org.dcsa.skernel.service.LocationService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;

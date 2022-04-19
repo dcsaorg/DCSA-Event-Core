@@ -3,8 +3,8 @@ package org.dcsa.core.events.edocumentation.model.transferobject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.transferobjects.DocumentPartyTO;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.model.transferobjects.ReferenceTO;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
