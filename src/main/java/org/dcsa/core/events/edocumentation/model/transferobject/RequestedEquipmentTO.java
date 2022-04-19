@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Data
 public class RequestedEquipmentTO {
@@ -16,6 +17,8 @@ public class RequestedEquipmentTO {
 
   @PositiveOrZero(message = "RequestedEquipmentUnits has to be a positive value.")
   private Integer requestedEquipmentUnits;
+
+  private List<String> equipmentReferences;
 
   @JsonProperty("isShipperOwned")
   private boolean isShipperOwned;
