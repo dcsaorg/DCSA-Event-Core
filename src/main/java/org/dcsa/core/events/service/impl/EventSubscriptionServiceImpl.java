@@ -10,10 +10,7 @@ import org.dcsa.core.events.model.enums.TransportEventTypeCode;
 import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.EventSubscriptionService;
-import org.dcsa.core.exception.CreateException;
-import org.dcsa.core.exception.DeleteException;
-import org.dcsa.core.exception.GetException;
-import org.dcsa.core.exception.UpdateException;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -54,7 +51,7 @@ public class EventSubscriptionServiceImpl
   public Mono<EventSubscription> findById(UUID id) {
     return eventSubscriptionRepository
         .findById(id)
-        .switchIfEmpty(Mono.error(new GetException("No EventSubscription with ID: " + id)));
+        .switchIfEmpty(Mono.error(ConcreteRequestErrorMessageException.notFound("No EventSubscription with ID: " + id)));
   }
 
   @Override
@@ -62,7 +59,7 @@ public class EventSubscriptionServiceImpl
     return eventSubscriptionRepository
         .deleteById(subscriptionID)
         .switchIfEmpty(
-            Mono.error(new DeleteException("No EventSubscription with ID: " + subscriptionID)));
+            Mono.error(ConcreteRequestErrorMessageException.notFound("No EventSubscription with ID: " + subscriptionID)));
   }
 
   @Override
@@ -76,7 +73,7 @@ public class EventSubscriptionServiceImpl
       signatureMethod = eventSubscription.getSignatureMethod();
     }
     if (secret == null || secret.length < 1) {
-      return Mono.error(new CreateException("Please provide a non-empty \"secret\" attribute"));
+      return Mono.error(ConcreteRequestErrorMessageException.invalidParameter("Please provide a non-empty \"secret\" attribute"));
     }
     if (signatureMethod.getMinKeyLength() == signatureMethod.getMaxKeyLength()) {
       if (secret.length != signatureMethod.getMinKeyLength()) {
@@ -84,14 +81,14 @@ public class EventSubscriptionServiceImpl
             && secret.length - 1 == signatureMethod.getMinKeyLength()
             && Character.isSpaceChar(((int) secret[secret.length - 1]) & 0xff)) {
           return Mono.error(
-              new CreateException(
+              ConcreteRequestErrorMessageException.invalidParameter(
                   "The secret provided in the \"secret\" attribute must be exactly "
                       + signatureMethod.getMinKeyLength()
                       + " bytes long (when deserialized).  Did you"
                       + " accidentally include a trailing newline/space in the secret?"));
         }
         return Mono.error(
-            new CreateException(
+            ConcreteRequestErrorMessageException.invalidParameter(
                 "The secret provided in the \"secret\" attribute must be exactly "
                     + signatureMethod.getMinKeyLength()
                     + " bytes long (when deserialized)"));
@@ -99,14 +96,14 @@ public class EventSubscriptionServiceImpl
     } else {
       if (secret.length < signatureMethod.getMinKeyLength()) {
         return Mono.error(
-            new CreateException(
+            ConcreteRequestErrorMessageException.invalidParameter(
                 "The secret provided in the \"secret\" attribute must be at least "
                     + signatureMethod.getMinKeyLength()
                     + " bytes long (when deserialized)"));
       }
       if (secret.length > signatureMethod.getMaxKeyLength()) {
         return Mono.error(
-            new CreateException(
+            ConcreteRequestErrorMessageException.invalidParameter(
                 "The secret provided in the \"secret\" attribute must be at most "
                     + signatureMethod.getMaxKeyLength()
                     + " bytes long (when deserialized)"));
@@ -125,7 +122,7 @@ public class EventSubscriptionServiceImpl
     try {
       new URI(eventSubscription.getCallbackUrl());
     } catch (URISyntaxException e) {
-      return Mono.error(new UpdateException("callbackUrl is invalid: " + e.getLocalizedMessage()));
+      return Mono.error(ConcreteRequestErrorMessageException.invalidParameter("callbackUrl is invalid: " + e.getLocalizedMessage()));
     }
     return Mono.just(eventSubscription);
   }
