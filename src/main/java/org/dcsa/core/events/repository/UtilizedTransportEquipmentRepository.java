@@ -17,9 +17,18 @@ public interface UtilizedTransportEquipmentRepository
           + "JOIN shipping_instruction si ON con.shipping_instruction_id = si.id "
           + "JOIN cargo_item ci ON ci.consignment_item_id = con.id "
           + "JOIN utilized_transport_equipment ute ON ute.id = ci.utilized_transport_equipment_id "
-          + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
+          + "WHERE si.id = :shippingInstructionID")
+  Flux<UtilizedTransportEquipment> findUtilizedTransportEquipmentsByShippingInstructionID(
+      UUID shippingInstructionID);
+
+  @Query(
+    "SELECT DISTINCT ute.* FROM consignment_item con "
+      + "JOIN shipping_instruction si ON con.shipping_instruction_id = si.id "
+      + "JOIN cargo_item ci ON ci.consignment_item_id = con.id "
+      + "JOIN utilized_transport_equipment ute ON ute.id = ci.utilized_transport_equipment_id "
+      + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
   Flux<UtilizedTransportEquipment> findUtilizedTransportEquipmentsByShippingInstructionReference(
-      String shippingInstructionReference);
+    String shippingInstructionReference);
 
   @Query(
       "SELECT DISTINCT ute.equipment_reference FROM utilized_transport_equipment ute "

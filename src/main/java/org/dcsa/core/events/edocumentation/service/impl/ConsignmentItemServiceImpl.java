@@ -68,9 +68,7 @@ public class ConsignmentItemServiceImpl implements ConsignmentItemService {
                           .flatMap(
                               cargoItem ->
                                   Mono.zip(
-                                      utilizedTransportEquipmentRepository
-                                          .findUtilizedTransportEquipmentsByShippingInstructionReference(
-                                              shippingInstructionReference)
+                                      utilizedTransportEquipmentRepository.findUtilizedTransportEquipmentsByShippingInstructionID(shippingInstructionID)
                                           .collectList()
                                           .flatMap(
                                               utilizedTransportEquipments -> {
