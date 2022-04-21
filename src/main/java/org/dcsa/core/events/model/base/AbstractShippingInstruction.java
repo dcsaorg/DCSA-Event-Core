@@ -53,6 +53,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("number_of_originals")
   private Integer numberOfOriginals;
 
+  @NotNull
   @Column("is_electronic")
   private Boolean isElectronic;
 
