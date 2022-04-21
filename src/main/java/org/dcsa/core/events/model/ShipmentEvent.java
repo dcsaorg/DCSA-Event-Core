@@ -40,6 +40,7 @@ public class ShipmentEvent extends Event {
     @JsonIgnore
     private UUID documentID;
 
+    @JsonIgnore
     @Column("document_reference")
     @Size(max = 100)
     private String documentReference;
@@ -58,10 +59,4 @@ public class ShipmentEvent extends Event {
 
     @Transient
     private List<DocumentReferenceTO> documentReferences;
-
-    @JsonProperty("eventTypeCode")
-    @Deprecated
-    public ShipmentEventTypeCode getEventTypeCode() {
-        return shipmentEventTypeCode;
-    }
 }
