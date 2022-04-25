@@ -31,7 +31,7 @@ public interface TransportDocumentRepository extends ExtendedRepository<Transpor
   Flux<TransportDocument> findDistinctTransportDocumentReferencesByTransportDocumentReference(
       String transportDocumentReference);
 
-  Mono<TransportDocument> findByTransportDocumentReference(String transportDocumentReference);
+  Mono<TransportDocument> findByTransportDocumentReferenceAndValidUntilIsNull(String transportDocumentReference);
 
   @Query(
       "SELECT DISTINCT td.transport_document_reference FROM transport_document td "
