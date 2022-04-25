@@ -10,6 +10,7 @@ import org.dcsa.core.events.edocumentation.service.BookingService;
 import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.ShipmentService;
 import org.dcsa.core.events.edocumentation.service.TransportService;
+import org.dcsa.core.events.model.Shipment;
 import org.dcsa.core.events.repository.ShipmentRepository;
 import org.dcsa.skernel.service.LocationService;
 import org.springframework.stereotype.Service;
@@ -51,21 +52,22 @@ class ShipmentServiceImpl implements ShipmentService {
         .flatMap(
             t -> {
               ShipmentTO shipmentTO = t.getT2();
+              Shipment shipment = t.getT1();
               return Mono.when(
-                      fetchShipmentCutOffTimeByShipmentID(t.getT1().getShipmentID())
+                      fetchShipmentCutOffTimeByShipmentID(shipment.getShipmentID())
                           .doOnNext(shipmentTO::setShipmentCutOffTimes),
-                      fetchShipmentLocationsByBookingID(t.getT1().getBookingID())
+                      fetchShipmentLocationsByBookingID(shipment.getBookingID())
                           .doOnNext(shipmentTO::setShipmentLocations),
-                      fetchCarrierClausesByShipmentID(t.getT1().getShipmentID())
+                      fetchCarrierClausesByShipmentID(shipment.getShipmentID())
                           .doOnNext(shipmentTO::setCarrierClauses),
-                      fetchConfirmedEquipmentByByBookingID(t.getT1().getBookingID())
+                      fetchConfirmedEquipmentByByBookingID(shipment.getBookingID())
                           .doOnNext(shipmentTO::setConfirmedEquipments),
-                      fetchChargesByShipmentID(t.getT1().getShipmentID())
+                      fetchChargesByShipmentID(shipment.getShipmentID())
                           .doOnNext(shipmentTO::setCharges),
                       bookingService
-                          .fetchByBookingID(t.getT1().getBookingID())
+                          .fetchByBookingID(shipment.getBookingID())
                           .doOnNext(shipmentTO::setBooking),
-                      fetchTransportsByShipmentID(t.getT1().getShipmentID())
+                      fetchTransportsByShipmentID(shipment.getShipmentID())
                           .doOnNext(shipmentTO::setTransports))
                   .thenReturn(shipmentTO);
             })
