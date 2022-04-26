@@ -28,11 +28,11 @@ public interface BookingRepository
   Flux<String> findCarrierBookingRefsByTransportDocumentRef(String transportDocumentRef);
 
   @Query(
-    "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
-      + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
-      + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
-      + "JOIN cargo_item ci ON ute.id = ci.utilized_transport_equipment_id "
-      + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
+      "SELECT DISTINCT b.carrier_booking_reference FROM booking b "
+          + "JOIN shipment s ON b.carrier_booking_reference = s.carrier_booking_reference "
+          + "JOIN utilized_transport_equipment ute ON s.id = ute.shipment_id "
+          + "JOIN cargo_item ci ON ute.id = ci.utilized_transport_equipment_id "
+          + "WHERE ci.shipping_instruction_id = :shippingInstructionID")
   Flux<String> findCarrierBookingRefsByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
@@ -42,6 +42,13 @@ public interface BookingRepository
           + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
   Flux<String> findCarrierBookingRefsByTransportCallID(String transportCallID);
+
+  @Query(
+      "SELECT * FROM booking b "
+          + "WHERE b.carrier_booking_request_reference = :carrierBookingRequestReference "
+          + "ORDER BY b.valid_until NULLS FIRST LIMIT 1")
+  Mono<Booking> findByCarrierBookingRequestReferenceAndValidUntilIsNull(
+      String carrierBookingRequestReference);
 
   Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 

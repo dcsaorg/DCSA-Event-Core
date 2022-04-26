@@ -17,6 +17,12 @@ public interface ShipmentRepository
   Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
 
   @Query(
+    "SELECT * FROM shipment S "
+      + "WHERE s.carrier_booking_reference = :carrierBookingReference "
+      + "ORDER BY s.valid_until NULLS FIRST LIMIT 1")
+  Mono<Shipment> findByCarrierBookingReferenceAndValidUntilIsNull(String carrierBookingReference);
+
+  @Query(
       "SELECT COUNT(s.id) "
           + "FROM shipment s "
           + "JOIN booking b ON s.booking_id = b.id "
