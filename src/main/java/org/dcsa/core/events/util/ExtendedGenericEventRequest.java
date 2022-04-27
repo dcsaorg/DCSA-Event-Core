@@ -173,12 +173,14 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
           .and().onEquals(TRANSPORT_CALL_ID_COLUMN, TRANSPORT_CALL_ID_COLUMN)
           .or()
           .onEquals(LINK_TYPE_COLUMN, LINK_TYPE_COLUMN)
-          .and().onEqualsThen(DOCUMENT_ID_COLUMN, DOCUMENT_ID_COLUMN)
-          .registerQueryFieldThen(CARRIER_BOOKING_REFERENCE_COLUMN, CARRIER_BOOKING_REFERENCE_JSON_NAME, String.class)
-          .registerQueryFieldAliasThen(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME)
-          .registerQueryFieldThen(CARRIER_BOOKING_REQUEST_REFERENCE_COLUMN, CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME, String.class)
-          .registerQueryFieldThen(TRANSPORT_DOCUMENT_REFERENCE_COLUMN, TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME, String.class)
-          .registerQueryField(DOCUMENT_REFERENCE_TYPE_COLUMN, DOCUMENT_REFERENCE_TYPE_JSON_NAME, TransportDocumentType.class);
+          .and().onEquals(DOCUMENT_ID_COLUMN, DOCUMENT_ID_COLUMN)
+          .endCondition()
+          .registerQueryField(CARRIER_BOOKING_REFERENCE_COLUMN, CARRIER_BOOKING_REFERENCE_JSON_NAME, String.class)
+          .registerQueryFieldAlias(CARRIER_BOOKING_REFERENCE_JSON_NAME, BOOKING_REFERENCE_JSON_NAME)
+          .registerQueryField(CARRIER_BOOKING_REQUEST_REFERENCE_COLUMN, CARRIER_BOOKING_REQUEST_REFERENCE_JSON_NAME, String.class)
+          .registerQueryField(TRANSPORT_DOCUMENT_REFERENCE_COLUMN, TRANSPORT_DOCUMENT_REFERENCE_JSON_NAME, String.class)
+          .registerQueryField(DOCUMENT_REFERENCE_TYPE_COLUMN, DOCUMENT_REFERENCE_TYPE_JSON_NAME, TransportDocumentType.class)
+          .finishTable();
     }
 
     private DBEntityAnalysis.DBEntityAnalysisBuilder<Event> queryParameterForTransportCall(DBEntityAnalysis.DBEntityAnalysisBuilder<Event> builder) {
@@ -197,20 +199,21 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .onTable(TransportCall.class)
                 .chainJoin(Voyage.class, "export_voyage")
                 .onFieldEqualsThen("exportVoyageID", "id")
-                .registerQueryFieldFromFieldThen("carrierVoyageNumber")
+                .registerQueryFieldFromField("carrierVoyageNumber")
                 .registerQueryFieldAlias("carrierVoyageNumber", "exportVoyageNumber")
 
                  // Go back to the Transport Call
                 .onTable(TransportCall.class)
                 .chainJoin(Voyage.class, "import_voyage")
                 .onFieldEqualsThen("importVoyageID", "id")
-                .registerQueryFieldFromFieldThen("carrierVoyageNumber", "importVoyage.")
-                .registerQueryFieldAliasThen("importVoyage.carrierVoyageNumber", "importVoyageNumber")
+                .registerQueryFieldFromField("carrierVoyageNumber", "importVoyage.")
+                .registerQueryFieldAlias("importVoyage.carrierVoyageNumber", "importVoyageNumber")
 
 
                 .chainJoin(Service.class)
                 .onFieldEqualsThen("serviceID", "id")
-                .registerQueryFieldFromField("carrierServiceCode");
+                .registerQueryFieldFromField("carrierServiceCode")
+                .finishTable();
     }
 
     @Override
