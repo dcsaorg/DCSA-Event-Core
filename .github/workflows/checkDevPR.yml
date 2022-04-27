@@ -39,14 +39,14 @@ jobs:
         uses: actions/checkout@v2.3.1
         with:
           repository: dcsaorg/DCSA-Core
-          ref: ${{env.GITHUB_BASE_REF}}
+          ref: ${{github.base_ref}}
           path: DCSA-Core
           token: ${{ secrets.REPO_ACCESS_PAT }}
 
       - name: Set dcsa-core mvn version variable
-        run: cd DCSA-Core && echo "DCSA_CORE_PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -Dchangelist='')- " >> $GITHUB_ENV
+        run: cd DCSA-Core && echo "DCSA_CORE_PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -Dchangelist='')-" >> $GITHUB_ENV
 
-      - run: echo $DCSA_CORE_PROJECT_VERSION
+      - run: echo ${DCSA_CORE_PROJECT_VERSION}${GITHUB_BASE_REF}-SNAPSHOT && echo ${{github.base_ref}}
 
       - name: Run CI
         run: mvn -B package -Dsha1=-${GITHUB_BASE_REF} -Dchangelist=-SNAPSHOT -Ddcsa.version=$DCSA_CORE_PROJECT_VERSION -Ddcsa.core.tag=${GITHUB_BASE_REF} -Ddcsa.artifacttype=-SNAPSHOT
