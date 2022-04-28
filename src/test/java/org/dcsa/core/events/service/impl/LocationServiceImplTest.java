@@ -4,7 +4,7 @@ import org.dcsa.core.events.model.Address;
 import org.dcsa.core.events.model.Facility;
 import org.dcsa.core.events.model.Location;
 import org.dcsa.core.events.model.UnLocation;
-import org.dcsa.core.events.model.mappers.LocationMapper;
+import org.dcsa.core.events.model.mapper.LocationMapper;
 import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.LocationRepository;
 import org.dcsa.core.events.repository.UnLocationRepository;
