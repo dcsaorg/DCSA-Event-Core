@@ -50,6 +50,7 @@ public interface BookingRepository
   Mono<Booking> findByCarrierBookingRequestReferenceAndValidUntilIsNull(
       String carrierBookingRequestReference);
 
+  @Deprecated
   Mono<Booking> findByCarrierBookingRequestReference(String carrierBookingRequestReference);
 
   Flux<Booking> findAllOrderByBookingRequestDateTime(Example example, Pageable pageable);
@@ -68,11 +69,12 @@ public interface BookingRepository
 
   @Modifying
   @Query(
-      "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime where carrier_booking_request_reference = :carrierBookingRequestReference")
+    "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime"
+      + " where carrier_booking_request_reference = :carrierBookingRequestReference AND valid_until IS NULL")
   Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
-      ShipmentEventTypeCode documentStatus,
-      String carrierBookingRequestReference,
-      OffsetDateTime updatedDateTime);
+    ShipmentEventTypeCode documentStatus,
+    String carrierBookingRequestReference,
+    OffsetDateTime updatedDateTime);
 
   @Query(
       "SELECT DISTINCT b.* FROM shipment s "
