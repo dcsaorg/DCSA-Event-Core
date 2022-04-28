@@ -16,5 +16,6 @@ public enum DocumentTypeCode {
     OOG;
 
     public final static String EBL_DOCUMENT_TYPE_CODES = "SHI,TRD";
+    public final static String BKG_DOCUMENT_TYPE_CODES = "BKG,CBR";
 
 }
