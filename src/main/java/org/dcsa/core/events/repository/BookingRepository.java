@@ -69,18 +69,26 @@ public interface BookingRepository
 
   @Modifying
   @Query(
-    "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime"
-      + " where carrier_booking_request_reference = :carrierBookingRequestReference AND valid_until IS NULL")
+      "UPDATE booking SET document_status = :documentStatus, updated_date_time = :updatedDateTime"
+          + " where carrier_booking_request_reference = :carrierBookingRequestReference AND valid_until IS NULL")
   Mono<Boolean> updateDocumentStatusAndUpdatedDateTimeForCarrierBookingRequestReference(
-    ShipmentEventTypeCode documentStatus,
-    String carrierBookingRequestReference,
-    OffsetDateTime updatedDateTime);
+      ShipmentEventTypeCode documentStatus,
+      String carrierBookingRequestReference,
+      OffsetDateTime updatedDateTime);
 
+  @Deprecated
   @Query(
       "SELECT DISTINCT b.* FROM shipment s "
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE s.carrier_booking_reference = :carrierBookingReference")
   Flux<Booking> findAllByCarrierBookingReference(String carrierBookingReference);
+
+  @Query(
+      "SELECT DISTINCT b.* FROM shipment s "
+          + "JOIN booking b ON b.id = s.booking_id "
+          + "WHERE s.carrier_booking_reference = :carrierBookingReference AND b.valid_until IS NULL")
+  Flux<Booking> findAllByCarrierBookingReferenceWhereValidUntilIsNull(
+      String carrierBookingReference);
 
   @Query(
       "SELECT DISTINCT b.* FROM shipping_instruction si "
