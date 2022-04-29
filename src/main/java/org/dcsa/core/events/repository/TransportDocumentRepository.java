@@ -31,7 +31,11 @@ public interface TransportDocumentRepository extends ExtendedRepository<Transpor
   Flux<TransportDocument> findDistinctTransportDocumentReferencesByTransportDocumentReference(
       String transportDocumentReference);
 
-  Mono<TransportDocument> findByTransportDocumentReferenceAndValidUntilIsNull(String transportDocumentReference);
+  @Query(
+    "SELECT td.* FROM transport_document td"
+      + " WHERE td.transport_document_reference = :transportDocumentReference"
+      + " ORDER BY td.valid_until DESC NULLS FIRST LIMIT 1")
+  Mono<TransportDocument> findLatestTransportDocumentByTransportDocumentReference(String transportDocumentReference);
 
   @Query(
       "SELECT DISTINCT td.transport_document_reference FROM transport_document td "
