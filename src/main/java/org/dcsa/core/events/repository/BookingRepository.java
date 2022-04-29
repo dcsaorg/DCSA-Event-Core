@@ -86,9 +86,9 @@ public interface BookingRepository
   @Query(
       "SELECT DISTINCT b.* FROM shipment s "
           + "JOIN booking b ON b.id = s.booking_id "
-          + "WHERE s.carrier_booking_reference = :carrierBookingReference"
+          + "WHERE s.carrier_booking_reference = :carrierBookingReference "
           + "ORDER BY b.valid_until NULLS FIRST LIMIT 1")
-  Flux<Booking> findCarrierBookingReferenceAndValidUntilIsNull(
+  Mono<Booking> findCarrierBookingReferenceAndValidUntilIsNull(
       String carrierBookingReference);
 
   @Query(
