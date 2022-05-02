@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 import java.util.UUID;
 
 public interface CarrierClauseService {
-    Flux<CarrierClauseTO> fetchCarrierClausesByTransportDocumentReference(String transportDocumentReference);
+    Flux<CarrierClauseTO> fetchCarrierClausesByTransportDocumentID(UUID transportDocumentId);
 
     //ToDo method already created to be used in BookingService when refactoring Booking
     Flux<CarrierClauseTO> fetchCarrierClausesByShipmentID(UUID shipmentID);

@@ -95,7 +95,7 @@ class ShipmentServiceImplTest {
 
     shipmentCarrierClause = new ShipmentCarrierClause();
     shipmentCarrierClause.setCarrierClauseID(UUID.randomUUID());
-    shipmentCarrierClause.setTransportDocumentReference("ref");
+    shipmentCarrierClause.setTransportDocumentID(UUID.randomUUID());
 
     carrierClauseTO = new CarrierClauseTO();
     carrierClauseTO.setClauseContent("clause content");
