@@ -17,7 +17,6 @@ public class ShipmentCarrierClause {
   @Column("shipment_id")
   private UUID shipmentID;
 
-  @Size(max = 20)
-  @Column("transport_document_reference ")
-  private String transportDocumentReference;
+  @Column("transport_document_id ")
+  private UUID transportDocumentID;
 }
