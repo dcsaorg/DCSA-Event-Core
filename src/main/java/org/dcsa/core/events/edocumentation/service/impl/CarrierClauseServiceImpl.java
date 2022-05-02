@@ -17,10 +17,10 @@ public class CarrierClauseServiceImpl implements CarrierClauseService {
   private final CarrierClauseMapper carrierClauseMapper;
 
   @Override
-  public Flux<CarrierClauseTO> fetchCarrierClausesByTransportDocumentReference(
-      String transportDocumentReference) {
+  public Flux<CarrierClauseTO> fetchCarrierClausesByTransportDocumentID(
+      UUID transportDocumentId) {
     return carrierClauseRepository
-        .fetchAllByTransportDocumentReference(transportDocumentReference)
+        .fetchAllByTransportDocumentID(transportDocumentId)
         .map(carrierClauseMapper::carrierClauseToDTO);
   }
 
