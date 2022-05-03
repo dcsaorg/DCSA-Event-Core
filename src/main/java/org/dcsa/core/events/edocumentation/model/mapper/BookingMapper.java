@@ -17,12 +17,18 @@ public interface BookingMapper {
   @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
   BookingTO bookingToDTO(Booking booking);
 
+  @Mapping(source = "invoicePayableAt", target = "invoicePayableAt", ignore = true)
+  @Mapping(source = "communicationChannel", target = "communicationChannelCode")
+  @Mapping(source = "bookingRequestUpdatedDateTime", target = "updatedDateTime")
+  @Mapping(source = "bookingRequestCreatedDateTime", target = "bookingRequestDateTime")
+  Booking dtoToBooking(BookingTO bookingTO);
+
   @Mapping(source = "bookingTO.invoicePayableAt", target = "invoicePayableAt", ignore = true)
   @Mapping(source = "bookingTO.communicationChannel", target = "communicationChannelCode")
   @Mapping(source = "bookingTO.bookingRequestUpdatedDateTime", target = "updatedDateTime")
   @Mapping(source = "bookingTO.bookingRequestCreatedDateTime", target = "bookingRequestDateTime")
   @Mapping(source = "bookingId", target = "id")
-  Booking dtoToBooking(BookingTO bookingTO, UUID bookingId);
+  Booking dtoToBookingWithBookingId(BookingTO bookingTO, UUID bookingId);
 
   @Mapping(source = "updatedDateTime", target = "bookingRequestUpdatedDateTime")
   @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
