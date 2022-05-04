@@ -1,6 +1,8 @@
 package org.dcsa.core.events.model;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
@@ -11,6 +13,7 @@ import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
@@ -27,36 +30,33 @@ public class ShipmentEvent extends Event {
     @Column("document_type_code")
     private DocumentTypeCode documentTypeCode;
 
+    //Historically the documentID field contained the references and not the ID.
+    //This is now changed, so the ShipmentEvent documentID field contains the ID of an entity (e.g. shipment or transport document)
+    //The reference is now moved to the documentReference field. However, the JSON payload in the API need to preserve backwardscompatibility.
+    //Hence, the documentID field (now containing the ID) is not provided in the jsonpayload and the documentReference field is marshalled with the JsonProperty documentID
+
     @Column("document_id")
     @Size(max = 100)
-    private String documentID;
+    @JsonIgnore
+    private UUID documentID;
+
+    @JsonIgnore
+    @Column("document_reference")
+    @Size(max = 100)
+    private String documentReference;
+
+    @JsonGetter("documentID")
+    public String getDocumentReferenceAsDocumentID() {
+      return documentReference;
+    }
 
     @Column("reason")
     @Size(max = 250)
     private String reason;
 
-    @JsonProperty("shipmentID")
-    public UUID getShipmentID() {
-        if (documentTypeCode == DocumentTypeCode.SHI) {
-            return UUID.fromString(documentID);
-        }
-        return null;
-    }
-
-    @JsonProperty("shipmentInformationTypeCode")
-    public DocumentTypeCode getShipmentInformationTypeCode() {
-        if (documentTypeCode == DocumentTypeCode.BKG) {
-            return DocumentTypeCode.BOK;
-        }
-        return documentTypeCode;
-    }
-
     @Transient
     private List<Reference> references;
 
-    @JsonProperty("eventTypeCode")
-    @Deprecated
-    public ShipmentEventTypeCode getEventTypeCode() {
-        return shipmentEventTypeCode;
-    }
+    @Transient
+    private List<DocumentReferenceTO> documentReferences;
 }

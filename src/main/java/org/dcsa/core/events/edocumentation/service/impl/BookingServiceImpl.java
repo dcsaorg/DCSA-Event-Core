@@ -14,7 +14,7 @@ import org.dcsa.core.events.repository.CommodityRepository;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.ValueAddedServiceRequestRepository;
 import org.dcsa.core.events.service.DocumentPartyService;
-import org.dcsa.core.events.service.LocationService;
+import org.dcsa.skernel.service.LocationService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

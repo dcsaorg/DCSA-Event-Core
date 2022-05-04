@@ -12,9 +12,15 @@ import java.util.UUID;
 
 @Repository
 public interface ShipmentRepository
-    extends ReactiveCrudRepository<Shipment, UUID>, ShipmentCustomRepository {
+    extends ReactiveCrudRepository<Shipment, UUID> {
 
   Mono<Shipment> findByCarrierBookingReference(String carrierBookingReference);
+
+  @Query(
+    "SELECT * FROM shipment s "
+      + "WHERE s.carrier_booking_reference = :carrierBookingReference "
+      + "ORDER BY s.valid_until NULLS FIRST LIMIT 1")
+  Mono<Shipment> findByCarrierBookingReferenceAndValidUntilIsNull(String carrierBookingReference);
 
   @Query(
       "SELECT COUNT(s.id) "
@@ -27,6 +33,6 @@ public interface ShipmentRepository
       "SELECT DISTINCT s.* FROM shipment s "
           + "JOIN consignment_item ci ON ci.shipment_id = s.id  "
           + "JOIN shipping_instruction si ON si.id = ci.shipping_instruction_id "
-          + "WHERE si.id = :shippingInstructionReference")
+          + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
   Flux<Shipment> findByShippingInstructionReference(String shippingInstructionReference);
 }

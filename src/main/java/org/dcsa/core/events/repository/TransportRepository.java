@@ -1,7 +1,6 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.Transport;
-import org.dcsa.core.repository.ExtendedRepository;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
@@ -22,24 +21,20 @@ public interface TransportRepository extends ReactiveCrudRepository<Transport, U
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "
           + "JOIN shipment_transport st "
-          + " ON st.transport_id = t.id"
-          + "JOIN utilized_transport_equipment ute"
-          + " ON ute.shipment_id = st.shipment_id"
-          + "JOIN cargo_item ci "
-          + " ON ci.utilized_transport_equipment_id = ute.id "
+          + " ON st.transport_id = t.id "
+          + "JOIN consignment_item ci "
+          + " ON st.shipment_id = ci.shipment_id "
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = st.shipment_id "
-          + "WHERE (ci.shipping_instruction_id = :shippingInstructionReference OR r.shipping_instruction_id = :shippingInstructionReference)")
-  Flux<String> findVesselIMONumbersByShippingInstructionReference(String shippingInstructionReference);
+          + "WHERE (ci.shipping_instruction_id = :shippingInstructionID OR r.shipping_instruction_id = :shippingInstructionID)")
+  Flux<String> findVesselIMONumbersByShippingInstructionID(UUID shippingInstructionID);
 
   @Query(
       "SELECT DISTINCT t.vessel_imo_number FROM transport t "
           + "JOIN shipment_transport st "
-          + " ON st.transport_id = t.id"
-          + "JOIN utilized_transport_equipment ute"
-          + " ON ute.shipment_id = st.shipment_id"
-          + "JOIN cargo_item ci "
-          + " ON ci.utilized_transport_equipment_id = ute.id "
+          + " ON st.transport_id = t.id "
+          + "JOIN consignment_item ci "
+          + " ON st.shipment_id = ci.shipment_id "
           + "LEFT JOIN reference r "
           + "ON r.shipment_id = st.shipment_id "
           + "JOIN transport_document td "

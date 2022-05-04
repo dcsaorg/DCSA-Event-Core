@@ -7,5 +7,4 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface ActiveReeferSettingsRepository extends ReactiveCrudRepository<ActiveReeferSettings, UUID> {
-    Mono<Void> deleteByUtilizedTransportEquipmentID(UUID utilizedTransportEquipmentID);
 }

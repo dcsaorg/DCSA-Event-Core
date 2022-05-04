@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.validator.EnumSubset;
-import org.dcsa.core.validator.ValidVesselIMONumber;
+import org.dcsa.skernel.validator.ValidVesselIMONumber;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -75,10 +75,10 @@ abstract class AbstractBookingTO {
   protected LocalDate expectedDepartureDate;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING)
-  protected LocalDate expectedArrivalDateStart;
+  protected LocalDate expectedArrivalAtPlaceOfDeliveryStartDate;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING)
-  protected LocalDate expectedArrivalDateEnd;
+  protected LocalDate expectedArrivalAtPlaceOfDeliveryEndDate;
 
   protected TransportDocumentTypeCode transportDocumentTypeCode;
 
@@ -90,8 +90,8 @@ abstract class AbstractBookingTO {
 
   protected IncoTerms incoTerms;
 
-  @NotNull(message = "The attribute communicationChannel is required.")
-  protected CommunicationChannel communicationChannel;
+  @NotNull(message = "The attribute communicationChannelCode is required.")
+  protected CommunicationChannelCode communicationChannelCode;
 
   @NotNull(message = "The attribute isEquipmentSubstitutionAllowed is required.")
   protected Boolean isEquipmentSubstitutionAllowed;

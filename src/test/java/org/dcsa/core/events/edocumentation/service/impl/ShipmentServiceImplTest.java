@@ -12,9 +12,9 @@ import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.*;
-import org.dcsa.core.events.model.transferobjects.LocationTO;
 import org.dcsa.core.events.repository.ShipmentRepository;
-import org.dcsa.core.events.service.LocationService;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
+import org.dcsa.skernel.service.LocationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,7 +95,7 @@ class ShipmentServiceImplTest {
 
     shipmentCarrierClause = new ShipmentCarrierClause();
     shipmentCarrierClause.setCarrierClauseID(UUID.randomUUID());
-    shipmentCarrierClause.setTransportDocumentReference("ref");
+    shipmentCarrierClause.setTransportDocumentID(UUID.randomUUID());
 
     carrierClauseTO = new CarrierClauseTO();
     carrierClauseTO.setClauseContent("clause content");
@@ -114,7 +114,7 @@ class ShipmentServiceImplTest {
     charge.setCurrencyCode("x".repeat(20));
     charge.setPaymentTermCode(PaymentTerm.PRE);
     charge.setQuantity(123d);
-    charge.setTransportDocumentReference("x".repeat(20));
+    charge.setTransportDocumentID(UUID.randomUUID());
     charge.setUnitPrice(12.12d);
 
     shipmentTransport = new ShipmentTransport();
@@ -231,8 +231,7 @@ class ShipmentServiceImplTest {
   @DisplayName("Test fetchCarrierClausesByShipmentID should return empty list if ID is null.")
   void fetchCarrierClausesByShipmentIDForNullID() {
 
-    StepVerifier.create(shipmentService.fetchCarrierClausesByShipmentID(null))
-        .verifyComplete();
+    StepVerifier.create(shipmentService.fetchCarrierClausesByShipmentID(null)).verifyComplete();
   }
 
   @Test
@@ -398,10 +397,12 @@ class ShipmentServiceImplTest {
   }
 
   @Test
-  @DisplayName("Test findByShippingInstructionReference should return valid shipmentTO for valid ID.")
+  @DisplayName(
+      "Test findByShippingInstructionReference should return valid shipmentTO for valid ID.")
   void findByShippingInstructionReferenceForValidID() {
 
-    when(shipmentRepository.findByShippingInstructionReference(any())).thenReturn(Flux.just(shipment));
+    when(shipmentRepository.findByShippingInstructionReference(any()))
+        .thenReturn(Flux.just(shipment));
 
     when(shipmentCutOffTimeRepository.findAllByShipmentID(any()))
         .thenReturn(Flux.just(shipmentCutOffTime));
@@ -418,7 +419,8 @@ class ShipmentServiceImplTest {
     when(locationService.fetchLocationByID(any())).thenReturn(Mono.just(locationTO));
     when(bookingService.fetchByBookingID(any())).thenReturn(Mono.empty());
 
-    StepVerifier.create(shipmentService.findByShippingInstructionReference(UUID.randomUUID().toString()))
+    StepVerifier.create(
+            shipmentService.findByShippingInstructionReference(UUID.randomUUID().toString()))
         .assertNext(
             result -> {
               assertEquals(
@@ -428,19 +430,24 @@ class ShipmentServiceImplTest {
                   shipmentCutOffTime.getCutOffDateTime(),
                   result.get(0).getShipmentCutOffTimes().get(0).getCutOffDateTime());
               assertEquals(
-                  "Hamburg", result.get(0).getShipmentLocations().get(0).getLocation().getLocationName());
+                  "Hamburg",
+                  result.get(0).getShipmentLocations().get(0).getLocation().getLocationName());
               assertEquals("Tokyo", result.get(0).getShipmentLocations().get(0).getDisplayedName());
-              assertEquals("clause content", result.get(0).getCarrierClauses().get(0).getClauseContent());
               assertEquals(
-                  "22GP", result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentSizetype());
-              assertEquals(3, result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentUnits());
+                  "clause content", result.get(0).getCarrierClauses().get(0).getClauseContent());
+              assertEquals(
+                  "22GP",
+                  result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentSizetype());
+              assertEquals(
+                  3, result.get(0).getConfirmedEquipments().get(0).getConfirmedEquipmentUnits());
               assertEquals(
                   charge.getChargeType(), result.get(0).getCharges().get(0).getChargeType());
               assertEquals("WHAT", result.get(0).getCharges().get(0).getCalculationBasis());
               assertEquals(PaymentTerm.PRE, result.get(0).getCharges().get(0).getPaymentTermCode());
               assertEquals("YOYO", result.get(0).getTransports().get(0).getTransportName());
               assertEquals(
-                  DCSATransportType.VESSEL, result.get(0).getTransports().get(0).getModeOfTransport());
+                  DCSATransportType.VESSEL,
+                  result.get(0).getTransports().get(0).getModeOfTransport());
             })
         .verifyComplete();
   }

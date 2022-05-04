@@ -16,10 +16,10 @@ public interface CargoItemRepository
       "SELECT DISTINCT ci.* FROM shipping_instruction si "
           + "JOIN consignment_item con ON con.shipping_instruction_id = si.id "
           + "JOIN cargo_item ci ON ci.consignment_item_id = con.id "
-          + "WHERE si.id = :shippingInstructionReference")
-  Flux<CargoItem>
-  findAllByShippingInstructionReference(String shippingInstructionReference);
+          + "WHERE si.id = :shippingInstructionID")
+  Flux<CargoItem> findAllByShippingInstructionID(UUID shippingInstructionID);
 
   Flux<CargoItem> findAllByConsignmentItemID(UUID consignmentItemID);
+
   Mono<Void> deleteAllByIdIn(List<UUID> cargoItemIDs);
 }

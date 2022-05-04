@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface ChargeService {
 
-	Flux<ChargeTO> fetchChargesByTransportDocumentReference(String transportDocumentReference);
-	Flux<ChargeTO> fetchChargesByShipmentID(UUID shipmentID);
+  Flux<ChargeTO> fetchChargesByTransportDocumentID(UUID transportDocumentID);
+
+  Flux<ChargeTO> fetchChargesByShipmentID(UUID shipmentID);
 }

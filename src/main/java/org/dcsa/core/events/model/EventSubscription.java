@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.base.AbstractEventSubscription;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.model.enums.SignatureMethod;
-import org.dcsa.core.validator.ValidVesselIMONumber;
+import org.dcsa.skernel.validator.ValidVesselIMONumber;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 

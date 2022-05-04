@@ -1,9 +1,10 @@
 package org.dcsa.core.events.model.transferobjects;
 
 import lombok.Data;
-import org.dcsa.core.events.model.enums.PartyFunction;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.validator.EnumSubset;
+import org.dcsa.skernel.model.enums.PartyFunction;
+import org.dcsa.skernel.model.transferobjects.PartyTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.dcsa.core.events.model.enums.PartyFunction.DOCUMENTATION_PARTY_FUNCTION_CODES;
+import static org.dcsa.skernel.model.enums.PartyFunction.DOCUMENTATION_PARTY_FUNCTION_CODES;
 
 @Data
 public class DocumentPartyTO {

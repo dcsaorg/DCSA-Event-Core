@@ -1,7 +1,7 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
-import org.dcsa.core.events.model.enums.PartyFunction;
+import org.dcsa.skernel.model.enums.PartyFunction;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -17,7 +17,7 @@ public class DocumentParty {
   private String partyID;
 
   @Column("shipping_instruction_id")
-  private String shippingInstructionReference;
+  private UUID shippingInstructionID;
 
   @Column("shipment_id")
   private UUID shipmentID;

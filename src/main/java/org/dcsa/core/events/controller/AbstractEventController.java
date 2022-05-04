@@ -2,7 +2,7 @@ package org.dcsa.core.events.controller;
 
 import org.dcsa.core.events.model.Event;
 import org.dcsa.core.events.service.EventService;
-import org.dcsa.core.exception.GetException;
+import org.dcsa.core.exception.DCSAException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ public abstract class AbstractEventController<S extends EventService<T>, T exten
         ExtendedRequest<T> extendedRequest = newExtendedRequest();
         try {
             extendedRequest.parseParameter(request.getQueryParams());
-        } catch (GetException getException) {
-            return Flux.error(getException);
+        } catch (DCSAException ex) {
+            return Flux.error(ex);
         }
 
         return getService().findAllExtended(extendedRequest)
