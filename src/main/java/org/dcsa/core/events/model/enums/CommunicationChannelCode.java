@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum CommunicationChannel {
+public enum CommunicationChannelCode {
   EI("EDI transmission"),
   EM("Email"),
   AO("API");

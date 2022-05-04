@@ -113,7 +113,7 @@ public class Booking implements Persistable<UUID> {
   private String bookingChannelReference;
 
   @Column("communication_channel_code")
-  private CommunicationChannel communicationChannelCode;
+  private CommunicationChannelCode communicationChannelCode;
 
   @Column("is_equipment_substitution_allowed")
   private Boolean isEquipmentSubstitutionAllowed;

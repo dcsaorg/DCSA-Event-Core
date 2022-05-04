@@ -10,13 +10,13 @@ import org.mapstruct.Mapping;
 public interface BookingMapper {
   @Mapping(source = "invoicePayableAt", target = "invoicePayableAt.id")
   @Mapping(source = "placeOfIssueID", target = "placeOfIssue.id")
-  @Mapping(source = "communicationChannelCode", target = "communicationChannel")
+  @Mapping(source = "communicationChannelCode", target = "communicationChannelCode")
   @Mapping(source = "updatedDateTime", target = "bookingRequestUpdatedDateTime")
   @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
   BookingTO bookingToDTO(Booking booking);
 
   @Mapping(source = "invoicePayableAt", target = "invoicePayableAt", ignore = true)
-  @Mapping(source = "communicationChannel", target = "communicationChannelCode")
+  @Mapping(source = "communicationChannelCode", target = "communicationChannelCode")
   @Mapping(source = "bookingRequestUpdatedDateTime", target = "updatedDateTime")
   @Mapping(source = "bookingRequestCreatedDateTime", target = "bookingRequestDateTime")
   Booking dtoToBooking(BookingTO bookingTO);

@@ -90,8 +90,8 @@ abstract class AbstractBookingTO {
 
   protected IncoTerms incoTerms;
 
-  @NotNull(message = "The attribute communicationChannel is required.")
-  protected CommunicationChannel communicationChannel;
+  @NotNull(message = "The attribute communicationChannelCode is required.")
+  protected CommunicationChannelCode communicationChannelCode;
 
   @NotNull(message = "The attribute isEquipmentSubstitutionAllowed is required.")
   protected Boolean isEquipmentSubstitutionAllowed;
