@@ -17,8 +17,8 @@ public class Charge {
   @Size(max = 100)
   private String id;
 
-  @Column("transport_document_reference")
-  private String transportDocumentReference;
+  @Column("transport_document_id")
+  private UUID transportDocumentID;
 
   @Column("shipment_id")
   private UUID shipmentID;

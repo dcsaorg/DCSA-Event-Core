@@ -1,27 +1,23 @@
 package org.dcsa.core.events.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import org.dcsa.core.events.model.enums.CargoGrossWeight;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.UUID;
 
-@Table("utilized_transport_equipment")
 @Data
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
-public class UtilizedTransportEquipment extends AbstractUtilizedTransportEquipment {
+@Table("requested_equipment_equipment")
+public class RequestedEquipmentEquipment {
 
-  @Id
-  @JsonIgnore
-  @Column("id")
-  private UUID id;
+  @NotNull
+  @Column("requested_equipment_id")
+  private UUID requestedEquipmentId;
 
   @NotNull
   @Size(max = 15)

@@ -1,8 +1,6 @@
 package org.dcsa.core.events.repository;
 
 import org.dcsa.core.events.model.DocumentParty;
-import org.dcsa.core.repository.ExtendedRepository;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -14,9 +12,9 @@ import java.util.UUID;
 public interface DocumentPartyRepository extends ReactiveCrudRepository<DocumentParty, UUID> {
   Flux<DocumentParty> findByBookingID(UUID bookingID);
 
-  Flux<DocumentParty> findByShippingInstructionReference(String shippingInstructionReference);
+  Flux<DocumentParty> findByShippingInstructionID(UUID shippingInstructionID);
 
   Mono<Void> deleteByBookingID(UUID bookingID);
 
-  Mono<Void> deleteByShippingInstructionReference(String shippingInstructionReference);
+  Mono<Void> deleteByShippingInstructionID(UUID shippingInstructionID);
 }

@@ -15,8 +15,7 @@ import java.util.UUID;
 @Data
 @Table("consignment_item")
 public class ConsignmentItem {
-  @Id
-  private UUID id;
+  @Id private UUID id;
 
   @NotBlank
   @Column("description_of_goods")
@@ -28,9 +27,8 @@ public class ConsignmentItem {
   private String hsCode;
 
   @NotNull
-  @Size(max = 100)
   @Column("shipping_instruction_id")
-  private String shippingInstructionID;
+  private UUID shippingInstructionID;
 
   @NotNull
   @Column("weight")

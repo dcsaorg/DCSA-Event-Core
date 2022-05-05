@@ -7,12 +7,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.ModeOfTransport;
 import org.dcsa.core.events.model.Service;
-import org.dcsa.core.events.model.Vessel;
+import org.dcsa.skernel.model.Vessel;
 import org.dcsa.core.events.model.Voyage;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.enums.DCSATransportType;
-import org.dcsa.core.events.model.enums.FacilityCodeListProvider;
 import org.dcsa.core.model.ForeignKey;
+import org.dcsa.skernel.model.enums.FacilityCodeListProvider;
+import org.dcsa.skernel.model.transferobjects.FacilityTO;
+import org.dcsa.skernel.model.transferobjects.LocationTO;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.sql.Join;
 

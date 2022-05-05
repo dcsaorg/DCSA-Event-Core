@@ -7,6 +7,7 @@ import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.EquipmentEventRepository;
 import org.dcsa.core.events.repository.EquipmentRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
+import org.dcsa.core.events.service.DocumentReferenceService;
 import org.dcsa.core.events.service.EquipmentEventService;
 import org.dcsa.core.events.service.TransportCallService;
 import org.dcsa.core.events.service.TransportCallTOService;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class EquipmentEventServiceImpl extends QueryServiceImpl<EquipmentEventRepository, EquipmentEvent, UUID> implements EquipmentEventService {
+    private final DocumentReferenceService documentReferenceService;
     private final EquipmentEventRepository equipmentEventRepository;
     private final EquipmentRepository equipmentRepository;
     private final TransportCallService transportCallService;
@@ -42,7 +44,7 @@ public class EquipmentEventServiceImpl extends QueryServiceImpl<EquipmentEventRe
                 .flatMap(equipmentEvent ->
                         transportCallService.findReferencesForTransportCallID(event.getTransportCallID())
                                 .doOnNext(equipmentEvent::setReferences)
-                                .then(transportCallService.findDocumentReferencesForTransportCallID(event.getTransportCallID()))
+                                .then(documentReferenceService.findAllDocumentReferencesForEvent(event))
                                 .doOnNext(equipmentEvent::setDocumentReferences)
                                 .then(Mono.justOrEmpty(event.getEquipmentReference()))
                                 .flatMap(equipmentReference -> transportCallService.findSealsForTransportCallIDAndEquipmentReference(event.getTransportCallID(), equipmentReference))

@@ -48,7 +48,7 @@ class CarrierClauseServiceImplTest {
     shipmentCarrierClause = new ShipmentCarrierClause();
     shipmentCarrierClause.setCarrierClauseID(carrierClauseID);
     shipmentCarrierClause.setShipmentID(shipmentID);
-    shipmentCarrierClause.setTransportDocumentReference("transportDocumentReference1");
+    shipmentCarrierClause.setTransportDocumentID(UUID.randomUUID());
   }
 
   @Test
@@ -56,11 +56,11 @@ class CarrierClauseServiceImplTest {
       "Find carrier clause for transport document with one carrier clause should return one carrier clause")
   void fetchSingleCarrierClausesByTransportDocumentReference() {
 
-    when(carrierClauseRepository.fetchAllByTransportDocumentReference(any())).thenReturn(Flux.just(carrierClause));
+    when(carrierClauseRepository.fetchAllByTransportDocumentID(any())).thenReturn(Flux.just(carrierClause));
 
     StepVerifier.create(
-            carrierClauseService.fetchCarrierClausesByTransportDocumentReference(
-                "transportDocumentReference1"))
+            carrierClauseService.fetchCarrierClausesByTransportDocumentID(
+                shipmentCarrierClause.getTransportDocumentID()))
         .assertNext(
             carrierClauseTO -> {
               assertEquals(carrierClause.getClauseContent(), carrierClauseTO.getClauseContent());
@@ -77,21 +77,23 @@ class CarrierClauseServiceImplTest {
     carrierClause2.setId(carrierClauseID);
     carrierClause2.setClauseContent("Carrier Clause2");
 
+    UUID transportDocumentId2 = UUID.randomUUID();
+
     ShipmentCarrierClause shipmentCarrierClause2 = new ShipmentCarrierClause();
     shipmentCarrierClause2.setCarrierClauseID(carrierClauseID);
     shipmentCarrierClause2.setShipmentID(UUID.randomUUID());
-    shipmentCarrierClause2.setTransportDocumentReference("transportDocumentReference1");
+    shipmentCarrierClause2.setTransportDocumentID(UUID.randomUUID());
 
-    when(carrierClauseRepository.fetchAllByTransportDocumentReference(
-            eq("transportDocumentReference1")))
+    when(carrierClauseRepository.fetchAllByTransportDocumentID(
+            eq(shipmentCarrierClause.getTransportDocumentID())))
         .thenReturn(Flux.just(carrierClause, carrierClause2));
 
     StepVerifier.create(
-            carrierClauseService.fetchCarrierClausesByTransportDocumentReference(
-                "transportDocumentReference1"))
+            carrierClauseService.fetchCarrierClausesByTransportDocumentID(
+                shipmentCarrierClause.getTransportDocumentID()))
         .assertNext(
             carrierClauseTO -> {
-              verify(carrierClauseRepository).fetchAllByTransportDocumentReference(any());
+              verify(carrierClauseRepository).fetchAllByTransportDocumentID(any());
               assertEquals(carrierClause.getClauseContent(), carrierClauseTO.getClauseContent());
             })
         .assertNext(
@@ -104,13 +106,13 @@ class CarrierClauseServiceImplTest {
   @Test
   @DisplayName("Transport document without carrier clauses should return no carrier clauses")
   void fetchCarrierClausesByTransportDocumentReferenceNothingFound() {
-    when(carrierClauseRepository.fetchAllByTransportDocumentReference(
-            eq("transportDocumentReference1")))
+    when(carrierClauseRepository.fetchAllByTransportDocumentID(
+            eq(shipmentCarrierClause.getTransportDocumentID())))
         .thenReturn(Flux.empty());
 
     StepVerifier.create(
-            carrierClauseService.fetchCarrierClausesByTransportDocumentReference(
-                "transportDocumentReference1"))
+            carrierClauseService.fetchCarrierClausesByTransportDocumentID(
+                shipmentCarrierClause.getTransportDocumentID()))
         .verifyComplete();
   }
 
@@ -139,10 +141,12 @@ class CarrierClauseServiceImplTest {
     carrierClause2.setId(carrierClauseID);
     carrierClause2.setClauseContent("Carrier Clause2");
 
+    UUID transportDocumentId1 = UUID.randomUUID();
+
     ShipmentCarrierClause shipmentCarrierClause2 = new ShipmentCarrierClause();
     shipmentCarrierClause2.setCarrierClauseID(carrierClauseID);
     shipmentCarrierClause2.setShipmentID(shipmentID);
-    shipmentCarrierClause2.setTransportDocumentReference("transportDocumentReference1");
+    shipmentCarrierClause2.setTransportDocumentID(transportDocumentId1);
 
     when(carrierClauseRepository.fetchAllByShipmentID(
       eq(shipmentID)))

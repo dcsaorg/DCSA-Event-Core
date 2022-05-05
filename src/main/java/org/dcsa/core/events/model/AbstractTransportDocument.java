@@ -20,50 +20,56 @@ import java.util.UUID;
 @NoArgsConstructor
 public abstract class AbstractTransportDocument extends AuditBase {
 
-    @Id
-    @Column("transport_document_reference")
-    @Size(max = 20)
-    private String transportDocumentReference;
+  @Id
+  @Column("id")
+  private UUID id;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @Column("created_date_time")
-    protected OffsetDateTime transportDocumentRequestCreatedDateTime;
+  @Column("transport_document_reference")
+  @Size(max = 20)
+  private String transportDocumentReference;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @Column("updated_date_time")
-    protected OffsetDateTime transportDocumentRequestUpdatedDateTime;
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  @Column("created_date_time")
+  protected OffsetDateTime transportDocumentRequestCreatedDateTime;
 
-    @Column("issue_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate issueDate;
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  @Column("updated_date_time")
+  protected OffsetDateTime transportDocumentRequestUpdatedDateTime;
 
-    @Column("shipped_onboard_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate shippedOnBoardDate;
+  @Column("issue_date")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private LocalDate issueDate;
 
-    @Column("received_for_shipment_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate receivedForShipmentDate;
+  @Column("shipped_onboard_date")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private LocalDate shippedOnBoardDate;
 
-    @Column("number_of_originals")
-    private Integer numberOfOriginals;
+  @Column("received_for_shipment_date")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private LocalDate receivedForShipmentDate;
 
-    @Column("issuer")
-    private UUID issuer;
+  @Column("number_of_originals")
+  private Integer numberOfOriginals;
 
-    @Column("shipping_instruction_id")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String shippingInstructionReference;
+  @Column("issuer")
+  private UUID issuer;
 
-    @Column("declared_value_currency")
-    @Size(max = 3)
-    private String declaredValueCurrency;
+  @Column("shipping_instruction_id")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private UUID shippingInstructionID;
 
-    @Column("declared_value")
-    private Float declaredValue;
+  @Column("declared_value_currency")
+  @Size(max = 3)
+  private String declaredValueCurrency;
 
-    @Column("number_of_rider_pages")
-    private Integer numberOfRiderPages;
+  @Column("declared_value")
+  private Float declaredValue;
+
+  @Column("number_of_rider_pages")
+  private Integer numberOfRiderPages;
+
+  @Column("valid_until")
+  private OffsetDateTime validUntil;
 }

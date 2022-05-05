@@ -2,13 +2,14 @@ package org.dcsa.core.events.model.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dcsa.skernel.model.enums.FacilityTypeCode;
 
 import java.util.EnumSet;
 import java.util.Set;
 
 import static org.dcsa.core.events.model.enums.EventClassifierCode.*;
-import static org.dcsa.core.events.model.enums.FacilityTypeCode.*;
 import static org.dcsa.core.events.model.enums.PortCallPhaseTypeCode.*;
+import static org.dcsa.skernel.model.enums.FacilityTypeCode.*;
 
 @RequiredArgsConstructor
 public enum PortCallServiceTypeCode {

@@ -9,12 +9,12 @@ import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.model.enums.TransportDocumentTypeCode;
 import org.dcsa.core.model.AuditBase;
 import org.dcsa.core.validator.EnumSubset;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.EBL_DOCUMENT_STATUSES;
 
@@ -23,9 +23,8 @@ import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.EBL_DOCUMEN
 @NoArgsConstructor
 public abstract class AbstractShippingInstruction extends AuditBase {
 
-  @Id
   @Size(max = 100)
-  @Column("id")
+  @Column("shipping_instruction_reference")
   private String shippingInstructionReference;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -54,6 +53,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("number_of_originals")
   private Integer numberOfOriginals;
 
+  @NotNull
   @Column("is_electronic")
   private Boolean isElectronic;
 
@@ -89,7 +89,9 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("displayed_name_for_place_of_delivery")
   private String displayedNameForPlaceOfDelivery;
 
-  @Size(max = 20)
   @Column("amendment_to_transport_document")
-  private String amendmentToTransportDocument;
+  private UUID amendmentToTransportDocument;
+
+  @Column("valid_until")
+  private OffsetDateTime validUntil;
 }
