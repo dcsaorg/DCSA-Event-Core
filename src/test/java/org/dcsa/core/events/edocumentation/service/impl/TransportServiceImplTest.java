@@ -1,10 +1,12 @@
 package org.dcsa.core.events.edocumentation.service.impl;
 
 import org.dcsa.core.events.edocumentation.model.mapper.TransportMapper;
+import org.dcsa.core.events.edocumentation.repository.ShipmentTransportRepository;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.model.enums.EventType;
 import org.dcsa.core.events.model.enums.TransportEventTypeCode;
+import org.dcsa.core.events.model.enums.TransportPlanStageCode;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.skernel.model.Vessel;
 import org.dcsa.skernel.model.enums.FacilityTypeCode;
@@ -46,6 +48,7 @@ class TransportServiceImplTest {
   @Mock ModeOfTransportRepository modeOfTransportRepository;
   @Mock VesselRepository vesselRepository;
   @Mock VoyageRepository voyageRepository;
+  @Mock ShipmentTransportRepository shipmentTransportRepository;
 
   // services
   @Mock LocationService locationService;
@@ -62,6 +65,7 @@ class TransportServiceImplTest {
   ModeOfTransport modeOfTransport;
   Vessel vessel;
   Voyage voyage;
+  ShipmentTransport shipmentTransport;
 
   @BeforeEach
   void init() {
@@ -103,6 +107,12 @@ class TransportServiceImplTest {
     voyage.setId(UUID.randomUUID());
     voyage.setServiceID(UUID.randomUUID());
     voyage.setCarrierVoyageNumber("99PROBLEMS");
+
+    shipmentTransport = new ShipmentTransport();
+    shipmentTransport.setTransportID(transport.getTransportID());
+    shipmentTransport.setShipmentID(UUID.randomUUID());
+    shipmentTransport.setTransportPlanStageCode(TransportPlanStageCode.ONC);
+    shipmentTransport.setTransportPlanStageSequenceNumber(123);
   }
 
   @Test
@@ -184,5 +194,43 @@ class TransportServiceImplTest {
               assertEquals("Hamburg", result.getLoadLocation().getLocationName());
             })
         .verifyComplete();
+  }
+
+  @Test
+  @DisplayName("Test findByShipmentID should return valid TransportTO for valid ID.")
+  void findByShipmentIDForValidID() {
+
+    when(transportRepository.findAllById(any(List.class))).thenReturn(Flux.just(transport));
+    when(transportRepository.findById(any(UUID.class))).thenReturn(Mono.just(transport));
+    when(transportCallRepository.findById(any(UUID.class))).thenReturn(Mono.just(transportCall));
+    when(shipmentTransportRepository.findAllByShipmentID(any(UUID.class))).thenReturn(Flux.just(shipmentTransport));
+    when(transportEventRepository
+      .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+        any(), eq(TransportEventTypeCode.ARRI), any()))
+      .thenReturn(Mono.just(transportEvent1));
+    when(transportEventRepository
+      .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
+        any(), eq(TransportEventTypeCode.DEPA), any()))
+      .thenReturn(Mono.just(transportEvent2));
+
+    when(locationService.fetchLocationByID(transportCall.getLocationID()))
+      .thenReturn(Mono.just(locationTO));
+
+    when(modeOfTransportRepository.findByTransportCallID(any()))
+      .thenReturn(Mono.just(modeOfTransport));
+
+    when(vesselRepository.findById(any(UUID.class))).thenReturn(Mono.just(vessel));
+
+    when(voyageRepository.findById(any(UUID.class))).thenReturn(Mono.just(voyage));
+
+    StepVerifier.create(transportService.findByShipmentID(shipmentTransport.getShipmentID()))
+      .assertNext(
+        result -> {
+          assertEquals("JD", result.getTransportName());
+          assertEquals(DCSATransportType.VESSEL, result.getModeOfTransport());
+          assertEquals("JZ", result.getVesselName());
+          assertEquals("Hamburg", result.getLoadLocation().getLocationName());
+        })
+      .verifyComplete();
   }
 }
