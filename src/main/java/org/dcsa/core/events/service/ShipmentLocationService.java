@@ -11,8 +11,9 @@ public interface ShipmentLocationService {
 
   Mono<List<ShipmentLocationTO>> fetchShipmentLocationsByBookingID(UUID bookingID);
 
+  Mono<List<ShipmentLocationTO>> fetchShipmentLocationByTransportDocumentID(
+      UUID transportDocumentId);
+
   Mono<List<ShipmentLocationTO>> createShipmentLocationsByBookingIDAndTOs(
       final UUID bookingID, List<ShipmentLocationTO> shipmentLocations);
-
-  Mono<List<ShipmentLocationTO>> fetchShipmentLocationByTransportDocumentID(UUID transportDocumentId);
 }

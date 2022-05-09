@@ -11,6 +11,8 @@ import org.dcsa.core.events.edocumentation.service.CarrierClauseService;
 import org.dcsa.core.events.edocumentation.service.ChargeService;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.ShipmentLocation;
+import org.dcsa.core.events.model.ShippingInstruction;
+import org.dcsa.core.events.model.enums.ShipmentEventTypeCode;
 import org.dcsa.core.events.model.mapper.RequestedEquipmentMapper;
 import org.dcsa.core.events.model.transferobjects.ReferenceTO;
 import org.dcsa.core.events.repository.*;
@@ -18,6 +20,7 @@ import org.dcsa.core.events.service.DocumentPartyService;
 import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.events.service.ShipmentEventService;
 import org.dcsa.core.events.service.ShipmentLocationService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.util.MappingUtils;
 import org.dcsa.skernel.model.Location;
@@ -43,6 +46,7 @@ import java.util.function.Function;
 @Service
 public class ShipmentLocationServiceImpl implements ShipmentLocationService {
 
+  // repositories
   private final LocationRepository locationRepository;
   private final ShipmentLocationRepository shipmentLocationRepository;
 
@@ -59,19 +63,30 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
     if (bookingID == null) return Mono.empty();
     return shipmentLocationRepository
         .findByBookingID(bookingID)
-        .flatMap(
-            sl ->
-                locationService
-                    .fetchLocationDeepObjByID(sl.getLocationID())
-                    .flatMap(
-                        locationTO -> {
-                          ShipmentLocationTO shipmentLocationTO =
-                              shipmentMapper.shipmentLocationToDTO(sl);
-                          shipmentLocationTO.setLocation(locationTO);
-                          return Mono.just(shipmentLocationTO);
-                        }))
+        .flatMap(getDeepShipmentLocationObject)
         .collectList();
   }
+
+  @Override
+  public Mono<List<ShipmentLocationTO>> fetchShipmentLocationByTransportDocumentID(
+      UUID transportDocumentId) {
+    return shipmentLocationRepository
+        .findByTransportDocumentID(transportDocumentId)
+        .flatMap(getDeepShipmentLocationObject)
+        .collectList();
+  }
+
+    private final Function<ShipmentLocation, Mono<ShipmentLocationTO>>
+      getDeepShipmentLocationObject =
+          shipmentLocation -> locationService
+              .fetchLocationDeepObjByID(shipmentLocation.getLocationID())
+              .flatMap(
+                  locationTO -> {
+                    ShipmentLocationTO shipmentLocationTO =
+                        shipmentMapper.shipmentLocationToDTO(shipmentLocation);
+                    shipmentLocationTO.setLocation(locationTO);
+                    return Mono.just(shipmentLocationTO);
+                  });
 
   @Override
   public Mono<List<ShipmentLocationTO>> createShipmentLocationsByBookingIDAndTOs(
@@ -132,25 +147,6 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
                           shipmentLocationTO.setDisplayedName(savedSl.getDisplayedName());
                           shipmentLocationTO.setEventDateTime(savedSl.getEventDateTime());
                           return shipmentLocationTO;
-                        }))
-        .collectList();
-  }
-
-  @Override
-  public Mono<List<ShipmentLocationTO>> fetchShipmentLocationByTransportDocumentID(
-      UUID transportDocumentId) {
-    return shipmentLocationRepository
-        .findByTransportDocumentID(transportDocumentId)
-        .flatMap(
-            sl ->
-                locationService
-                    .fetchLocationDeepObjByID(sl.getLocationID())
-                    .flatMap(
-                        locationTO -> {
-                          ShipmentLocationTO shipmentLocationTO =
-                              shipmentMapper.shipmentLocationToDTO(sl);
-                          shipmentLocationTO.setLocation(locationTO);
-                          return Mono.just(shipmentLocationTO);
                         }))
         .collectList();
   }
