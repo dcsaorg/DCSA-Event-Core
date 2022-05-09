@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.dcsa.core.events.model.enums.*;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.validator.EnumSubset;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.Persistable;
@@ -13,7 +14,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.EnumSet;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 
 import static org.dcsa.core.events.model.enums.ShipmentEventTypeCode.BOOKING_DOCUMENT_STATUSES;
 
@@ -145,5 +148,29 @@ public class Booking implements Persistable<UUID> {
   @Override
   public boolean isNew() {
     return this.getId() == null;
+  }
+
+  public Booking checkCancelBookingStatus() {
+    EnumSet<ShipmentEventTypeCode> allowedDocumentStatuses =
+      EnumSet.of(
+        ShipmentEventTypeCode.RECE,
+        ShipmentEventTypeCode.PENU,
+        ShipmentEventTypeCode.CONF,
+        ShipmentEventTypeCode.PENC);
+    if (allowedDocumentStatuses.contains(this.getDocumentStatus())) {
+      return this;
+    }
+    throw ConcreteRequestErrorMessageException.invalidParameter(
+      "Cannot Cancel Booking that is not in status RECE, PENU, CONF or PENC");
+  }
+
+  public Booking checkUpdateBookingStatus() {
+    EnumSet<ShipmentEventTypeCode> allowedDocumentStatuses =
+      EnumSet.of(ShipmentEventTypeCode.RECE, ShipmentEventTypeCode.PENU);
+    if (allowedDocumentStatuses.contains(this.getDocumentStatus())) {
+      return this;
+    }
+    throw ConcreteRequestErrorMessageException.invalidParameter(
+      "Cannot Update Booking that is not in status RECE or PENU");
   }
 }
