@@ -27,10 +27,10 @@ public class Transport {
 
     @JsonIgnore
     @Column("load_transport_call_id")
-    private String loadTransportCallID;
+    private UUID loadTransportCallID;
 
     @JsonIgnore
     @Column("discharge_transport_call_id")
-    private String dischargeTransportCallID;
+    private UUID dischargeTransportCallID;
 
 }

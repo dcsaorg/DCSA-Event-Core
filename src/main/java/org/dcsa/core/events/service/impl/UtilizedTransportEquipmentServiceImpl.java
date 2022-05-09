@@ -1,10 +1,12 @@
 package org.dcsa.core.events.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dcsa.core.events.model.mapper.*;
+import org.dcsa.core.events.model.mapper.ActiveReeferSettingsMapper;
+import org.dcsa.core.events.model.mapper.EquipmentMapper;
+import org.dcsa.core.events.model.mapper.SealMapper;
+import org.dcsa.core.events.model.mapper.UtilizedTransportEquipmentMapper;
 import org.dcsa.core.events.model.transferobjects.*;
 import org.dcsa.core.events.repository.*;
-import org.dcsa.core.events.service.ReferenceService;
 import org.dcsa.core.events.service.UtilizedTransportEquipmentService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,10 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
   private final EquipmentRepository equipmentRepository;
   private final SealRepository sealRepository;
   private final ActiveReeferSettingsRepository activeReeferSettingsRepository;
-  private final CargoItemRepository cargoItemRepository;
-  private final CargoLineItemRepository cargoLineItemRepository;
-  private final ReferenceService referenceService;
 
   private final ShipmentRepository shipmentRepository;
 
   private final SealMapper sealMapper;
-  private final CargoLineItemMapper cargoLineItemMapper;
-  private final CargoItemMapper cargoItemMapper;
   private final ActiveReeferSettingsMapper activeReeferSettingsMapper;
   private final EquipmentMapper equipmentMapper;
   private final UtilizedTransportEquipmentMapper utilizedTransportEquipmentMapper;
@@ -71,21 +68,6 @@ public class UtilizedTransportEquipmentServiceImpl implements UtilizedTransportE
                   .thenReturn(utilizedTransportEquipmentTO);
             })
         .collectList();
-  }
-
-  @Override
-  public Mono<List<UtilizedTransportEquipmentTO>>
-      resolveUtilizedTransportEquipmentsForShippingInstructionReference(
-          List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
-          ShippingInstructionTO shippingInstructionTO) {
-    return utilizedTransportEquipmentRepository
-        .findUtilizedTransportEquipmentsByShippingInstructionReference(
-            shippingInstructionTO.getShippingInstructionReference())
-        .collectList()
-        .flatMap(
-            ignored ->
-                addUtilizedTransportEquipmentToShippingInstruction(
-                    utilizedTransportEquipmentTOs, shippingInstructionTO));
   }
 
   @Override

@@ -41,7 +41,7 @@ public interface BookingRepository
           + "JOIN shipment_transport st ON s.id = st.shipment_id "
           + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
-  Flux<String> findCarrierBookingRefsByTransportCallID(String transportCallID);
+  Flux<String> findCarrierBookingRefsByTransportCallID(UUID transportCallID);
 
   @Query(
       "SELECT * FROM booking b "

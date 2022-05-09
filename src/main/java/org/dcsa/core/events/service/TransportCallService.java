@@ -8,12 +8,13 @@ import org.dcsa.core.events.model.transferobjects.DocumentReferenceTO;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface TransportCallService {
 
-    Mono<List<Reference>> findReferencesForTransportCallID(String transportCallID);
+    Mono<List<Reference>> findReferencesForTransportCallID(UUID transportCallID);
 
-    Mono<List<Seal>> findSealsForTransportCallIDAndEquipmentReference(String transportCallID, String equipmentReference);
+    Mono<List<Seal>> findSealsForTransportCallIDAndEquipmentReference(UUID transportCallID, String equipmentReference);
 
     Mono<TransportCall> create(TransportCall transportCall);
 }

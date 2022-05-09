@@ -44,5 +44,5 @@ public interface TransportDocumentRepository extends ExtendedRepository<Transpor
           + "JOIN shipment_transport st ON (st.shipment_id = ci.shipment_id OR st.shipment_id = r.shipment_id) "
           + "JOIN transport t ON st.transport_id = t.id "
           + "WHERE t.load_transport_call_id = :transportCallID")
-  Flux<String> findTransportDocumentReferencesByTransportCallID(String transportCallID);
+  Flux<String> findTransportDocumentReferencesByTransportCallID(UUID transportCallID);
 }

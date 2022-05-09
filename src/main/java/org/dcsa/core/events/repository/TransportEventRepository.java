@@ -22,7 +22,7 @@ public interface TransportEventRepository extends ExtendedRepository<TransportEv
           + "DESC LIMIT 1")
   Mono<TransportEvent>
       findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
-          String transportCallId,
+          UUID transportCallId,
           TransportEventTypeCode transportEventTypeCode,
           EventClassifierCode eventClassifierCode);
 }

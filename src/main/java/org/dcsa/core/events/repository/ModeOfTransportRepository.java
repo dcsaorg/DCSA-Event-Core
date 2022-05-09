@@ -8,6 +8,8 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Repository
 public interface ModeOfTransportRepository extends ReactiveCrudRepository<ModeOfTransport, String> {
 
@@ -16,7 +18,7 @@ public interface ModeOfTransportRepository extends ReactiveCrudRepository<ModeOf
               "JOIN mode_of_transport mot " +
               "ON tc.mode_of_transport_code = mot.mode_of_transport_code " +
               "WHERE tc.id = :transportCallID")
-  Mono<ModeOfTransport> findByTransportCallID(String transportCallID);
+  Mono<ModeOfTransport> findByTransportCallID(UUID transportCallID);
 
   Mono<ModeOfTransport> findByDcsaTransportType(DCSATransportType dcsaTransportType);
 }

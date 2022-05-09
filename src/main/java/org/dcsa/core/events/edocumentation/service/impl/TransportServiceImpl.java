@@ -120,12 +120,12 @@ public class TransportServiceImpl implements TransportService {
                                     "Could not find a TransportCall")))));
   }
 
-  Mono<TransportCall> fetchTransportCallByID(String transportCallID) {
+  Mono<TransportCall> fetchTransportCallByID(UUID transportCallID) {
     return Mono.justOrEmpty(transportCallID).flatMap(transportCallRepository::findById);
   }
 
-  Mono<LocationTO> fetchLocationByTransportCallID(String id) {
-    return fetchTransportCallByID(id)
+  Mono<LocationTO> fetchLocationByTransportCallID(UUID transportCallID) {
+    return fetchTransportCallByID(transportCallID)
         .flatMap(
             transportCall ->
                 locationService
@@ -136,12 +136,12 @@ public class TransportServiceImpl implements TransportService {
                                 "Could not find a Location for the TransportCall"))));
   }
 
-  Mono<ModeOfTransport> fetchModeOfTransportByTransportCallID(String transportCallId) {
+  Mono<ModeOfTransport> fetchModeOfTransportByTransportCallID(UUID transportCallId) {
     return Mono.justOrEmpty(transportCallId)
         .flatMap(modeOfTransportRepository::findByTransportCallID);
   }
 
-  Mono<Vessel> fetchVesselByTransportCallID(String transportCallId) {
+  Mono<Vessel> fetchVesselByTransportCallID(UUID transportCallId) {
     return Mono.justOrEmpty(transportCallId)
         .flatMap(this::fetchTransportCallByID)
         .flatMap(
