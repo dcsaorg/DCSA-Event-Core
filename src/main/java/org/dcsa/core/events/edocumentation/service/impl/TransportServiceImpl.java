@@ -3,6 +3,7 @@ package org.dcsa.core.events.edocumentation.service.impl;
 import lombok.AllArgsConstructor;
 import org.dcsa.core.events.edocumentation.model.mapper.TransportMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.TransportTO;
+import org.dcsa.core.events.edocumentation.repository.ShipmentTransportRepository;
 import org.dcsa.core.events.edocumentation.service.TransportService;
 import org.dcsa.core.events.model.*;
 import org.dcsa.core.events.model.enums.EventClassifierCode;
@@ -35,6 +36,7 @@ public class TransportServiceImpl implements TransportService {
   private final ModeOfTransportRepository modeOfTransportRepository;
   private final VesselRepository vesselRepository;
   private final VoyageRepository voyageRepository;
+  private final ShipmentTransportRepository shipmentTransportRepository;
 
   private final LocationService locationService;
 
@@ -88,6 +90,24 @@ public class TransportServiceImpl implements TransportService {
                                           }))
                               .thenReturn(transportTO);
                         }));
+  }
+
+  @Override
+  public Flux<TransportTO> findByShipmentID(UUID shipmentID) {
+    return shipmentTransportRepository
+      .findAllByShipmentID(shipmentID)
+      .flatMap(this::getTransportsByShipmentTransport);
+  }
+
+  private Flux<TransportTO> getTransportsByShipmentTransport(ShipmentTransport shipmentTransport) {
+    return findByTransportID(shipmentTransport.getTransportID())
+      .doOnNext(
+        transportTO ->
+          transportTO.setTransportPlanStage(shipmentTransport.getTransportPlanStageCode()))
+      .doOnNext(
+        transportTO ->
+          transportTO.setTransportPlanStageSequenceNumber(
+            shipmentTransport.getTransportPlanStageSequenceNumber()));
   }
 
   Mono<Tuple2<TransportEvent, TransportEvent>> fetchTransportEventByTransportID(UUID transportId) {
