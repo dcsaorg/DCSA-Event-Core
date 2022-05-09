@@ -22,7 +22,10 @@ public class AbstractTransportCall extends AuditBase {
 
     @Id
     @Column("id")
-    protected String transportCallID;
+    protected UUID transportCallID;
+
+    @Column("transport_call_reference")
+    protected String transportCallReference;
 
     @Column("transport_call_sequence_number")
     private Integer transportCallSequenceNumber;

@@ -5,6 +5,8 @@ import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 
+import java.util.UUID;
+
 public interface TransportDocumentTypeRepository
     extends ReactiveCrudRepository<TransportDocumentType, String> {
 
@@ -41,5 +43,5 @@ public interface TransportDocumentTypeRepository
           + "LEFT JOIN reference r ON si.id = r.shipping_instruction_id "
           + "JOIN shipment_transport st ON (st.shipment_id = ci.shipment_id OR st.shipment_id = r.shipment_id) "
           + "JOIN transport t ON st.transport_id = t.id WHERE t.load_transport_call_id = :transportCallID")
-  Flux<String> findCodesByTransportCallID(String transportCallID);
+  Flux<String> findCodesByTransportCallID(UUID transportCallID);
 }

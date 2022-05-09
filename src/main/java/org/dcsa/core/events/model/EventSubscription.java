@@ -1,5 +1,6 @@
 package org.dcsa.core.events.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dcsa.core.events.model.base.AbstractEventSubscription;
@@ -36,8 +37,11 @@ public class EventSubscription extends AbstractEventSubscription implements Even
   @Column("transport_document_reference")
   private String transportDocumentReference;
 
-  @Column("transport_call_id")
-  private String transportCallID;
+  // For historical reasons, we use TransportCallID externally (API) but TransportCallReference internally
+  // Side-effect of DDT-1037
+  @JsonProperty("transportCallID")
+  @Column("transport_call_reference")
+  private String transportCallReference;
 
   @Column("retry_count")
   private Long retryCount = 0L;

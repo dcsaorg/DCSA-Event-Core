@@ -156,6 +156,7 @@ public class EventSubscriptionServiceImpl
             .collectList();
 
     String vesselIMONumber = equipmentEvent.getTransportCall().getVessel().getVesselIMONumber();
+    String transportCallReference = equipmentEvent.getTransportCall().getTransportCallReference();
 
     List<DocumentReferenceTO> documentReferences = equipmentEvent.getDocumentReferences();
 
@@ -212,7 +213,7 @@ public class EventSubscriptionServiceImpl
                   carrierBookingRefs,
                   transportDocumentRefs,
                   documentTypeCodes,
-                  equipmentEvent.getTransportCallID(),
+                  transportCallReference,
                   vesselIMONumber,
                   voyageNumbers,
                   serviceCodes);
@@ -226,7 +227,7 @@ public class EventSubscriptionServiceImpl
     Mono<List<String>> carrierServiceCodes;
     Mono<List<String>> transportDocumentReferences;
     Mono<List<String>> transportDocumentTypeCodes;
-    Mono<List<String>> transportCallIDs;
+    Mono<List<String>> transportCallReferences;
     Mono<List<String>> equipmentReferences;
     Mono<List<String>> vesselIMONumbers;
 
@@ -251,9 +252,9 @@ public class EventSubscriptionServiceImpl
             transportDocumentTypeRepository
                 .findCodesByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
-        transportCallIDs =
+        transportCallReferences =
             transportCallRepository
-                .findTransportCallIDByCarrierBookingRef(shipmentEvent.getDocumentReference())
+                .findTransportCallReferenceByCarrierBookingRef(shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
             utilizedTransportEquipmentRepository
@@ -289,9 +290,9 @@ public class EventSubscriptionServiceImpl
             transportDocumentTypeRepository
                 .findCodesByShippingInstructionReference(shipmentEvent.getDocumentReference())
                 .collectList();
-        transportCallIDs =
+        transportCallReferences =
             transportCallRepository
-                .findTransportCallIDByShippingInstructionReference(
+                .findTransportCallReferenceByShippingInstructionReference(
                     shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
@@ -332,9 +333,9 @@ public class EventSubscriptionServiceImpl
                 .findCodesByTransportDocumentReference(shipmentEvent.getDocumentReference())
                 .collectList();
 
-        transportCallIDs =
+        transportCallReferences =
             transportCallRepository
-                .findTransportCallIDByTransportDocumentRef(shipmentEvent.getDocumentReference())
+                .findTransportCallReferenceByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         equipmentReferences =
             utilizedTransportEquipmentRepository
@@ -356,7 +357,7 @@ public class EventSubscriptionServiceImpl
             carrierBookingReferences,
             transportDocumentReferences,
             transportDocumentTypeCodes,
-            transportCallIDs,
+            transportCallReferences,
             equipmentReferences,
             carrierServiceCodes,
             carrierVoyageNumbers,
@@ -387,7 +388,7 @@ public class EventSubscriptionServiceImpl
 
     TransportEventTypeCode transportEventTypeCode = transportEvent.getTransportEventTypeCode();
     String vesselIMONumber = transportEvent.getTransportCall().getVessel().getVesselIMONumber();
-    String transportCallID = transportEvent.getTransportCallID();
+    String transportCallReference = transportEvent.getTransportCall().getTransportCallReference();
 
     List<DocumentReferenceTO> documentReferences = transportEvent.getDocumentReferences();
     List<String> carrierBookingReferences =
@@ -441,7 +442,7 @@ public class EventSubscriptionServiceImpl
                   serviceCodes,
                   transportEventTypeCode,
                   vesselIMONumber,
-                  transportCallID,
+                  transportCallReference,
                   carrierBookingRefs,
                   transportDocumentRefs,
                   documentTypeCodes);
@@ -462,7 +463,7 @@ public class EventSubscriptionServiceImpl
 
     String vesselIMONumber = operationsEvent.getTransportCall().getVessel().getVesselIMONumber();
 
-    String transportCallID = operationsEvent.getTransportCallID();
+    String transportCallReference = operationsEvent.getTransportCall().getTransportCallReference();
 
     Mono<List<String>> carrierBookingReferences =
         bookingRepository
@@ -513,7 +514,7 @@ public class EventSubscriptionServiceImpl
                   cbrs,
                   tdrs,
                   tdtcs,
-                  transportCallID,
+                  transportCallReference,
                   vesselIMONumber,
                   cvns,
                   cscs);

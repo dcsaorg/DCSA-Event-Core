@@ -4,9 +4,11 @@ import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.service.QueryService;
 import reactor.core.publisher.Mono;
 
-public interface AbstractTransportCallTOService<T extends TransportCallTO> extends QueryService<T, String> {
+import java.util.UUID;
 
-    Mono<T> findById(String id);
+public interface AbstractTransportCallTOService<T extends TransportCallTO> extends QueryService<T, UUID> {
+
+    Mono<T> findById(UUID id);
 
     Mono<T> create(T transportCallTO);
 }

@@ -168,7 +168,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
           + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
           + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code = (:transportDocumentTypeCodes))"
-          + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
+          + "   AND (es.transport_call_reference IS NULL OR es.transport_call_reference = :transportCallReference)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
           + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
           + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))")
@@ -178,7 +178,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
       List<String> carrierBookingReferences,
       List<String> transportDocumentReferences,
       List<String> transportDocumentTypeCodes,
-      String transportCallID,
+      String transportCallReference,
       String vesselIMONumber,
       List<String> carrierVoyageNumbers,
       List<String> carrierServiceCodes);
@@ -206,7 +206,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
       List<String> carrierBookingReferences,
       List<String> transportDocumentReferences,
       List<String> transportDocumentTypeCodes,
-      List<String> transportCallIDs,
+      List<String> transportCallReferences,
       List<String> equipmentReferences,
       List<String> carrierServiceCodes,
       List<String> carrierVoyageNumbers,
@@ -225,7 +225,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
           + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
           + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN (:transportDocumentTypeCodes))"
-          + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
+          + "   AND (es.transport_call_reference IS NULL OR es.transport_call_reference = :transportCallReference)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
           + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
           + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))"
@@ -235,7 +235,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
       List<String> carrierServiceCodes,
       TransportEventTypeCode transportEventTypeCode,
       String vesselIMONumber,
-      String transportCallID,
+      String transportCallReference,
       List<String> carrierBookingReferences,
       List<String> transportDocumentReferences,
       List<String> transportDocumentTypeCodes);
@@ -253,7 +253,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
           + "   AND (es.carrier_booking_reference IS NULL OR es.carrier_booking_reference IN (:carrierBookingReferences))"
           + "   AND (es.transport_document_reference IS NULL OR es.transport_document_reference IN (:transportDocumentReferences))"
           + "   AND (estdt.transport_document_type_code IS NULL OR estdt.transport_document_type_code IN (:transportDocumentTypeCodes))"
-          + "   AND (es.transport_call_id IS NULL OR es.transport_call_id = :transportCallID)"
+          + "   AND (es.transport_call_reference IS NULL OR es.transport_call_reference = :transportCallReference)"
           + "   AND (es.vessel_imo_number IS NULL OR es.vessel_imo_number = :vesselIMONumber)"
           + "   AND (es.carrier_voyage_number IS NULL OR es.carrier_voyage_number IN (:carrierVoyageNumbers))"
           + "   AND (es.carrier_service_code IS NULL OR es.carrier_service_code IN (:carrierServiceCodes))"
@@ -263,7 +263,7 @@ public interface EventSubscriptionRepository extends ExtendedRepository<EventSub
       List<String> carrierBookingReferences,
       List<String> transportDocumentReferences,
       List<String> transportDocumentTypeCodes,
-      String transportCallID,
+      String transportCallReference,
       String vesselIMONumber,
       List<String> carrierVoyageNumbers,
       List<String> carrierServiceCodes);

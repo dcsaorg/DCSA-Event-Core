@@ -8,11 +8,13 @@ import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 
+import java.util.UUID;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TransportCall extends AbstractTransportCall implements Persistable<String> {
+public class TransportCall extends AbstractTransportCall implements Persistable<UUID> {
 
     @Transient
     @JsonIgnore
@@ -20,7 +22,7 @@ public class TransportCall extends AbstractTransportCall implements Persistable<
 
     @JsonIgnore
     @Override
-    public String getId() {
+    public UUID getId() {
         return this.transportCallID;
     }
 

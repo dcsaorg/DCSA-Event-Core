@@ -19,9 +19,4 @@ public interface UtilizedTransportEquipmentService {
   Mono<List<UtilizedTransportEquipmentTO>> addUtilizedTransportEquipmentToShippingInstruction(
       List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
       ShippingInstructionTO shippingInstructionTO);
-
-  Mono<List<UtilizedTransportEquipmentTO>>
-      resolveUtilizedTransportEquipmentsForShippingInstructionReference(
-          List<UtilizedTransportEquipmentTO> utilizedTransportEquipmentTOs,
-          ShippingInstructionTO shippingInstructionTO);
 }

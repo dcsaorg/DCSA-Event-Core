@@ -13,6 +13,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.List;
+import java.util.UUID;
 
 @Table("transport_event")
 @Data
@@ -30,7 +31,7 @@ public class TransportEvent extends Event implements TransportCallBasedEvent {
     private String changeRemark;
 
     @Column("transport_call_id")
-    private String transportCallID;
+    private UUID transportCallID;
 
     @Transient
     private TransportCallTO transportCall;

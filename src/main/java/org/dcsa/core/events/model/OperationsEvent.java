@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dcsa.core.events.model.enums.*;
+import org.dcsa.core.events.model.enums.EventClassifierCode;
+import org.dcsa.core.events.model.enums.OperationsEventTypeCode;
+import org.dcsa.core.events.model.enums.PortCallPhaseTypeCode;
+import org.dcsa.core.events.model.enums.PortCallServiceTypeCode;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.validator.EnumSubset;
 import org.dcsa.skernel.model.enums.FacilityTypeCode;
@@ -17,6 +20,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Table("operations_event")
 @NoArgsConstructor
@@ -26,7 +30,7 @@ import java.util.Set;
 public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @Column("transport_call_id")
-    private String transportCallID;
+    private UUID transportCallID;
 
     @Column("operations_event_type_code")
     private OperationsEventTypeCode operationsEventTypeCode;
@@ -76,7 +80,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     private PartyTO publisher;
 
     @JsonIgnore
-    public String getTransportCallID() {
+    public UUID getTransportCallID() {
         return transportCallID;
     }
 

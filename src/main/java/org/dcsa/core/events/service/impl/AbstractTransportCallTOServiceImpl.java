@@ -1,20 +1,24 @@
 package org.dcsa.core.events.service.impl;
 
-import org.dcsa.skernel.model.Carrier;
 import org.dcsa.core.events.model.Service;
 import org.dcsa.core.events.model.TransportCall;
-import org.dcsa.skernel.model.Vessel;
 import org.dcsa.core.events.model.base.AbstractTransportCall;
 import org.dcsa.core.events.model.transferobjects.TransportCallTO;
 import org.dcsa.core.events.repository.AbstractTransportCallTORepository;
 import org.dcsa.core.events.repository.ModeOfTransportRepository;
-import org.dcsa.core.events.service.*;
+import org.dcsa.core.events.service.AbstractTransportCallTOService;
+import org.dcsa.core.events.service.ServiceService;
+import org.dcsa.core.events.service.TransportCallService;
+import org.dcsa.core.events.service.VoyageService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.exception.NotFoundException;
 import org.dcsa.core.extendedrequest.ExtendedParameters;
 import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.dcsa.core.util.MappingUtils;
+import org.dcsa.skernel.model.Carrier;
+import org.dcsa.skernel.model.Vessel;
 import org.dcsa.skernel.model.transferobjects.LocationTO;
 import org.dcsa.skernel.service.CarrierService;
 import org.dcsa.skernel.service.FacilityService;
@@ -27,8 +31,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTransportCallTORepository<T>, T extends TransportCallTO> extends QueryServiceImpl<R, T, String> implements AbstractTransportCallTOService<T> {
+public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTransportCallTORepository<T>, T extends TransportCallTO> extends QueryServiceImpl<R, T, UUID> implements AbstractTransportCallTOService<T> {
 
     @Autowired
     private CarrierService carrierService;
@@ -57,9 +62,9 @@ public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTrans
     }
 
     @Override
-    public Mono<T> findById(String id) {
+    public Mono<T> findById(UUID transportCallID) {
         ExtendedRequest<T> extendedRequest = newExtendedRequest();
-        extendedRequest.parseParameter(Map.of("transportCallID", List.of(id)));
+        extendedRequest.parseParameter(Map.of("transportCallID", List.of(transportCallID.toString())));
         return getRepository().findAllExtended(extendedRequest)
                 .take(2)
                 .collectList()
@@ -68,7 +73,7 @@ public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTrans
                         throw new AssertionError("transportID is not unique");
                     }
                     if (transportCallTOs.isEmpty()) {
-                        return Mono.error(new NotFoundException("Not transport call with ID " + id + " was found"));
+                        return Mono.error(ConcreteRequestErrorMessageException.notFound("Not transport call with ID " + transportCallID + " was found"));
                     }
                     T transportCallTO = transportCallTOs.get(0);
                     return Mono.just(transportCallTO);
@@ -174,6 +179,7 @@ public abstract class AbstractTransportCallTOServiceImpl<R extends AbstractTrans
                 .switchIfEmpty(Mono.error(new AssertionError("Internal error: TransportCallTO was empty")))
                 .flatMap(transportCallService::create)
                 .doOnNext(transportCall -> transportCallTO.setTransportCallID(transportCall.getTransportCallID()))
+          // FIXME: Update transport call reference too if necessary
                 .switchIfEmpty(Mono.error(new AssertionError("Internal error: Post create transport call was empty but should not be")))
                 .thenReturn(transportCallTO);
     }

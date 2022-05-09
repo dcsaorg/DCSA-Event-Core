@@ -21,7 +21,7 @@ public interface DocumentReferenceRepository extends R2dbcRepository<DocumentRef
      + "   AND edr.transport_call_id = :transportCallID"
      + "   AND edr.document_reference_type IN (:documentReferenceTypes)"
   )
-  Flux<DocumentReferenceTO> findAllDocumentReferenceByTransportCallID(String transportCallID, List<DocumentReferenceType> documentReferenceTypes);
+  Flux<DocumentReferenceTO> findAllDocumentReferenceByTransportCallID(UUID transportCallID, List<DocumentReferenceType> documentReferenceTypes);
 
 
   @Query("SELECT edr.document_reference_type, edr.document_reference_value"

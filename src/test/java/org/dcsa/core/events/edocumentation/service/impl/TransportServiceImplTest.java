@@ -67,11 +67,11 @@ class TransportServiceImplTest {
   void init() {
     transport = new Transport();
     transport.setTransportName("JD");
-    transport.setLoadTransportCallID(UUID.randomUUID().toString());
-    transport.setDischargeTransportCallID(UUID.randomUUID().toString());
+    transport.setLoadTransportCallID(UUID.randomUUID());
+    transport.setDischargeTransportCallID(UUID.randomUUID());
     transport.setTransportReference("test");
     transport.setTransportID(UUID.randomUUID());
-    transport.setLoadTransportCallID(UUID.randomUUID().toString());
+    transport.setLoadTransportCallID(UUID.randomUUID());
 
     transportEvent1 = new TransportEvent();
     transportEvent1.setEventType(EventType.TRANSPORT);
@@ -82,7 +82,7 @@ class TransportServiceImplTest {
     transportEvent2.setEventID(UUID.randomUUID());
 
     transportCall = new TransportCall();
-    transportCall.setTransportCallID(UUID.randomUUID().toString());
+    transportCall.setTransportCallID(UUID.randomUUID());
     transportCall.setFacilityTypeCode(FacilityTypeCode.BOCR);
     transportCall.setVesselID(UUID.randomUUID());
     transportCall.setImportVoyageID(UUID.randomUUID());
@@ -139,8 +139,8 @@ class TransportServiceImplTest {
   @Test
   @DisplayName("Test fetchTransportCallByID should return valid transport call for given ID.")
   void fetchTransportCallByIDForValidID() {
-    when(transportCallRepository.findById(any(String.class))).thenReturn(Mono.just(transportCall));
-    StepVerifier.create(transportService.fetchTransportCallByID(UUID.randomUUID().toString()))
+    when(transportCallRepository.findById(any(UUID.class))).thenReturn(Mono.just(transportCall));
+    StepVerifier.create(transportService.fetchTransportCallByID(UUID.randomUUID()))
         .assertNext(
             res -> {
               assertEquals(transportCall.getTransportCallID(), res.getTransportCallID());
@@ -155,7 +155,7 @@ class TransportServiceImplTest {
 
     when(transportRepository.findAllById(any(List.class))).thenReturn(Flux.just(transport));
     when(transportRepository.findById(any(UUID.class))).thenReturn(Mono.just(transport));
-    when(transportCallRepository.findById(any(String.class))).thenReturn(Mono.just(transportCall));
+    when(transportCallRepository.findById(any(UUID.class))).thenReturn(Mono.just(transportCall));
     when(transportEventRepository
             .findFirstByTransportCallIDAndEventTypeCodeAndEventClassifierCodeOrderByEventDateTimeDesc(
                 any(), eq(TransportEventTypeCode.ARRI), any()))
