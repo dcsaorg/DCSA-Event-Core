@@ -1,10 +1,7 @@
 package org.dcsa.core.events.model.mapper;
 
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentLocationTO;
-import org.dcsa.core.events.model.CargoItem;
 import org.dcsa.core.events.model.ShipmentLocation;
-import org.dcsa.core.events.model.transferobjects.CargoItemTO;
-import org.dcsa.core.events.repository.CargoItemCustomRepository;
 import org.dcsa.skernel.model.transferobjects.LocationTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
