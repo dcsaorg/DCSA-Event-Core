@@ -5,17 +5,12 @@ import org.dcsa.core.events.edocumentation.model.mapper.ShipmentMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentLocationTO;
 import org.dcsa.core.events.edocumentation.repository.ShipmentLocationRepository;
 import org.dcsa.core.events.model.ShipmentLocation;
+import org.dcsa.core.events.model.mapper.ShipmentLocationMapper;
 import org.dcsa.core.events.service.ShipmentLocationService;
-import org.dcsa.skernel.model.Location;
-import org.dcsa.skernel.model.mapper.LocationMapper;
-import org.dcsa.skernel.model.transferobjects.LocationTO;
-import org.dcsa.skernel.repositority.LocationRepository;
-import org.dcsa.skernel.service.AddressService;
 import org.dcsa.skernel.service.LocationService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,16 +22,14 @@ import java.util.UUID;
 public class ShipmentLocationServiceImpl implements ShipmentLocationService {
 
   // repositories
-  private final LocationRepository locationRepository;
   private final ShipmentLocationRepository shipmentLocationRepository;
 
   // mappers
-  private final LocationMapper locationMapper;
+  private final ShipmentLocationMapper shipmentLocationMapper;
   private final ShipmentMapper shipmentMapper;
 
   // services
   private final LocationService locationService;
-  private final AddressService addressService;
 
   @Override
   public Mono<List<ShipmentLocationTO>> fetchShipmentLocationsByBookingID(UUID bookingID) {
@@ -79,56 +72,18 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
 
     return Flux.fromIterable(shipmentLocations)
         .flatMap(
-            slTO -> {
-              ShipmentLocation shipmentLocation = new ShipmentLocation();
-              shipmentLocation.setBookingID(bookingID);
-              shipmentLocation.setShipmentLocationTypeCode(slTO.getShipmentLocationTypeCode());
-              shipmentLocation.setDisplayedName(slTO.getDisplayedName());
-              shipmentLocation.setEventDateTime(slTO.getEventDateTime());
+            shipmentLocationTO -> {
+              ShipmentLocation shipmentLocation =
+                  shipmentLocationMapper.dtoToShipmentLocationWithBookingID(
+                      shipmentLocationTO, bookingID);
 
-              Location location = locationMapper.dtoToLocation(slTO.getLocation());
-
-              if (Objects.isNull(slTO.getLocation().getAddress())) {
-                return locationRepository
-                    .save(location)
-                    .map(
-                        l -> {
-                          LocationTO lTO = locationMapper.locationToDTO(l);
-                          shipmentLocation.setLocationID(l.getId());
-                          return Tuples.of(lTO, shipmentLocation);
-                        });
-              } else {
-                return addressService
-                    .ensureResolvable(slTO.getLocation().getAddress())
-                    .flatMap(
-                        a -> {
-                          location.setAddressID(a.getId());
-                          return locationRepository
-                              .save(location)
-                              .map(
-                                  l -> {
-                                    LocationTO lTO = locationMapper.locationToDTO(l);
-                                    lTO.setAddress(a);
-                                    shipmentLocation.setLocationID(l.getId());
-                                    return Tuples.of(lTO, shipmentLocation);
-                                  });
-                        });
-              }
+              return locationService
+                  .ensureResolvable(shipmentLocationTO.getLocation())
+                  .doOnNext(shipmentLocationTO::setLocation)
+                  .doOnNext(locationTO -> shipmentLocation.setLocationID(locationTO.getId()))
+                  .then(shipmentLocationRepository.save(shipmentLocation))
+                  .thenReturn(shipmentLocationTO);
             })
-        .flatMap(
-            t ->
-                shipmentLocationRepository
-                    .save(t.getT2())
-                    .map(
-                        savedSl -> {
-                          ShipmentLocationTO shipmentLocationTO = new ShipmentLocationTO();
-                          shipmentLocationTO.setLocation(t.getT1());
-                          shipmentLocationTO.setShipmentLocationTypeCode(
-                              savedSl.getShipmentLocationTypeCode());
-                          shipmentLocationTO.setDisplayedName(savedSl.getDisplayedName());
-                          shipmentLocationTO.setEventDateTime(savedSl.getEventDateTime());
-                          return shipmentLocationTO;
-                        }))
         .collectList();
   }
 }
