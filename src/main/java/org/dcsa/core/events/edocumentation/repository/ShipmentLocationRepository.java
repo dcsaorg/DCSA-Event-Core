@@ -1,7 +1,6 @@
 package org.dcsa.core.events.edocumentation.repository;
 
 import org.dcsa.core.events.model.ShipmentLocation;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
