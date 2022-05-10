@@ -19,9 +19,11 @@ public interface ShipmentLocationRepository extends ReactiveCrudRepository<Shipm
   Mono<Void> deleteByBookingID(UUID bookingID);
 
   @Query(
-      "SELECT sl.* FROM booking b "
-          + "JOIN transport_document td ON td.transport_document_reference = b.transport_document_reference "
+      "SELECT DISTINCT sl.* FROM transport_document td "
+          + "JOIN consignment_item ci ON td.shipping_instruction_id = ci.shipping_instruction_id "
+          + "JOIN shipment s ON s.id = ci.shipment_id "
+          + "JOIN booking b ON b.id = s.booking_id "
           + "JOIN shipment_location sl ON sl.booking_id = b.id "
-          + "WHERE td.id = :transportDocumentId")
+          + "WHERE td.id = :transport_document_id")
   Flux<ShipmentLocation> findByTransportDocumentID(UUID transportDocumentId);
 }
