@@ -1,12 +1,12 @@
-package org.dcsa.core.events.service.impl;
+package org.dcsa.core.events.edocumentation.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.edocumentation.model.mapper.ShipmentMapper;
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentLocationTO;
 import org.dcsa.core.events.edocumentation.repository.ShipmentLocationRepository;
 import org.dcsa.core.events.model.ShipmentLocation;
-import org.dcsa.core.events.model.mapper.ShipmentLocationMapper;
-import org.dcsa.core.events.service.ShipmentLocationService;
+import org.dcsa.core.events.edocumentation.model.mapper.ShipmentLocationMapper;
+import org.dcsa.core.events.edocumentation.service.ShipmentLocationService;
 import org.dcsa.skernel.service.LocationService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

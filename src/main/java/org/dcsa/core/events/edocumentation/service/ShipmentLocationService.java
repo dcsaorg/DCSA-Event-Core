@@ -1,4 +1,4 @@
-package org.dcsa.core.events.service;
+package org.dcsa.core.events.edocumentation.service;
 
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentLocationTO;
 import reactor.core.publisher.Mono;

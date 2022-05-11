@@ -1,4 +1,4 @@
-package org.dcsa.core.events.model.mapper;
+package org.dcsa.core.events.edocumentation.model.mapper;
 
 import org.dcsa.core.events.edocumentation.model.transferobject.ShipmentLocationTO;
 import org.dcsa.core.events.model.ShipmentLocation;
