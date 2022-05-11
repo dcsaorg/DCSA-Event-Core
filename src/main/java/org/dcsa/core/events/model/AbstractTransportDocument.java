@@ -31,12 +31,12 @@ public abstract class AbstractTransportDocument extends AuditBase {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   @Column("created_date_time")
-  protected OffsetDateTime transportDocumentRequestCreatedDateTime;
+  protected OffsetDateTime transportDocumentCreatedDateTime;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   @Column("updated_date_time")
-  protected OffsetDateTime transportDocumentRequestUpdatedDateTime;
+  protected OffsetDateTime transportDocumentUpdatedDateTime;
 
   @Column("issue_date")
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
