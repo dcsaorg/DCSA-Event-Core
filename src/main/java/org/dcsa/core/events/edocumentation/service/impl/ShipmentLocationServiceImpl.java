@@ -53,12 +53,11 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
       ShipmentLocation shipmentLocation) {
     return locationService
         .fetchLocationDeepObjByID(shipmentLocation.getLocationID())
-        .flatMap(
+        .map(
             locationTO -> {
-              ShipmentLocationTO shipmentLocationTO =
-                  shipmentMapper.shipmentLocationToDTO(shipmentLocation);
+              ShipmentLocationTO shipmentLocationTO = shipmentMapper.shipmentLocationToDTO(shipmentLocation);
               shipmentLocationTO.setLocation(locationTO);
-              return Mono.just(shipmentLocationTO);
+              return shipmentLocationTO;
             });
   }
 
