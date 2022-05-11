@@ -95,19 +95,26 @@ public class TransportServiceImpl implements TransportService {
   @Override
   public Flux<TransportTO> findByShipmentID(UUID shipmentID) {
     return shipmentTransportRepository
-      .findAllByShipmentID(shipmentID)
-      .flatMap(this::getTransportsByShipmentTransport);
+        .findAllByShipmentID(shipmentID)
+        .flatMap(this::getTransportsByShipmentTransport);
+  }
+
+  @Override
+  public Flux<TransportTO> findByCarrierBookingReference(String carrierBookingReference) {
+    return shipmentTransportRepository
+        .findByCarrierBookingReference(carrierBookingReference)
+        .flatMap(this::getTransportsByShipmentTransport);
   }
 
   private Flux<TransportTO> getTransportsByShipmentTransport(ShipmentTransport shipmentTransport) {
     return findByTransportID(shipmentTransport.getTransportID())
-      .doOnNext(
-        transportTO ->
-          transportTO.setTransportPlanStage(shipmentTransport.getTransportPlanStageCode()))
-      .doOnNext(
-        transportTO ->
-          transportTO.setTransportPlanStageSequenceNumber(
-            shipmentTransport.getTransportPlanStageSequenceNumber()));
+        .doOnNext(
+            transportTO ->
+                transportTO.setTransportPlanStage(shipmentTransport.getTransportPlanStageCode()))
+        .doOnNext(
+            transportTO ->
+                transportTO.setTransportPlanStageSequenceNumber(
+                    shipmentTransport.getTransportPlanStageSequenceNumber()));
   }
 
   Mono<Tuple2<TransportEvent, TransportEvent>> fetchTransportEventByTransportID(UUID transportId) {
@@ -115,8 +122,7 @@ public class TransportServiceImpl implements TransportService {
         .findById(transportId)
         .switchIfEmpty(
             Mono.error(
-                ConcreteRequestErrorMessageException.notFound(
-                    "Can not find a Transport event")))
+                ConcreteRequestErrorMessageException.notFound("Can not find a Transport event")))
         .flatMap(
             x ->
                 Mono.zip(

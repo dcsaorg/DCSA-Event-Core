@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface TransportService {
     Flux<TransportTO> findByTransportID(UUID id);
     Flux<TransportTO> findByShipmentID(UUID shipmentID);
+    Flux<TransportTO> findByCarrierBookingReference(String carrierBookingReference);
 }
