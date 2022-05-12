@@ -14,6 +14,5 @@ public interface ShipmentLocationMapper {
   @Mapping(source = "bookingId", target = "bookingID")
   ShipmentLocation dtoToShipmentLocationWithBookingID(ShipmentLocationTO shipmentLocationTO, UUID bookingId);
 
-  @Mapping(source = "locationTO", target = "locationTO")
   ShipmentLocationTO shipmentLocationToDtoWithLocationTO(ShipmentLocation shipmentLocation, LocationTO locationTO);
 }
