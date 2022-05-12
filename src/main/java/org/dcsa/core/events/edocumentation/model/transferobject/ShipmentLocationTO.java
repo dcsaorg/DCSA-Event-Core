@@ -14,7 +14,7 @@ public
 class ShipmentLocationTO {
 
   @NotNull(message = "Location is required.")
-  private LocationTO location;
+  private LocationTO locationTO;
 
   @NotNull(message = "LocationType is required.")
   private LocationType shipmentLocationTypeCode;
