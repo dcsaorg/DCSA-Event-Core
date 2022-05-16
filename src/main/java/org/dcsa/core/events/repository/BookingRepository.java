@@ -98,4 +98,12 @@ public interface BookingRepository
           + "JOIN booking b ON b.id = s.booking_id "
           + "WHERE si.shipping_instruction_reference = :shippingInstructionReference")
   Flux<Booking> findAllByShippingInstructionReference(String shippingInstructionReference);
+
+  @Query(
+      "SELECT b.* FROM dcsa_im_v3_0.transport_document td "
+          + "JOIN dcsa_im_v3_0.consignment_item ci ON td.shipping_instruction_id = ci.shipping_instruction_id "
+          + "JOIN dcsa_im_v3_0.shipment s ON ci.shipment_id = s.id "
+          + "JOIN dcsa_im_v3_0.booking b ON s.booking_id = b.id "
+          + "WHERE td.transport_document_reference = :transportDocumentReference")
+  Mono<Booking> findBookingByTransportDocumentReference(String transportDocumentReference);
 }
