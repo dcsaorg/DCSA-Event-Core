@@ -106,5 +106,5 @@ public interface BookingRepository
           + "JOIN dcsa_im_v3_0.shipment s ON ci.shipment_id = s.id "
           + "JOIN dcsa_im_v3_0.booking b ON s.booking_id = b.id "
           + "WHERE td.transport_document_reference = :transportDocumentReference")
-  Mono<List<Booking>> findBookingsByTransportDocumentReference(String transportDocumentReference);
+  Flux<Booking> findBookingsByTransportDocumentReference(String transportDocumentReference);
 }
