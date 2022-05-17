@@ -7,6 +7,8 @@ import org.dcsa.core.events.model.transferobjects.DocumentPartyTO;
 import org.dcsa.core.events.repository.*;
 import org.dcsa.core.events.service.DocumentPartyService;
 import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
+import org.dcsa.core.util.MappingUtils;
+import org.dcsa.skernel.model.Address;
 import org.dcsa.skernel.model.Party;
 import org.dcsa.skernel.model.PartyContactDetails;
 import org.dcsa.skernel.model.PartyIdentifyingCode;
@@ -23,10 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -152,8 +151,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
                     .codeListName(idc.getCodeListName())
                     .dcsaResponsibleAgencyCode(idc.getDcsaResponsibleAgencyCode())
                     .build())
-        .collectList()
-        .defaultIfEmpty(Collections.emptyList());
+        .collectList();
   }
 
   Mono<List<PartyContactDetailsTO>> fetchPartyContactDetailsByPartyID(String partyID) {
@@ -176,7 +174,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   }
 
   private Mono<List<DocumentPartyTO>> createDocumentParties(
-      Object id, ColumnReferenceType refColumn, List<DocumentPartyTO> documentParties) {
+      UUID id, ColumnReferenceType refColumn, List<DocumentPartyTO> documentParties) {
     if (Objects.isNull(documentParties) || documentParties.isEmpty()) {
       return Mono.just(Collections.emptyList());
     }
@@ -230,101 +228,71 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   }
 
   private Mono<Tuple2<String, PartyTO>> createPartyByTO(final PartyTO partyTO) {
-
-    Mono<Tuple2<String, PartyTO>> partyMap;
-
-    if (Objects.isNull(partyTO.getAddress())) {
-
-      partyMap =
-          partyRepository
-              .save(partyMapper.dtoToParty(partyTO))
+    return Mono.justOrEmpty(partyTO.getAddress())
+        .flatMap(addressService::ensureResolvable)
+        .map(Optional::of)
+        .switchIfEmpty(Mono.just(Optional.empty()))
+        .flatMap(
+          optionalAddress -> {
+            Party party = partyMapper.dtoToParty(partyTO);
+            Address address = optionalAddress.orElse(null);
+            if (address != null) {
+              party.setAddressID(address.getId());
+            }
+            return partyRepository
+              .save(party)
               .map(
-                  p ->
-                      Tuples.of(
-                          p.getId(),
-                          p.toPartyTO(
-                              partyTO.getNmftaCode(),
-                              partyTO.getAddress(),
-                              partyTO.getIdentifyingCodes())));
-
-    } else {
-      // if there is an address connected to the party, we need to create it first.
-      partyMap =
-          addressService
-              .ensureResolvable(partyTO.getAddress())
-              .flatMap(
-                  address -> {
-                    Party party = partyMapper.dtoToParty(partyTO);
-                    party.setAddressID(address.getId());
-                    return partyRepository
-                        .save(party)
-                        .map(
-                            p -> {
-                              PartyTO pTO =
-                                  p.toPartyTO(
-                                      partyTO.getNmftaCode(),
-                                      address,
-                                      partyTO.getIdentifyingCodes());
-                              return Tuples.of(p.getId(), pTO);
-                            });
-                  });
-    }
-
-    return partyMap
+                p -> {
+                  PartyTO pTO =
+                    p.toPartyTO(
+                      partyTO.getNmftaCode(),
+                      address,
+                      partyTO.getIdentifyingCodes());
+                  return Tuples.of(p.getId(), pTO);
+                });
+        })
         .flatMap(
-            t -> {
-              Stream<PartyContactDetails> partyContactDetailsStream =
-                  partyTO.getPartyContactDetails().stream()
-                      .map(pcdTO -> pcdTO.toPartyContactDetails(t.getT1()));
-
-              return partyContactDetailsRepository
-                  .saveAll(Flux.fromStream(partyContactDetailsStream))
-                  .map(PartyContactDetails::toPartyTO)
-                  .collectList()
-                  .flatMap(
-                      pcds -> {
-                        t.getT2().setPartyContactDetails(pcds);
-                        return Mono.just(t);
-                      });
-            })
+            t -> Flux.fromIterable(partyTO.getPartyContactDetails())
+                .map(pcdTO -> pcdTO.toPartyContactDetails(t.getT1()))
+                .buffer(MappingUtils.SQL_LIST_BUFFER_SIZE)
+                .concatMap(partyContactDetailsRepository::saveAll)
+                .map(PartyContactDetails::toPartyTO)
+                .collectList()
+                .flatMap(
+                    pcds -> {
+                      t.getT2().setPartyContactDetails(pcds);
+                      return Mono.just(t);
+                    }))
         .flatMap(
-            t -> {
-              Stream<PartyIdentifyingCode> partyIdentifyingCodeStream =
-                  partyTO.getIdentifyingCodes().stream()
-                      .map(
-                          idc -> {
-                            PartyIdentifyingCode partyIdentifyingCode = new PartyIdentifyingCode();
-                            partyIdentifyingCode.setPartyID(t.getT1());
-                            partyIdentifyingCode.setDcsaResponsibleAgencyCode(
-                                idc.getDcsaResponsibleAgencyCode());
-                            partyIdentifyingCode.setCodeListName(idc.getCodeListName());
-                            partyIdentifyingCode.setPartyCode(idc.getPartyCode());
-                            return partyIdentifyingCode;
-                          });
-              return partyIdentifyingCodeRepository
-                  .saveAll(
-                      Flux.fromStream(
-                          partyIdentifyingCodeStream)) // save identifying codes related to party
-                  // obj
-                  .map(
-                      savedIdcs ->
-                          PartyTO.IdentifyingCode.builder()
-                              .partyCode(savedIdcs.getPartyCode())
-                              .codeListName(savedIdcs.getCodeListName())
-                              .dcsaResponsibleAgencyCode(savedIdcs.getDcsaResponsibleAgencyCode())
-                              .build())
-                  .collectList()
-                  .flatMap(
-                      identifyingCodes -> {
-                        PartyTO pTO = t.getT2();
-                        pTO.setIdentifyingCodes(identifyingCodes);
-                        return Mono.just(Tuples.of(t.getT1(), pTO));
-                      });
-            });
+            t -> Flux.fromIterable(partyTO.getIdentifyingCodes())
+                .map(idc -> {
+                   PartyIdentifyingCode partyIdentifyingCode = new PartyIdentifyingCode();
+                   partyIdentifyingCode.setPartyID(t.getT1());
+                   partyIdentifyingCode.setDcsaResponsibleAgencyCode(
+                     idc.getDcsaResponsibleAgencyCode());
+                   partyIdentifyingCode.setCodeListName(idc.getCodeListName());
+                   partyIdentifyingCode.setPartyCode(idc.getPartyCode());
+                   return partyIdentifyingCode;
+                }).buffer(MappingUtils.SQL_LIST_BUFFER_SIZE)
+                .concatMap(partyIdentifyingCodeRepository::saveAll)
+                .map(
+                    savedIdcs ->
+                        PartyTO.IdentifyingCode.builder()
+                            .partyCode(savedIdcs.getPartyCode())
+                            .codeListName(savedIdcs.getCodeListName())
+                            .dcsaResponsibleAgencyCode(savedIdcs.getDcsaResponsibleAgencyCode())
+                            .build())
+                .collectList()
+                .flatMap(
+                    identifyingCodes -> {
+                      PartyTO pTO = t.getT2();
+                      pTO.setIdentifyingCodes(identifyingCodes);
+                      return Mono.just(Tuples.of(t.getT1(), pTO));
+                }));
   }
 
   private DocumentParty getDocumentPartyByRefColumn(
-      Object id,
+      UUID id,
       ColumnReferenceType columnReferenceType,
       String partyID,
       DocumentPartyTO documentPartyTO) {
@@ -335,15 +303,16 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
 
     switch (columnReferenceType) {
       case BOOKING:
-        documentParty.setBookingID((UUID) id);
+        documentParty.setBookingID(id);
         break;
       case SHIPPING_INSTRUCTION:
-        documentParty.setShippingInstructionID((UUID) id);
+        documentParty.setShippingInstructionID(id);
         break;
       case SHIPMENT:
-        documentParty.setShipmentID((UUID) id);
+        documentParty.setShipmentID(id);
         break;
       default:
+        throw new AssertionError("This should not happen: Missing switch case for: " + columnReferenceType);
     }
 
     return documentParty;
