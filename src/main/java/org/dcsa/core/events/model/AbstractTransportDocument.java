@@ -53,8 +53,8 @@ public abstract class AbstractTransportDocument extends AuditBase {
   @Column("number_of_originals")
   private Integer numberOfOriginals;
 
-  @Column("issuer")
-  private UUID issuer;
+  @Column("carrier")
+  private UUID carrier;
 
   @Column("shipping_instruction_id")
   @JsonInclude(JsonInclude.Include.NON_NULL)
