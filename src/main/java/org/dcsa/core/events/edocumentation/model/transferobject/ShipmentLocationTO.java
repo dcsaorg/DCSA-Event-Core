@@ -1,6 +1,7 @@
 package org.dcsa.core.events.edocumentation.model.transferobject;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.dcsa.core.events.model.enums.LocationType;
 import org.dcsa.skernel.model.transferobjects.LocationTO;
@@ -10,11 +11,11 @@ import javax.validation.constraints.Size;
 import java.time.OffsetDateTime;
 
 @Data
-public
-class ShipmentLocationTO {
+public class ShipmentLocationTO {
 
+  @JsonProperty("location")
   @NotNull(message = "Location is required.")
-  private LocationTO location;
+  private LocationTO locationTO;
 
   @NotNull(message = "LocationType is required.")
   private LocationType shipmentLocationTypeCode;

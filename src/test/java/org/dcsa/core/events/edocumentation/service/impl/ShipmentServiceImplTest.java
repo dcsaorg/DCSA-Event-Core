@@ -221,7 +221,7 @@ class ShipmentServiceImplTest {
         .assertNext(
             res -> {
               assertEquals(1, res.size());
-              assertEquals("Hamburg", res.get(0).getLocation().getLocationName());
+              assertEquals("Hamburg", res.get(0).getLocationTO().getLocationName());
               assertEquals("Tokyo", res.get(0).getDisplayedName());
             })
         .verifyComplete();
@@ -431,7 +431,7 @@ class ShipmentServiceImplTest {
                   result.get(0).getShipmentCutOffTimes().get(0).getCutOffDateTime());
               assertEquals(
                   "Hamburg",
-                  result.get(0).getShipmentLocations().get(0).getLocation().getLocationName());
+                  result.get(0).getShipmentLocations().get(0).getLocationTO().getLocationName());
               assertEquals("Tokyo", result.get(0).getShipmentLocations().get(0).getDisplayedName());
               assertEquals(
                   "clause content", result.get(0).getCarrierClauses().get(0).getClauseContent());

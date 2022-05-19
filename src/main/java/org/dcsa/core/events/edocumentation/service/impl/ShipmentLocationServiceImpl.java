@@ -56,7 +56,7 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
         .map(
             locationTO -> {
               ShipmentLocationTO shipmentLocationTO = shipmentMapper.shipmentLocationToDTO(shipmentLocation);
-              shipmentLocationTO.setLocation(locationTO);
+              shipmentLocationTO.setLocationTO(locationTO);
               return shipmentLocationTO;
             });
   }
@@ -77,8 +77,8 @@ public class ShipmentLocationServiceImpl implements ShipmentLocationService {
                       shipmentLocationTO, bookingID);
 
               return locationService
-                  .ensureResolvable(shipmentLocationTO.getLocation())
-                  .doOnNext(shipmentLocationTO::setLocation)
+                  .ensureResolvable(shipmentLocationTO.getLocationTO())
+                  .doOnNext(shipmentLocationTO::setLocationTO)
                   .doOnNext(locationTO -> shipmentLocation.setLocationID(locationTO.getId()))
                   .then(shipmentLocationRepository.save(shipmentLocation))
                   .thenReturn(shipmentLocationTO);
