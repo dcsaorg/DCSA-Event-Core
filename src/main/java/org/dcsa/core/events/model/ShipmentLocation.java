@@ -24,10 +24,6 @@ public class ShipmentLocation {
   @Column("location_id")
   private String locationID;
 
-  @Size(max = 100)
-  @Column("shipping_instruction_id ")
-  private UUID shippingInstructionID;
-
   @Column("shipment_location_type_code")
   private LocationType shipmentLocationTypeCode;
 

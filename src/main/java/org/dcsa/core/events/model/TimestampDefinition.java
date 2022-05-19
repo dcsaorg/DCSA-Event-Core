@@ -68,6 +68,4 @@ public class TimestampDefinition {
     @Column("reject_timestamp_definition")
     private String rejectTimestampDefinition;
 
-    @Column("canonical_timestamp_definition")
-    private String canonicalTimestampDefinition;
 }
