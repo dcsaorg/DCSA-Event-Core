@@ -3,9 +3,8 @@ package org.dcsa.core.events.edocumentation.model.transferobject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.dcsa.core.events.model.enums.CargoGrossVolume;
-import org.dcsa.core.events.model.enums.CargoGrossWeight;
-import org.springframework.data.relational.core.mapping.Column;
+import org.dcsa.core.events.model.enums.VolumeUnit;
+import org.dcsa.core.events.model.enums.WeightUnit;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,11 +27,11 @@ public class CommodityTO {
   private Double cargoGrossWeight;
 
   @NotNull(message = "CargoGrossWeightUnit is required.")
-  private CargoGrossWeight cargoGrossWeightUnit;
+  private WeightUnit cargoGrossWeightUnit;
 
   private Float cargoGrossVolume;
 
-  private CargoGrossVolume cargoGrossVolumeUnit;
+  private VolumeUnit cargoGrossVolumeUnit;
 
   @PositiveOrZero
   private Integer numberOfPackages;

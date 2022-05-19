@@ -1,5 +1,7 @@
 package org.dcsa.core.events.repository.impl;
 
+import org.dcsa.core.events.model.enums.VolumeUnit;
+import org.dcsa.core.events.model.enums.WeightUnit;
 import org.dcsa.core.events.repository.CargoItemCustomRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -89,8 +91,8 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("hs_code", "720711");
     cargoItemWithCargoLineItem1.put("weight", 100F);
     cargoItemWithCargoLineItem1.put("volume", 300F);
-    cargoItemWithCargoLineItem1.put("weight_unit", "KGM");
-    cargoItemWithCargoLineItem1.put("volume_unit", "CBM");
+    cargoItemWithCargoLineItem1.put("weight_unit", WeightUnit.KGM);
+    cargoItemWithCargoLineItem1.put("volume_unit", VolumeUnit.MTQ);
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
     cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionID);
     cargoItemWithCargoLineItem1.put("package_code", "123");
@@ -106,8 +108,8 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem2.put("hs_code", "720711");
     cargoItemWithCargoLineItem2.put("weight", 100F);
     cargoItemWithCargoLineItem2.put("volume", 300F);
-    cargoItemWithCargoLineItem2.put("weight_unit", "KGM");
-    cargoItemWithCargoLineItem2.put("volume_unit", "CBM");
+    cargoItemWithCargoLineItem2.put("weight_unit", WeightUnit.KGM);
+    cargoItemWithCargoLineItem2.put("volume_unit", VolumeUnit.MTQ);
     cargoItemWithCargoLineItem2.put("number_of_packages", 2);
     cargoItemWithCargoLineItem2.put("shipping_instruction_id", shippingInstructionID);
     cargoItemWithCargoLineItem2.put("package_code", "123");
@@ -117,11 +119,9 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem2.put("cargo_item_id", cargoItemId);
     cargoItemWithCargoLineItem2.put("shipping_marks", "shipping_marks2");
 
-    List<Map<String, Object>> cargoItemWithCargoLineItems =
-        List.of(cargoItemWithCargoLineItem1, cargoItemWithCargoLineItem2);
+    List<Map<String, Object>> cargoItemWithCargoLineItems = List.of(cargoItemWithCargoLineItem1, cargoItemWithCargoLineItem2);
 
-    CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult =
-        cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
+    CargoItemCustomRepository.CargoItemWithCargoLineItems cargoItemsResult = cargoItemCustomRepository.mapResultSet(cargoItemWithCargoLineItems);
     assertEquals(utilizedTransportEquipmentID, cargoItemsResult.getUtilizedTransportEquipmentID());
 
     // assertions on cargoLineItems
@@ -147,8 +147,8 @@ public class CargoItemCustomRepositoryImplTest {
     cargoItemWithCargoLineItem1.put("hs_code", "720711");
     cargoItemWithCargoLineItem1.put("weight", 100F);
     cargoItemWithCargoLineItem1.put("volume", 300F);
-    cargoItemWithCargoLineItem1.put("weight_unit", "KGM");
-    cargoItemWithCargoLineItem1.put("volume_unit", "CBM");
+    cargoItemWithCargoLineItem1.put("weight_unit", WeightUnit.KGM);
+    cargoItemWithCargoLineItem1.put("volume_unit", VolumeUnit.MTQ);
     cargoItemWithCargoLineItem1.put("number_of_packages", 2);
     cargoItemWithCargoLineItem1.put("shipping_instruction_id", shippingInstructionReference);
     cargoItemWithCargoLineItem1.put("package_code", "123");
