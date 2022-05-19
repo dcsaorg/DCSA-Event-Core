@@ -13,4 +13,6 @@ public class TransportDocument extends AbstractTransportDocument {
     @Column("place_of_issue")
     private String placeOfIssue;
 
+    @Column("issuingParty")
+    private String issuingParty;
 }
