@@ -109,7 +109,7 @@ class ConsignmentItemServiceImplTest {
     cargoItem.setWeight(100F);
     cargoItem.setWeightUnit(WeightUnit.KGM);
     cargoItem.setVolume(400F);
-    cargoItem.setVolumeUnit(VolumeUnit.CBM);
+    cargoItem.setVolumeUnit(VolumeUnit.MTQ);
 
     cargoLineItem = new CargoLineItem();
     cargoLineItem.setCargoItemID(cargoItem.getId());
@@ -131,7 +131,7 @@ class ConsignmentItemServiceImplTest {
     consignmentItem.setHsCode("411510");
     consignmentItem.setWeight(24.08);
     consignmentItem.setWeightUnit(WeightUnit.KGM);
-    consignmentItem.setVolumeUnit(VolumeUnit.CBM);
+    consignmentItem.setVolumeUnit(VolumeUnit.MTQ);
     consignmentItem.setShipmentID(shipment.getShipmentID());
   }
 
@@ -162,7 +162,7 @@ class ConsignmentItemServiceImplTest {
     cargoItemTO.setWeight(100F);
     cargoItemTO.setWeightUnit(WeightUnit.KGM);
     cargoItemTO.setVolume(400F);
-    cargoItemTO.setVolumeUnit(VolumeUnit.CBM);
+    cargoItemTO.setVolumeUnit(VolumeUnit.MTQ);
     cargoItemTO.setPackageCode("ABC");
     cargoItemTO.setNumberOfPackages(1);
     cargoItemTO.setReferences(List.of(referenceTO));

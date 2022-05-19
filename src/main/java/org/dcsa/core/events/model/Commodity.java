@@ -1,8 +1,8 @@
 package org.dcsa.core.events.model;
 
 import lombok.Data;
-import org.dcsa.core.events.model.enums.CargoGrossVolume;
-import org.dcsa.core.events.model.enums.CargoGrossWeight;
+import org.dcsa.core.events.model.enums.VolumeUnit;
+import org.dcsa.core.events.model.enums.WeightUnit;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -31,13 +31,13 @@ public class Commodity {
   private Double cargoGrossWeight;
 
   @Column("cargo_gross_weight_unit")
-  private CargoGrossWeight cargoGrossWeightUnit;
+  private WeightUnit cargoGrossWeightUnit;
 
   @Column("cargo_gross_volume")
   private Float cargoGrossVolume;
 
   @Column("cargo_gross_volume_unit")
-  private CargoGrossVolume cargoGrossVolumeUnit;
+  private VolumeUnit cargoGrossVolumeUnit;
 
   @Column("number_of_packages")
   private Integer numberOfPackages;
