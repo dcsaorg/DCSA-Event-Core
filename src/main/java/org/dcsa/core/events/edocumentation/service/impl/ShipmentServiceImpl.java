@@ -99,7 +99,7 @@ class ShipmentServiceImpl implements ShipmentService {
                                     lTO -> {
                                       ShipmentLocationTO shipmentLocationTO =
                                           shipmentMapper.shipmentLocationToDTO(sl);
-                                      shipmentLocationTO.setLocation(lTO);
+                                      shipmentLocationTO.setLocationTO(lTO);
                                       return Mono.just(shipmentLocationTO);
                                     }))
                     .collectList())

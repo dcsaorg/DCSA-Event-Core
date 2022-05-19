@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
                         lTO -> {
                           ShipmentLocationTO shipmentLocationTO =
                               shipmentMapper.shipmentLocationToDTO(sl);
-                          shipmentLocationTO.setLocation(lTO);
+                          shipmentLocationTO.setLocationTO(lTO);
                           return Mono.just(shipmentLocationTO);
                         }))
         .collectList();
