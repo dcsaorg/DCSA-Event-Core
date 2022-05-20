@@ -40,7 +40,7 @@ public class EventSubscriptionServiceImpl
   private final TransportDocumentTypeRepository transportDocumentTypeRepository;
   private final UtilizedTransportEquipmentRepository utilizedTransportEquipmentRepository;
   private final TransportRepository transportRepository;
-  private final BookingRepository bookingRepository;
+  private final ShipmentRepository shipmentRepository;
 
   @Override
   public EventSubscriptionRepository getRepository() {
@@ -267,7 +267,7 @@ public class EventSubscriptionServiceImpl
         break;
       case SHI:
         carrierBookingReferences =
-            bookingRepository
+            shipmentRepository
                 .findCarrierBookingRefsByShippingInstructionID(shipmentEvent.getDocumentID())
                 .collectList();
         carrierVoyageNumbers =
@@ -307,7 +307,7 @@ public class EventSubscriptionServiceImpl
         break;
       case TRD:
         carrierBookingReferences =
-            bookingRepository
+            shipmentRepository
                 .findCarrierBookingRefsByTransportDocumentRef(shipmentEvent.getDocumentReference())
                 .collectList();
         carrierVoyageNumbers =
@@ -466,7 +466,7 @@ public class EventSubscriptionServiceImpl
     String transportCallReference = operationsEvent.getTransportCall().getTransportCallReference();
 
     Mono<List<String>> carrierBookingReferences =
-        bookingRepository
+        shipmentRepository
             .findCarrierBookingRefsByTransportCallID(operationsEvent.getTransportCallID())
             .collectList();
     Mono<List<String>> transportDocumentReferences =

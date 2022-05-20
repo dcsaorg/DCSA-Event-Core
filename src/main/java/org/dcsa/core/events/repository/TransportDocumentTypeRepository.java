@@ -26,7 +26,7 @@ public interface TransportDocumentTypeRepository
   @Query(
       "SELECT DISTINCT tdt.transport_document_type_code FROM transport_document_type tdt "
           + "JOIN shipping_instruction si "
-          + "ON si.transport_document_type = tdt.transport_document_type_code "
+          + "ON si.transport_document_type_code = tdt.transport_document_type_code "
           + "WHERE si.id = :shippingInstructionReference")
   Flux<String> findCodesByShippingInstructionReference(String shippingInstructionReference);
 
@@ -38,7 +38,7 @@ public interface TransportDocumentTypeRepository
   Flux<String> findCodesByTransportDocumentReference(String transportDocumentReference);
 
   @Query(
-      "SELECT DISTINCT si.transport_document_type FROM shipping_instruction si "
+      "SELECT DISTINCT si.transport_document_type_code FROM shipping_instruction si "
           + "LEFT JOIN consignment_item ci ON si.id = ci.shipping_instruction_id "
           + "LEFT JOIN reference r ON si.id = r.shipping_instruction_id "
           + "JOIN shipment_transport st ON (st.shipment_id = ci.shipment_id OR st.shipment_id = r.shipment_id) "
