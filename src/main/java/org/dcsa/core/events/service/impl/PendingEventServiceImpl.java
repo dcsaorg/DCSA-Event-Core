@@ -163,6 +163,8 @@ public class PendingEventServiceImpl implements PendingEventService {
                     }
                     return eventSubscriptionService.update(submissionResult.getEventSubscription())
                             .thenMany(Flux.fromIterable(submissionResult.getPendingMessages()))
+                            // We start this method by deleting the row, so re-insert it with the same ID on error.
+                            .doOnNext(pe -> pe.setNew(true))
                             .concatMap(pendingEventRepository::save)
                             .then(Mono.just(submissionResult));
                 });

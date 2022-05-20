@@ -109,7 +109,8 @@ public class EventSubscriptionServiceImpl
                     + " bytes long (when deserialized)"));
       }
     }
-    return checkEventSubscription(eventSubscription);
+    return checkEventSubscription(eventSubscription)
+      .flatMap(eventSubscriptionRepository::save);
   }
 
   @Override

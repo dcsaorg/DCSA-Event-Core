@@ -2,6 +2,8 @@ package org.dcsa.core.events.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -10,7 +12,7 @@ import java.util.UUID;
 
 @Table("pending_event_queue")
 @Data
-public class PendingMessage {
+public class PendingMessage implements Persistable<UUID> {
 
     @Id
     @Column("delivery_id")
@@ -37,4 +39,16 @@ public class PendingMessage {
     @Column("retry_count")
     private Integer retryCount = 0;
 
+    @Transient
+    private boolean isNew;
+
+    @Override
+    public UUID getId() {
+        return deliveryID;
+    }
+
+    @Override
+    public boolean isNew() {
+        return deliveryID == null || isNew;
+    }
 }
