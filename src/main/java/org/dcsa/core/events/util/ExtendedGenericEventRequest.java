@@ -7,6 +7,7 @@ import org.dcsa.core.extendedrequest.ExtendedRequest;
 import org.dcsa.core.extendedrequest.QueryField;
 import org.dcsa.core.extendedrequest.QueryFields;
 import org.dcsa.core.query.DBEntityAnalysis;
+import org.dcsa.skernel.model.Location;
 import org.dcsa.skernel.model.Vessel;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
@@ -162,6 +163,13 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
 
                 // Go back to Transport Call
                 .onTable(TransportCall.class)
+                .chainJoin(Location.class, "unLocationCode")
+                .onFieldEqualsThen("locationID", "id")
+                .registerQueryFieldFromField("unLocationCode")
+                .registerQueryFieldAlias("UNLocationCode", "unLocationCode")
+
+                // Go back to Transport Call
+                .onTable(TransportCall.class)
                 .chainJoin(Voyage.class, "export_voyage")
                 .onFieldEqualsThen("exportVoyageID", "id")
                 .registerQueryFieldFromField("carrierVoyageNumber")
@@ -173,7 +181,6 @@ public class ExtendedGenericEventRequest extends ExtendedRequest<Event> {
                 .onFieldEqualsThen("importVoyageID", "id")
                 .registerQueryFieldFromField("carrierVoyageNumber", "importVoyage.")
                 .registerQueryFieldAlias("importVoyage.carrierVoyageNumber", "importVoyageNumber")
-
 
                 .chainJoin(Service.class)
                 .onFieldEqualsThen("serviceID", "id")
