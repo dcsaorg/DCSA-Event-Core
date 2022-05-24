@@ -88,7 +88,7 @@ public class OperationsEventServiceImpl extends QueryServiceImpl<OperationsEvent
               .flatMap(locationService::ensureResolvable)
               .doOnNext(loc -> operationsEvent.setVesselPositionID(loc.getId()))
               .then(Mono.justOrEmpty(operationsEvent.getPublisher()))
-              .flatMap(partyService::ensureResolvable)
+              .flatMap(partyService::createPartyByTO)
               .doOnNext(publisher -> operationsEvent.setPublisherID(publisher.getId()))
               .thenReturn(operationsEvent)
               .flatMap(oe -> {
