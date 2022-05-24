@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.dcsa.core.events.model.Reference;
 import org.dcsa.core.events.model.Seal;
 import org.dcsa.core.events.model.TransportCall;
+import org.dcsa.core.events.model.enums.DCSATransportType;
 import org.dcsa.core.events.repository.ReferenceRepository;
 import org.dcsa.core.events.repository.TransportCallRepository;
 import org.dcsa.core.events.service.TransportCallService;
+import org.dcsa.core.exception.ConcreteRequestErrorMessageException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -37,5 +39,41 @@ public class TransportCallServiceImpl implements TransportCallService {
     public Mono<TransportCall> create(TransportCall transportCall) {
         return transportCallRepository.save(transportCall);
     }
+
+  public Mono<TransportCall> findTransportCall(String UNLocationCode, String facilitySMDGCode,
+                                               DCSATransportType modeOfTransport,
+                                               String vesselIMONumber, String carrierServiceCode,
+                                               String importVoyageNumber, String exportVoyageNumber,
+                                               Integer transportCallSequenceNumber) {
+    return transportCallRepository.findAllTransportCall(
+        UNLocationCode,
+        facilitySMDGCode,
+        modeOfTransport,
+        vesselIMONumber,
+        carrierServiceCode,
+        importVoyageNumber,
+        exportVoyageNumber,
+        transportCallSequenceNumber
+      ).take(2)
+      .collectList()
+      .flatMap(transportCalls -> {
+        if (transportCalls.isEmpty()) {
+          return Mono.empty();
+        }
+        if (transportCalls.size() > 1) {
+          if (carrierServiceCode == null) {
+            if (transportCallSequenceNumber == null) {
+              return Mono.error(ConcreteRequestErrorMessageException.invalidInput("Ambiguous transport call; please define sequence number or/and carrier service code + voyage number"));
+            }
+            return Mono.error(ConcreteRequestErrorMessageException.invalidInput("Ambiguous transport call; please define carrier service code and voyage number"));
+          }
+          if (transportCallSequenceNumber == null) {
+            return Mono.error(ConcreteRequestErrorMessageException.invalidInput("Ambiguous transport call; please define sequence number"));
+          }
+          return Mono.error(new AssertionError("Internal error: Ambitious transport call; the result should be unique but is not"));
+        }
+        return Mono.just(transportCalls.get(0));
+      });
+  }
 
 }
