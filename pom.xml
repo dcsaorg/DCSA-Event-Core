@@ -23,7 +23,7 @@
 		<!-- End: Define DCSA-Event-Core version -->
 
 		<!-- Define DCSA-Core version -->
-		<dcsa.version>0.8.33</dcsa.version>
+		<dcsa.version>0.8.34</dcsa.version>
 		<dcsa.core.tag/>
 		<dcsa.artifacttype>-SNAPSHOT</dcsa.artifacttype>
 		<core.version>${dcsa.version}${dcsa.core.tag}${dcsa.artifacttype}</core.version>
