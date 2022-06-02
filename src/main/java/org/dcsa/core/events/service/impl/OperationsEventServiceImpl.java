@@ -5,7 +5,8 @@ import org.dcsa.core.events.model.OperationsEvent;
 import org.dcsa.core.events.model.UnmappedEvent;
 import org.dcsa.core.events.repository.OperationsEventRepository;
 import org.dcsa.core.events.repository.UnmappedEventRepository;
-import org.dcsa.core.events.service.*;
+import org.dcsa.core.events.service.OperationsEventService;
+import org.dcsa.core.events.service.TransportCallTOService;
 import org.dcsa.core.exception.CreateException;
 import org.dcsa.core.service.impl.QueryServiceImpl;
 import org.dcsa.skernel.service.LocationService;
@@ -24,7 +25,6 @@ public class OperationsEventServiceImpl extends QueryServiceImpl<OperationsEvent
     private final TransportCallTOService transportCallTOService;
     private final PartyService partyService;
     private final LocationService locationService;
-    private final TimestampDefinitionService timestampDefinitionService;
     private final UnmappedEventRepository unmappedEventRepository;
 
     @Override
@@ -100,7 +100,6 @@ public class OperationsEventServiceImpl extends QueryServiceImpl<OperationsEvent
                   return Mono.just(oe);
               })
               .flatMap(operationsEventRepository::save)
-              .flatMap(timestampDefinitionService::markOperationsEventAsTimestamp)
               .flatMap(
                       ope -> {
                           UnmappedEvent unmappedEvent = new UnmappedEvent();
