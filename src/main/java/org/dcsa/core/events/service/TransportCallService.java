@@ -17,4 +17,9 @@ public interface TransportCallService {
 
     Mono<TransportCall> create(TransportCall transportCall);
 
+  Mono<TransportCall> findTransportCall(String UNLocationCode, String facilitySMDGCode,
+                                        DCSATransportType modeOfTransport,
+                                        String vesselIMONumber, String carrierServiceCode,
+                                        String importVoyageNumber, String exportVoyageNumber,
+                                        Integer transportCallSequenceNumber);
 }
