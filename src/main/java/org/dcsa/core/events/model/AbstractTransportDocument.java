@@ -60,21 +60,6 @@ public abstract class AbstractTransportDocument extends AuditBase {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private UUID shippingInstructionID;
 
-  @Size(max = 35)
-  @Column("vessel_name")
-  private String vesselName;
-
-  @Size(max = 50)
-  @Column("export_voyage_number")
-  private String exportVoyageNumber;
-
-  @Column("declared_value_currency")
-  @Size(max = 3)
-  private String declaredValueCurrency;
-
-  @Column("declared_value")
-  private Float declaredValue;
-
   @Column("number_of_rider_pages")
   private Integer numberOfRiderPages;
 

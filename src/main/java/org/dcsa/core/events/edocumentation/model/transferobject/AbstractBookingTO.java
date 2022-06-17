@@ -6,6 +6,7 @@ import lombok.Data;
 import org.dcsa.core.events.model.enums.*;
 import org.dcsa.core.validator.EnumSubset;
 import org.dcsa.skernel.validator.ValidVesselIMONumber;
+import org.springframework.data.relational.core.mapping.Column;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -104,6 +105,11 @@ abstract class AbstractBookingTO {
 
   @Size(max = 50, message = "The attribute exportVoyageNumber has a max size of 50.")
   protected String exportVoyageNumber;
+
+  @Size(max = 3)
+  private String declaredValueCurrency;
+
+  private Float declaredValue;
 
   protected DCSATransportType preCarriageModeOfTransportCode;
 
