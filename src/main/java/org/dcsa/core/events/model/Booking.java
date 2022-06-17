@@ -128,6 +128,13 @@ public class Booking implements Persistable<UUID> {
   @Size(max = 50)
   private String exportVoyageNumber;
 
+  @Column("declared_value_currency")
+  @Size(max = 3)
+  private String declaredValueCurrency;
+
+  @Column("declared_value")
+  private Float declaredValue;
+
   @Column("place_of_issue")
   @Size(max = 100)
   private String placeOfIssueID;

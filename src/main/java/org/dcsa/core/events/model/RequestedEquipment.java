@@ -21,7 +21,7 @@ public class RequestedEquipment {
 
   @Size(max = 4)
   @Column("requested_equipment_sizetype")
-  private String requestedEquipmentSizetype;
+  private String requestedEquipmentSizeType;
 
   @Column("requested_equipment_units")
   private Integer requestedEquipmentUnits;
