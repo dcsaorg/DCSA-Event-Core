@@ -45,7 +45,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
 
   @NotNull
   @Column("is_shipped_onboard_type")
-  private Boolean isShippedOnboardType;
+  private Boolean isShippedOnBoardType;
 
   @Column("number_of_copies")
   private Integer numberOfCopies;
