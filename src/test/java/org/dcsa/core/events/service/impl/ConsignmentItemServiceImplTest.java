@@ -110,6 +110,7 @@ class ConsignmentItemServiceImplTest {
     cargoItem.setWeightUnit(WeightUnit.KGM);
     cargoItem.setVolume(400F);
     cargoItem.setVolumeUnit(VolumeUnit.MTQ);
+    cargoItem.setPackageNameOnBL("qweergyy");
 
     cargoLineItem = new CargoLineItem();
     cargoLineItem.setCargoItemID(cargoItem.getId());
@@ -167,6 +168,7 @@ class ConsignmentItemServiceImplTest {
     cargoItemTO.setNumberOfPackages(1);
     cargoItemTO.setReferences(List.of(referenceTO));
     cargoItemTO.setEquipmentReference(equipmentTO.getEquipmentReference());
+    cargoItemTO.setPackageNameOnBL("qweergyy");
 
     ConsignmentItemTO.ConsignmentItemTOBuilder consignmentItemTOBuilder =
         ConsignmentItemTO.builder();

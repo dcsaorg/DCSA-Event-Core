@@ -141,16 +141,6 @@ class UtilizedTransportEquipmentServiceImplTest {
     referenceTO.setReferenceValue("referenceValue");
     referenceTO.setReferenceType(ReferenceTypeCode.FF);
 
-    CargoItemTO cargoItemTO = new CargoItemTO();
-    cargoItemTO.setCargoLineItems(Collections.singletonList(cargoLineItemTO));
-    cargoItemTO.setWeight(100F);
-    cargoItemTO.setWeightUnit(WeightUnit.KGM);
-    cargoItemTO.setVolume(400F);
-    cargoItemTO.setVolumeUnit(VolumeUnit.MTQ);
-    cargoItemTO.setPackageCode("ABC");
-    cargoItemTO.setNumberOfPackages(1);
-    cargoItemTO.setReferences(List.of(referenceTO));
-
     SealTO sealTO = new SealTO();
     sealTO.setSealNumber("1");
     sealTO.setSealType(SealTypeCode.BLT);
