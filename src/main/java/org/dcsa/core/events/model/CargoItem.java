@@ -10,6 +10,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @Table("cargo_item")
@@ -30,4 +31,8 @@ public class CargoItem extends AbstractCargoItem {
 
   @Column("consignment_item_id")
   private UUID consignmentItemID;
+
+  @Size(max = 50)
+  @Column("package_name_on_bl")
+  private String packageNameOnBL;
 }

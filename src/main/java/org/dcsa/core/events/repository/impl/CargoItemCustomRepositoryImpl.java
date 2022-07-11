@@ -38,6 +38,7 @@ public class CargoItemCustomRepositoryImpl implements CargoItemCustomRepository 
               put("ci.number_of_packages", Column.create("number_of_packages", CARGO_ITEM_TABLE));
               put("ci.package_code", Column.create("package_code", CARGO_ITEM_TABLE));
               put("ci.utilized_transport_equipment_id", Column.create("utilized_transport_equipment_id", CARGO_ITEM_TABLE));
+              put("ci.package_name_on_bl", Column.create("package_name_on_bl", CARGO_ITEM_TABLE));
               put("ute.id", Column.create("id", UTILIZED_TRANSPORT_EQUIPMENT_TABLE));
               put("cli.cargo_line_item_id", Column.create("cargo_line_item_id", CARGO_LINE_ITEM_TABLE));
               put("cli.cargo_item_id", Column.create("cargo_item_id", CARGO_LINE_ITEM_TABLE));

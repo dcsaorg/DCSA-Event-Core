@@ -32,5 +32,8 @@ public class CargoItemTO {
   @Size(max = 3)
   private String packageCode;
 
+  @Size(max = 50)
+  private String packageNameOnBL;
+
   private List<ReferenceTO> references;
 }

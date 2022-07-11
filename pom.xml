@@ -17,7 +17,7 @@
 
 	<properties>
 		<!-- Define DCSA-Event-Core version -->
-		<revision>0.0.61</revision>
+		<revision>0.0.62</revision>
 		<sha1/>
 		<changelist>-SNAPSHOT</changelist>
 		<!-- End: Define DCSA-Event-Core version -->
