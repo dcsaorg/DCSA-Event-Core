@@ -10,5 +10,9 @@ public enum ReferenceTypeCode {
   CSI,
   BPR,
   BID,
-  EQ
+  EQ,
+  RUC,
+  DUE,
+  CER,
+  AES
 }
