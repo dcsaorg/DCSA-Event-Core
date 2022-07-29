@@ -22,7 +22,7 @@ public class ShipmentLocation {
   private UUID bookingID;
 
   @Column("location_id")
-  private String locationID;
+  private UUID locationID;
 
   @Column("shipment_location_type_code")
   private LocationType shipmentLocationTypeCode;

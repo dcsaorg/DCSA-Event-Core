@@ -68,7 +68,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   private Boolean areChargesDisplayedOnCopies;
 
   @Column("place_of_issue")
-  private String placeOfIssueID;
+  private UUID placeOfIssueID;
 
   @Column("transport_document_type_code")
   private TransportDocumentTypeCode transportDocumentTypeCode;
