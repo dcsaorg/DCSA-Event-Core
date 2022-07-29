@@ -41,7 +41,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @JsonIgnore
     @Column("event_location")
-    private String eventLocationID;
+    private UUID eventLocationID;
 
     @Column("port_call_phase_type_code")
     private PortCallPhaseTypeCode portCallPhaseTypeCode;
@@ -61,7 +61,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @JsonIgnore
     @Column("vessel_position")
-    private String vesselPositionID;
+    private UUID vesselPositionID;
 
     @Transient
     private TransportCallTO transportCall;
@@ -74,7 +74,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
 
     @JsonIgnore
     @Column("publisher")
-    private String publisherID;
+    private UUID publisherID;
 
     @Transient
     private PartyTO publisher;

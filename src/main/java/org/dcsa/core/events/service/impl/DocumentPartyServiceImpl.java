@@ -160,7 +160,7 @@ public class DocumentPartyServiceImpl implements DocumentPartyService {
   private DocumentParty getDocumentPartyByRefColumn(
       UUID id,
       ColumnReferenceType columnReferenceType,
-      String partyID,
+      UUID partyID,
       DocumentPartyTO documentPartyTO) {
     DocumentParty documentParty = new DocumentParty();
     documentParty.setPartyID(partyID);

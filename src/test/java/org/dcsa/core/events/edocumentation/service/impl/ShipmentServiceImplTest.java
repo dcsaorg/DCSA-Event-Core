@@ -89,7 +89,7 @@ class ShipmentServiceImplTest {
 
     shipmentLocation = new ShipmentLocation();
     shipmentLocation.setShipmentID(UUID.randomUUID());
-    shipmentLocation.setLocationID(UUID.randomUUID().toString());
+    shipmentLocation.setLocationID(UUID.randomUUID());
     shipmentLocation.setDisplayedName("Tokyo");
     shipmentLocation.setShipmentLocationTypeCode(LocationType.DRL);
 

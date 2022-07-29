@@ -14,7 +14,7 @@ public class DocumentParty {
   @Id private UUID id;
 
   @Column("party_id")
-  private String partyID;
+  private UUID partyID;
 
   @Column("shipping_instruction_id")
   private UUID shippingInstructionID;

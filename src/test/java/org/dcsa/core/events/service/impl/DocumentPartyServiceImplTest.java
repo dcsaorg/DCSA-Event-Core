@@ -115,13 +115,13 @@ class DocumentPartyServiceImplTest {
     address.setCountry("Denmark");
 
     party = new Party();
-    party.setId("a680fe72-503e-40b3-9cfc-dcadafdecf15");
+    party.setId(UUID.fromString("a680fe72-503e-40b3-9cfc-dcadafdecf15"));
     party.setPartyName("DCSA");
     party.setAddressID(address.getId());
 
     documentParty = new DocumentParty();
     documentParty.setId(UUID.fromString("3d9542f8-c362-4fa5-8902-90e30d87f1d4"));
-    documentParty.setPartyID("d04fb8c6-eb9c-474d-9cf7-86aa6bfcc2a2");
+    documentParty.setPartyID(UUID.fromString("d04fb8c6-eb9c-474d-9cf7-86aa6bfcc2a2"));
     documentParty.setPartyFunction(PartyFunction.DDS);
 
     partyIdentifyingCode = new PartyIdentifyingCode();

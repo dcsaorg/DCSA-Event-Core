@@ -94,7 +94,7 @@ public class Booking implements Persistable<UUID> {
 
   @Column("invoice_payable_at")
   @Size(max = 100)
-  private String invoicePayableAt;
+  private UUID invoicePayableAt;
 
   @Column("expected_departure_date")
   private LocalDate expectedDepartureDate;
@@ -137,7 +137,7 @@ public class Booking implements Persistable<UUID> {
 
   @Column("place_of_issue")
   @Size(max = 100)
-  private String placeOfIssueID;
+  private UUID placeOfIssueID;
 
   @JsonIgnore
   @Column("pre_carriage_mode_of_transport_code")
