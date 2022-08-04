@@ -40,7 +40,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     private PartyFunction publisherRole;
 
     @JsonIgnore
-    @Column("event_location")
+    @Column("event_location_id")
     private UUID eventLocationID;
 
     @Column("port_call_phase_type_code")
@@ -60,7 +60,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     private String delayReasonCode;
 
     @JsonIgnore
-    @Column("vessel_position")
+    @Column("vessel_position_id")
     private UUID vesselPositionID;
 
     @Transient
@@ -73,7 +73,7 @@ public class OperationsEvent extends Event implements TransportCallBasedEvent {
     private LocationTO vesselPosition;
 
     @JsonIgnore
-    @Column("publisher")
+    @Column("publisher_id")
     private UUID publisherID;
 
     @Transient
