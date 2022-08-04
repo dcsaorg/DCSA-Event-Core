@@ -37,6 +37,9 @@ public class EquipmentEvent extends Event implements TransportCallBasedEvent {
     @Column("transport_call_id")
     private UUID transportCallID;
 
+    @Column("event_location_id")
+    private UUID eventLocationID;
+
     @Transient
     private TransportCallTO transportCall;
 
