@@ -12,9 +12,9 @@ import java.util.UUID;
 @Table("transport_document")
 public class TransportDocument extends AbstractTransportDocument {
 
-    @Column("place_of_issue")
+    @Column("place_of_issue_id")
     private UUID placeOfIssue;
 
-    @Column("issuingParty")
+    @Column("issuing_party_id")
     private UUID issuingParty;
 }
