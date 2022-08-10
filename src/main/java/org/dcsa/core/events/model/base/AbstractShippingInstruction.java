@@ -67,7 +67,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("are_charges_displayed_on_copies")
   private Boolean areChargesDisplayedOnCopies;
 
-  @Column("place_of_issue")
+  @Column("place_of_issue_id")
   private UUID placeOfIssueID;
 
   @Column("transport_document_type_code")
@@ -89,7 +89,7 @@ public abstract class AbstractShippingInstruction extends AuditBase {
   @Column("displayed_name_for_place_of_delivery")
   private String displayedNameForPlaceOfDelivery;
 
-  @Column("amendment_to_transport_document")
+  @Column("amendment_to_transport_document_id")
   private UUID amendmentToTransportDocument;
 
   @Column("valid_until")
