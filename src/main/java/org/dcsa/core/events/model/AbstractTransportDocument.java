@@ -53,7 +53,7 @@ public abstract class AbstractTransportDocument extends AuditBase {
   @Column("number_of_originals")
   private Integer numberOfOriginals;
 
-  @Column("carrier")
+  @Column("carrier_id")
   private UUID carrier;
 
   @Column("shipping_instruction_id")
