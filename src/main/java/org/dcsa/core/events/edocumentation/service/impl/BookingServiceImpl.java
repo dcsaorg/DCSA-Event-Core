@@ -50,10 +50,10 @@ public class BookingServiceImpl implements BookingService {
               BookingTO bookingTO = bookingMapper.bookingToDTO(booking);
               return Mono.when(
                       locationService
-                          .fetchLocationByID(booking.getInvoicePayableAt())
+                          .fetchLocationByID(booking.getInvoicePayableAtId())
                           .doOnNext(bookingTO::setInvoicePayableAt),
                       locationService
-                          .fetchLocationByID(booking.getPlaceOfIssueID())
+                          .fetchLocationByID(booking.getPlaceOfIssueId())
                           .doOnNext(bookingTO::setPlaceOfIssue),
                       fetchCommoditiesByBookingID(booking.getId())
                           .doOnNext(bookingTO::setCommodities),

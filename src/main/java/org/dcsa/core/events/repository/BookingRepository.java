@@ -35,12 +35,12 @@ public interface BookingRepository
   Mono<Boolean> setVesselIDFor(UUID vesselId, UUID id);
 
   @Modifying
-  @Query("UPDATE booking SET invoice_payable_at = :invoicePayableAt where id = :id")
-  Mono<Boolean> setInvoicePayableAtFor(UUID invoicePayableAt, UUID id);
+  @Query("UPDATE booking SET invoice_payable_at_id = :invoicePayableAtId where id = :id")
+  Mono<Boolean> setInvoicePayableAtFor(UUID invoicePayableAtId, UUID id);
 
   @Modifying
-  @Query("UPDATE booking SET place_of_issue = :placeOfIssue where id = :id")
-  Mono<Boolean> setPlaceOfIssueIDFor(UUID placeOfIssue, UUID id);
+  @Query("UPDATE booking SET place_of_issue_id = :placeOfIssueId where id = :id")
+  Mono<Boolean> setPlaceOfIssueIDFor(UUID placeOfIssueId, UUID id);
 
   @Modifying
   @Query(
