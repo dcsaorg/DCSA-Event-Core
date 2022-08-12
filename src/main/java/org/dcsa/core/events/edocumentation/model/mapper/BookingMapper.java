@@ -8,14 +8,14 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
-  @Mapping(source = "invoicePayableAt", target = "invoicePayableAt.id")
+  @Mapping(source = "invoicePayableAtID", target = "invoicePayableAt.id")
   @Mapping(source = "placeOfIssueID", target = "placeOfIssue.id")
   @Mapping(source = "communicationChannelCode", target = "communicationChannelCode")
   @Mapping(source = "updatedDateTime", target = "bookingRequestUpdatedDateTime")
   @Mapping(source = "bookingRequestDateTime", target = "bookingRequestCreatedDateTime")
   BookingTO bookingToDTO(Booking booking);
 
-  @Mapping(source = "invoicePayableAt", target = "invoicePayableAt", ignore = true)
+  @Mapping(source = "invoicePayableAt", target = "invoicePayableAtID", ignore = true)
   @Mapping(source = "communicationChannelCode", target = "communicationChannelCode")
   @Mapping(source = "bookingRequestUpdatedDateTime", target = "updatedDateTime")
   @Mapping(source = "bookingRequestCreatedDateTime", target = "bookingRequestDateTime")
