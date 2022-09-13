@@ -92,7 +92,7 @@ public class Booking implements Persistable<UUID> {
   @Column("incoterms")
   private IncoTerms incoTerms;
 
-  @Column("invoice_payable_at")
+  @Column("invoice_payable_at_id")
   @Size(max = 100)
   private UUID invoicePayableAt;
 
@@ -124,18 +124,17 @@ public class Booking implements Persistable<UUID> {
   @Column("vessel_id")
   private UUID vesselId;
 
-  @Column("export_voyage_number")
-  @Size(max = 50)
-  private String exportVoyageNumber;
+  @Column("voyage_id")
+  private UUID voyageID;
 
-  @Column("declared_value_currency")
+  @Column("declared_value_currency_code")
   @Size(max = 3)
   private String declaredValueCurrency;
 
   @Column("declared_value")
   private Float declaredValue;
 
-  @Column("place_of_issue")
+  @Column("place_of_issue_id")
   @Size(max = 100)
   private UUID placeOfIssueID;
 
