@@ -60,4 +60,5 @@ public interface VoyageRepository extends ReactiveCrudRepository<Voyage, UUID> {
   Flux<String> findCarrierVoyageNumbersByTransportDocumentRef(String transportDocumentRef);
 
   Mono<Voyage> findByCarrierVoyageNumberAndServiceID(String carrierVoyageNumber, UUID serviceID);
+  Flux<Voyage> findByCarrierVoyageNumber(String carrierVoyageNumber);
 }
